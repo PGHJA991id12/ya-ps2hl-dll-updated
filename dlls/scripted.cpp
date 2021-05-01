@@ -737,6 +737,7 @@ void CCineMonster :: SequenceDone ( CBaseMonster *pMonster )
 	}
 
 	// PS2HL - fix epilepsy for clip_scientist on t0a0
+	// PS2HLU - fixes rosenberg repeating animations when using the radio in ht03uplink
 	if (pev->spawnflags & 0x400)
 		pMonster->m_pCine->m_iszPlay = 0;
 

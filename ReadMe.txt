@@ -12,7 +12,8 @@ It contains some fixes and hacks to the original code as well as new entities:
 "trigger_player_islave"	- detects "alien mode"
 and Blue Shift entities: vest, helmet, Rosenberg (for PS2 mod devs)
 
-All changes to the original code were marked with "PS2HL" comments. File names of a new entities are starting with "ps2hl_" prefix.
+All of supadupaplex's changes to the original code were marked with "PS2HL" comments. File names of supadupaplex's new entities are starting with "ps2hl_" prefix.
+All updated changes to original & supadupaplex's code were marked with "PS2HLU" comments. File names of my new entities are starting with "ps2hlu_" prefix.
 
 Credits:
 Based on HL SDK v2.3 fix for Visual Studio 2008 by Gary_McTaggart

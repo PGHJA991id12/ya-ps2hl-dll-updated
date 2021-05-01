@@ -41,6 +41,7 @@ void CItemGeneric::Spawn(void)
 	UTIL_SetSize(pev, Zero, Zero);
 	pev->solid = SOLID_NOT;
 	
+	// PS2HLU Drop to floor flag, required by Decay
 	if (FBitSet(pev->spawnflags, SF_ITEM_GENERIC_DROP_TO_FLOOR))
 	{
 		if( DROP_TO_FLOOR(ENT( pev ) ) == 0 )
