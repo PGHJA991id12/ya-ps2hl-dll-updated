@@ -18,6 +18,7 @@ Based on this article https://www.moddb.com/games/half-life/tutorials/where-is-p
 #include "util.h"		// Required Consts & Macros
 #include "cbase.h"		// Required for CPointEntity
 
+#define SF_ITEM_GENERIC_DROP_TO_FLOOR 1
 #define ITGN_DELAY_THINK 0.1f
 
 class CItemGeneric : public CBaseAnimating

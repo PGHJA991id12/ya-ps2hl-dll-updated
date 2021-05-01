@@ -40,6 +40,15 @@ void CItemGeneric::Spawn(void)
 	Zero.x = Zero.y = Zero.z = 0;
 	UTIL_SetSize(pev, Zero, Zero);
 	pev->solid = SOLID_NOT;
+	
+	if (FBitSet(pev->spawnflags, SF_ITEM_GENERIC_DROP_TO_FLOOR))
+	{
+		if( DROP_TO_FLOOR(ENT( pev ) ) == 0 )
+		{
+			ALERT(at_error, "Item %s fell out of level at %f,%f,%f\n", STRING( pev->classname ), pev->origin.x, pev->origin.y, pev->origin.z);
+			UTIL_Remove( this );
+		}
+	}
 
 	// Set think delay
 	pev->nextthink = gpGlobals->time + ITGN_DELAY_THINK;
