@@ -340,3 +340,274 @@ class CItemLongJump : public CItem
 };
 
 LINK_ENTITY_TO_CLASS( item_longjump, CItemLongJump );
+
+// PS2HLU Focus emitter
+
+// TODO:
+// Make shiny thingy on top face current target with smooth transition
+// Clean up this mess, and give the focus emitter its own file
+
+// This is a complete mess... This definetly needs a rewrite soon!
+
+typedef enum
+{
+FOCUSEMITTER_IDLE_CLOSED =0,
+FOCUSEMITTER_DEPLOY,
+FOCUSEMITTER_IDLE_OPEN,
+FOCUSEMITTER_BROKEN1,
+FOCUSEMITTER_BROKEN2,
+FOCUSEMITTER_DEATH,
+} FOCUSEMITTER_ANIM;
+
+class CFocusEmitter : public CBaseMonster
+{
+public:
+	void KeyValue( KeyValueData *pkvd );
+	void Spawn();
+	void Precache();
+	void Killed( entvars_t *pevAttacker, int iGib );
+	void EXPORT DyingThink(void);
+	void EXPORT EmitterThink(void);
+	void TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage );
+	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+	void TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType );
+	void EXPORT Animate();
+	int Classify();
+	int  BloodColor( void ) { return DONT_BLEED; }
+	void ChangeSequence( int NewSequence );
+	virtual int Save( CSave &save );
+	virtual int Restore( CRestore &restore );
+
+	static TYPEDESCRIPTION m_SaveData[];
+
+	string_t deploy_target;
+	string_t death_target;
+	int m_Emitterbeam;
+	//int m_iExplode;
+	CBeam *m_pBeam;
+};
+
+void CFocusEmitter::Precache()
+{
+PRECACHE_MODEL( "models/focus_emitter.mdl" );
+//m_Emitterbeam = PRECACHE_MODEL( "sprites/ht_laser.spr" );
+PRECACHE_MODEL( "sprites/ht_laser.spr" );
+//m_iExplode = PRECACHE_MODEL( "sprites/fexplo.spr" );
+}
+
+void CFocusEmitter::Spawn()
+{
+	Precache();
+
+	SET_MODEL(ENT(pev), "models/focus_emitter.mdl");
+
+	//pev->solid = SOLID_NOT; // this one is old
+	// BBox
+	Vector Zero;
+	Zero.x = Zero.y = Zero.z = 0;
+	UTIL_SetSize(pev, Zero, Zero);
+	pev->solid = SOLID_NOT;
+	// used for sequence handleing
+	//SetSequenceBox(); // This was a temponary solution
+	SetBodygroup( 2,2 );
+	SetThink(&CFocusEmitter::EmitterThink);
+
+	ChangeSequence( FOCUSEMITTER_IDLE_CLOSED );
+	//pev->effects |= EF_NOINTERP;
+	pev->effects |= EF_DIMLIGHT; // Temponary solution, need a better way to light this up
+	pev->takedamage = DAMAGE_NO;
+
+	pev->nextthink = -1;
+	
+	// What was I thinking when I wrote this? This is a mess, will require a complete rewrite sometime soon.
+}
+
+void CFocusEmitter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
+{
+	if (pev->takedamage == DAMAGE_NO) {
+	ChangeSequence(FOCUSEMITTER_DEPLOY);
+	pev->nextthink = gpGlobals->time + 0.1;
+	} else {
+		return;
+	}
+}
+
+void CFocusEmitter::EmitterThink (void)
+{
+	StudioFrameAdvance( 0 );
+	SetThink(&CFocusEmitter::EmitterThink);
+	pev->nextthink = gpGlobals->time + 0.1;
+
+	switch (pev->sequence)
+	{
+	case FOCUSEMITTER_DEPLOY:
+		//wait for opening animation
+		if (m_fSequenceFinished)
+		{
+		FireTargets( STRING( deploy_target ), this, this, USE_TOGGLE, 0 );
+		ChangeSequence( FOCUSEMITTER_IDLE_OPEN );
+		pev->takedamage = DAMAGE_YES;
+
+		Vector vecpevpos, vecpevang;
+		GetAttachment( 1, vecpevpos, vecpevang );
+
+		m_pBeam = CBeam::BeamCreate("sprites/ht_laser.spr", 40 );
+		m_pBeam->PointEntInit( vecpevpos, entindex() );
+		m_pBeam->SetEndAttachment( 1 );
+		m_pBeam->SetColor( 216, 216, 216 );
+		m_pBeam->SetBrightness( 255 );
+		m_pBeam->SetScrollRate( 35 );
+		}
+		break;
+	case FOCUSEMITTER_DEATH:
+		if (m_fSequenceFinished)
+			FireTargets( STRING( death_target ), this, this, USE_TOGGLE, 0 );
+			break;
+	default:
+		// Do nothing
+		break;
+	}
+
+}
+
+void CFocusEmitter::TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType )
+{
+	UTIL_Ricochet( ptr->vecEndPos, RANDOM_FLOAT(1.0, 2.0) ); // Make the focus emitter immune to all attacks except lasers!
+}
+
+void CFocusEmitter::TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage )
+{
+
+	/*if (bitsDamageType & DMG_LASER)
+	{
+		flDamage *= 2;
+	}*/
+		/*if (pevInflictor->owner == edict())
+		return 0;*/
+
+		if (pev->health <= 4)
+		{
+		ChangeSequence( FOCUSEMITTER_BROKEN1 );
+		}
+		else if (pev->health <= 2)
+		{
+		ChangeSequence( FOCUSEMITTER_BROKEN2 );
+		} // I have no idea how this was meant to work.
+}
+
+void CFocusEmitter::Killed( entvars_t *pevAttacker, int iGib )
+{
+	ChangeSequence( FOCUSEMITTER_DEATH );
+	SetThink(&CFocusEmitter::DyingThink);
+	pev->nextthink = gpGlobals->time + 0.1;
+	pev->takedamage = DAMAGE_NO;
+	if (m_pBeam)
+	{
+		UTIL_Remove( m_pBeam );
+		m_pBeam = NULL;
+	}
+}
+
+void CFocusEmitter::DyingThink(void)
+{
+	/*		// fireball
+	MESSAGE_BEGIN( MSG_PVS, SVC_TEMPENTITY, pev->origin );
+			WRITE_BYTE( TE_SPRITE );
+			WRITE_COORD( pev->origin.x );
+			WRITE_COORD( pev->origin.y + 5 );
+			WRITE_COORD( pev->origin.z);
+			WRITE_SHORT( m_iExplode );
+			WRITE_BYTE( 120 ); // scale * 10
+			WRITE_BYTE( 255 ); // brightness
+		MESSAGE_END();*/
+		
+		// big smoke
+		MESSAGE_BEGIN( MSG_PVS, SVC_TEMPENTITY, pev->origin );
+			WRITE_BYTE( TE_SMOKE );
+			WRITE_COORD( pev->origin.x );
+			WRITE_COORD( pev->origin.y + 5 );
+			WRITE_COORD( pev->origin.z );
+			WRITE_SHORT( g_sModelIndexSmoke );
+			WRITE_BYTE( 250 ); // scale * 10
+			WRITE_BYTE( 5  ); // framerate
+		MESSAGE_END();
+
+		FireTargets( STRING( death_target ), this, this, USE_TOGGLE, 0 );
+}
+
+int CFocusEmitter::Classify()
+{
+	return CLASS_NONE;
+}
+
+
+
+
+TYPEDESCRIPTION CFocusEmitter::m_SaveData[] =
+{
+	DEFINE_FIELD( CFocusEmitter, deploy_target, FIELD_STRING ),
+	DEFINE_FIELD( CFocusEmitter, death_target, FIELD_STRING ),
+	DEFINE_FIELD( CFocusEmitter, m_pBeam, FIELD_CLASSPTR),
+};
+
+IMPLEMENT_SAVERESTORE( CFocusEmitter, CBaseMonster )
+
+LINK_ENTITY_TO_CLASS( item_focusemitter, CFocusEmitter )
+
+void CFocusEmitter::KeyValue(KeyValueData *pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "deploy_target"))
+	{
+		deploy_target = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "death_target"))
+	{
+		death_target = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+
+	else
+		CBaseMonster::KeyValue( pkvd );
+}
+
+void CFocusEmitter::Animate()
+{
+/*		//ALERT(at_console, "%s at frame %f\n", STRING( pev->classname ), pev->frame );
+	   SetThink(&CFocusEmitter::Animate);
+    pev->nextthink = gpGlobals->time+0.01; // 0.01
+	if ( pev->frame > 100 )
+	{
+		//ALERT(at_console, "sequence finished!\n");
+		if (pev->sequence = FOCUSEMITTER_DEPLOY)
+		{
+			FireTargets( STRING( deploy_target ), this, this, USE_TOGGLE, 0 );
+			pev->frame = 0;
+			pev->sequence = 2;
+			pev->framerate = 0;
+		}
+	} else {
+	StudioFrameAdvance( );
+	    pev->frame >255? pev->frame=0:pev->frame++;
+	//&CFocusEmitter::Animate;
+	}*/
+
+
+	  SetThink(&CFocusEmitter::Animate);
+   // pev->nextthink = gpGlobals->time+0.01; // 0.01
+	if ( m_fSequenceFinished )
+	{
+	FireTargets( STRING( deploy_target ), this, this, USE_TOGGLE, 0 );
+	} else {
+	StudioFrameAdvance(0.1);
+	pev->nextthink = gpGlobals->time + 0.1; // 0.01
+	}
+}
+
+void CFocusEmitter::ChangeSequence(int NewSequence)
+{
+		//prepare sequence
+		pev->sequence = NewSequence;
+		pev->frame = 0;
+		ResetSequenceInfo(); 
+}
