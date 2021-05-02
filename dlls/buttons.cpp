@@ -906,6 +906,8 @@ public:
 	vec3_t	m_start;
 	vec3_t	m_end;
 	int		m_sounds;
+	// PS2HLU
+	string_t endlocktarget;
 };
 TYPEDESCRIPTION CMomentaryRotButton::m_SaveData[] =
 {
@@ -915,6 +917,7 @@ TYPEDESCRIPTION CMomentaryRotButton::m_SaveData[] =
 	DEFINE_FIELD( CMomentaryRotButton, m_start, FIELD_VECTOR ),
 	DEFINE_FIELD( CMomentaryRotButton, m_end, FIELD_VECTOR ),
 	DEFINE_FIELD( CMomentaryRotButton, m_sounds, FIELD_INTEGER ),
+	DEFINE_FIELD( CMomentaryRotButton, endlocktarget, FIELD_STRING ), // PS2HLU
 };
 
 IMPLEMENT_SAVERESTORE( CMomentaryRotButton, CBaseToggle );
@@ -967,6 +970,11 @@ void CMomentaryRotButton::KeyValue( KeyValueData *pkvd )
 	else if (FStrEq(pkvd->szKeyName, "sounds"))
 	{
 		m_sounds = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "endlocktarget")) //PS2HLU
+	{
+		endlocktarget = ALLOC_STRING(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else
@@ -1054,6 +1062,16 @@ void CMomentaryRotButton::UpdateSelf( float value )
 
 void CMomentaryRotButton::UpdateTarget( float value )
 {
+	//PS2HLU
+	// This fires the target when valve/button is fully turned
+		if (pev->spawnflags & 65536)
+		if ( m_end == pev->angles &&  m_lastUsed == 1 ) {
+			// Fire the endlocktarget upon locking
+			if( endlocktarget ) // TODO: remove this if it breaks firing endlocktarget
+			FireTargets( STRING( endlocktarget ), this, this, USE_TOGGLE, 0 );
+			endlocktarget = 0;
+		}
+
 	if (!FStringNull(pev->target))
 	{
 		edict_t* pentTarget	= NULL;
@@ -1087,6 +1105,16 @@ void CMomentaryRotButton::Off( void )
 
 void CMomentaryRotButton::Return( void )
 {
+	// PS2HLU This blocks the valve/button from returning when flag is checked
+	// This button return blocking with the firing was only used in ht04dampen IIRC
+	if (pev->spawnflags & 65536)
+		if ( m_end == pev->angles &&  m_lastUsed == 0 )
+		return;
+
+	if (pev->spawnflags & 65536)
+	if ( m_end == pev->angles &&  m_lastUsed == 1 ) // This is here to prevent button from returning in some weird cases
+	return;
+
 	float value = CBaseToggle::AxisDelta( pev->spawnflags, pev->angles, m_start ) / m_flMoveDistance;
 
 	UpdateAllButtons( value, 0 );	// This will end up calling UpdateSelfReturn() n times, but it still works right
