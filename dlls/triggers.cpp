@@ -300,6 +300,8 @@ private:
 };
 LINK_ENTITY_TO_CLASS( multi_manager, CMultiManager );
 
+LINK_ENTITY_TO_CLASS( multi_kill_manager, CMultiManager ); //PS2HLU Link new entity
+
 // Global Savedata for multi_manager
 TYPEDESCRIPTION	CMultiManager::m_SaveData[] = 
 {
@@ -319,7 +321,10 @@ void CMultiManager :: KeyValue( KeyValueData *pkvd )
 	// if ( !pkvd->fHandled )
 	// ... etc.
 
-	if (FStrEq(pkvd->szKeyName, "wait"))
+	if (FStrEq(pkvd->szKeyName, "killtarget")) // PS2HLU I have no idea if this is used anywhere, I will leave this here for now
+		pkvd->fHandled = TRUE;					// Also killtarget was used in the 2008 PC port of decay iirc. 
+	
+	else if (FStrEq(pkvd->szKeyName, "wait"))
 	{
 		m_flWait = atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
@@ -391,7 +396,18 @@ void CMultiManager :: ManagerThink ( void )
 	time = gpGlobals->time - m_startTime;
 	while ( m_index < m_cTargets && m_flTargetDelay[ m_index ] <= time )
 	{
+			if( FClassnameIs( pev, "multi_kill_manager" ) ) //PS2HLU Remove all entities listed in multi_kill_manager
+		{
+			CBaseEntity *m_pKillEnt;
+			m_pKillEnt = UTIL_FindEntityByTargetname( NULL, STRING( m_iTargetName[ m_index ] ) );
+				UTIL_Remove( m_pKillEnt );
+
+		//ALERT(at_console, "multi_kill_manager ran task\n" );
+
+		} else {
 		FireTargets( STRING( m_iTargetName[ m_index ] ), m_hActivator, this, USE_TOGGLE, 0 );
+		}
+
 		m_index++;
 	}
 
@@ -514,6 +530,10 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 				pevTarget->rendercolor = pev->rendercolor;
 		}
 	}
+	
+	// PS2HLU TODO:
+	// Make netname keyvalue search for a group of other entities that all have the same netname & change their rendering.
+	
 }
 
 
@@ -2464,6 +2484,9 @@ void CTriggerCamera::Move()
 	float fraction = 2 * gpGlobals->frametime;
 	pev->velocity = ((pev->movedir * pev->speed) * fraction) + (pev->velocity * (1-fraction));
 }
+
+// PS2HLU trigger_bit & trigger_bit_counter
+// These entities are used in ht11lasers for the laser control panel
 
 class CTriggerBit : public CBaseDelay
 {
