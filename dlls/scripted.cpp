@@ -208,7 +208,7 @@ void CCineMonster :: Spawn( void )
 
 				ALERT(at_console, "\n", pTarget->pev->sequence);
 
-				/*// Save data to external file
+				// Save data to external file
 				if (ps2hl_debug.value != 0)
 				{
 					FILE * ptrFile;
@@ -241,7 +241,7 @@ void CCineMonster :: Spawn( void )
 					fputc(']', ptrFile);
 					fputc('\n', ptrFile);
 					fclose(ptrFile);
-				}*/
+				}
 			}
 		}
 	}
@@ -1431,7 +1431,7 @@ void CFurniture :: Spawn( )
 //	SetThink (WalkMonsterDelay);
 
 	// PS2HL - warning about monster_furniture (it's glitched in PS2HL)
-	/*if (ps2hl_precache.value != 0)
+	if (ps2hl_precache.value != 0)
 	{
 		ALERT(at_console, "\n\n===== WARNING =====\nmonster_furniture entity found: %s\n\n\n", STRING(pev->targetname));
 
@@ -1450,7 +1450,7 @@ void CFurniture :: Spawn( )
 				fclose(ptrFile);
 			}
 		}
-	}*/
+	}
 
 	ResetSequenceInfo( );
 	pev->frame = 0;
