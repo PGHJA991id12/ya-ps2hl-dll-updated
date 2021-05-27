@@ -25,7 +25,9 @@
 #include	"skill.h"
 #include	"game.h"
 #include	"items.h"
+#ifndef NO_VOICEGAMEMGR //PS2HLU MSVC 6.0 Support
 #include	"voice_gamemgr.h"
+#endif
 #include	"hltv.h"
 
 extern DLL_GLOBAL CGameRules	*g_pGameRules;
@@ -43,6 +45,8 @@ extern int g_teamplay;
 
 float g_flIntermissionStartTime = 0;
 
+// PS2HLU MSVC 6.0 support
+#ifndef NO_VOICEGAMEMGR
 CVoiceGameMgr	g_VoiceGameMgr;
 
 class CMultiplayGameMgrHelper : public IVoiceGameMgrHelper
@@ -62,6 +66,7 @@ public:
 	}
 };
 static CMultiplayGameMgrHelper g_GameMgrHelper;
+#endif
 
 //*********************************************************
 // Rules for the half-life multiplayer game.
@@ -69,7 +74,10 @@ static CMultiplayGameMgrHelper g_GameMgrHelper;
 
 CHalfLifeMultiplay :: CHalfLifeMultiplay()
 {
+	// PS2HLU MSVC 6.0 SUPPORT
+	#ifndef NO_VOICEGAMEMGR
 	g_VoiceGameMgr.Init(&g_GameMgrHelper, gpGlobals->maxClients);
+	#endif
 
 	RefreshSkillData();
 	m_flIntermissionEndTime = 0;
@@ -116,8 +124,11 @@ CHalfLifeMultiplay :: CHalfLifeMultiplay()
 
 BOOL CHalfLifeMultiplay::ClientCommand( CBasePlayer *pPlayer, const char *pcmd )
 {
+	// PS2HLU MSVC 6.0 Support
+	#ifndef NO_VOICEGAMEMGR
 	if(g_VoiceGameMgr.ClientCommand(pPlayer, pcmd))
 		return TRUE;
+	#endif
 
 	return CGameRules::ClientCommand(pPlayer, pcmd);
 }
@@ -186,7 +197,10 @@ extern cvar_t mp_chattime;
 //=========================================================
 void CHalfLifeMultiplay :: Think ( void )
 {
+	// PS2HLU MSVC 6.0 support
+	#ifndef NO_VOICEGAMEMGR
 	g_VoiceGameMgr.Update(gpGlobals->frametime);
+	#endif
 
 	///// Check game rules /////
 	static int last_frags;
@@ -397,7 +411,11 @@ BOOL CHalfLifeMultiplay :: GetNextBestWeapon( CBasePlayer *pPlayer, CBasePlayerI
 //=========================================================
 BOOL CHalfLifeMultiplay :: ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ] )
 {
+	// PS2HLU MSVC 6.0 Support
+	#ifndef NO_VOICEGAMEMGR
 	g_VoiceGameMgr.ClientConnected(pEntity);
+	#endif
+
 	return TRUE;
 }
 
