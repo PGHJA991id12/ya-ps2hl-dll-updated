@@ -2732,8 +2732,8 @@ void CGraph::HashChoosePrimes(int TableSize)
     // Pick a set primes that are evenly spaced from (0 to LargestPrime)
     // We divide this interval into 16 equal sized zones. We want to find
     // one prime number that best represents that zone.
-	
-    // PS2HLU Removed iPrime redefinition for MSVC 6.0 support
+    //
+	int iPrime;
     for (int iZone = 1, iPrime = 0; iPrime < 16; iZone += Spacing)
     {
         // Search for a prime number that is less than the target zone

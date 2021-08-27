@@ -19,7 +19,6 @@ Credits:
 Based on HL SDK v2.3 fix for Visual Studio 2008 by Gary_McTaggart
 Code for Blue Shift entities was borrowed from here: https://github.com/FWGS/hlsdk-xash3d/blob/blueshift/dlls/
 Code for some Decay entities was borrowed from here: https://github.com/FWGS/hlsdk-xash3d/tree/decay-pc/dlls/
-Code for MSVC 6.0 support was borrowed from here: https://github.com/FWGS/hlsdk-xash3d/
 
 Useful tutorials that helped me to get started:
 https://www.moddb.com/games/half-life/tutorials/introduction-to-goldsrc-programming-setting-up-visual-studio
