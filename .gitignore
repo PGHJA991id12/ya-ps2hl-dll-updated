@@ -1,2 +1,9 @@
 *.dll
 *.bat
+*.pdb
+*.ncb
+*.opt
+*.dsp
+*.dsw
+*.plg
+*.so
