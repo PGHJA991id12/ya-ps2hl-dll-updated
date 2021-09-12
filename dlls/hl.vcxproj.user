@@ -7,14 +7,14 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommand>D:\Games\HL\Xash3D\hl.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-game ps2hl -dev -console +map c1a0d</LocalDebuggerCommandArguments>
-    <LocalDebuggerWorkingDirectory>D:\Games\HL\Xash3D</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommand>E:\team fortess 2\steamapps\common\Half-Life\hl.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-game ps2hlu -dev -console +map c1a0d</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>E:\team fortess 2\steamapps\common\Half-Life</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LocalDebuggerCommand>D:\Games\HL\Xash3D\hl.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-game ps2hl -dev -console</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommand>E:\team fortess 2\steamapps\common\Half-Life\hl.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-game ps2hlu -dev -console</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>..\..\..\..</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

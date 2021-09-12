@@ -7,3 +7,11 @@
 *.dsw
 *.plg
 *.so
+*.obj
+*.tlog
+*.suo
+*.log
+*.lib
+*.map
+*.exp
+*.htm
