@@ -531,8 +531,31 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 		}
 	}
 	
-	// PS2HLU TODO:
-	// Make netname keyvalue search for a group of other entities that all have the same netname & change their rendering.
+	// PS2HLU
+	// Searches for a group of other entities that all have the same netname & changes their rendering.
+
+	if (!FStringNull(pev->netname))
+	{
+		edict_t* pentTarget = NULL;
+		pentTarget = FIND_ENTITY_BY_STRING(NULL, "netname", STRING(pev->netname));
+		while (pentTarget)
+		{
+			if (FNullEnt(pentTarget))
+				break;
+
+			entvars_t *pevNetname = VARS(pentTarget);
+			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKFX))
+				pevNetname->renderfx = pev->renderfx;
+			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKAMT))
+				pevNetname->renderamt = pev->renderamt;
+			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKMODE))
+				pevNetname->rendermode = pev->rendermode;
+			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKCOLOR))
+				pevNetname->rendercolor = pev->rendercolor;
+
+			pentTarget = FIND_ENTITY_BY_STRING(pentTarget, "netname", STRING(pev->netname));
+		}
+	}
 	
 }
 
@@ -2594,4 +2617,183 @@ void CTriggerBitCounter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE
 	}
 	else
 		pev->skin = newState;
+}
+
+#include "shake.h"
+
+// PS2HLU
+// trigger_enddecay used to end missions
+
+#define SF_NOLEVELCHANGE 2
+
+class CTriggerEndDecay : public CBaseTrigger
+{
+public:
+	void KeyValue(KeyValueData *pkvd);
+	void Spawn();
+	void EXPORT EndDecayUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void EXPORT EndDecayThink();
+	void EXPORT Changelevel();
+	void EXPORT EndDecayTouch(CBaseEntity *pOther);
+private:
+	BOOL m_bIsSuccess;
+	int m_iKills[3];
+	int m_iWounds[3];
+	float m_flAccuracy[3];
+	int m_Nextmap; //string_t
+};
+
+LINK_ENTITY_TO_CLASS(trigger_enddecay, CTriggerEndDecay)
+
+void CTriggerEndDecay::KeyValue(KeyValueData *pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "success"))
+	{
+		m_bIsSuccess = (atoi(pkvd->szValue) == TRUE);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "woundsa"))
+	{
+		m_iWounds[0] = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "map"))
+	{
+		m_Nextmap = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "woundsb"))
+	{
+		m_iWounds[1] = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "woundsc"))
+	{
+		m_iWounds[2] = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "killsa"))
+	{
+		m_iKills[0] = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "killsb"))
+	{
+		m_iKills[1] = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "killsc"))
+	{
+		m_iKills[2] = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "accuracya"))
+	{
+		m_flAccuracy[0] = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "accuracyb"))
+	{
+		m_flAccuracy[1] = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "accuracyc"))
+	{
+		m_flAccuracy[2] = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "message"))
+	{
+		pev->message = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else
+		CBaseTrigger::KeyValue(pkvd);
+}
+
+void CTriggerEndDecay::Spawn()
+{
+	/*if( g_pGameRules->IsDeathmatch() )
+	{
+		REMOVE_ENTITY( ENT( pev ) );
+		return;
+	}*/
+
+	InitTrigger();
+
+	SetThink(&CBaseEntity::SUB_DoNothing);
+	SetUse(&CTriggerEndDecay::EndDecayUse);
+
+	// If it is a "use only" trigger, then don't set the touch function.
+	if (!(pev->spawnflags & SF_ENDSECTION_USEONLY))
+		SetTouch(&CTriggerEndDecay::EndDecayTouch);
+}
+
+void CTriggerEndDecay::EndDecayUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
+{
+	CBasePlayer *pPlayer = NULL;
+	pPlayer = (CBasePlayer*)UTIL_FindEntityByClassname(pPlayer, "player");
+	if (!pPlayer)
+		return;
+	if (!FNullEnt(FIND_CLIENT_IN_PVS(pPlayer->edict())))
+	{
+		pPlayer->EnableControl(FALSE);
+		UTIL_ScreenFadeAll(g_vecZero, 7.0f, 3.0f, 255, FFADE_OUT);
+		//UTIL_ShowMessageAll( STRING( pev->message ) );
+		if (pev->message)
+		{
+			UTIL_ShowMessageAll(STRING(pev->message));
+			//g_engfuncs.pfnEndSection(STRING(pev->message));
+		}
+		SetThink(&CTriggerEndDecay::Changelevel);
+		pev->nextthink = gpGlobals->time + 7.5;
+	}
+	else
+		return;
+
+}
+
+void CTriggerEndDecay::EndDecayTouch(CBaseEntity *pOther)
+{
+	// Only save on clients
+	if (!pOther->IsNetClient())
+		return;
+
+	SetTouch(NULL);
+	EndDecayUse(pOther, pOther, USE_ON, 1);
+}
+
+void CTriggerEndDecay::EndDecayThink()
+{
+	/*UTIL_ScreenFadeAll( g_vecZero, 7.0f, 3.0f, 255, FFADE_OUT );
+	UTIL_ShowMessageAll( STRING( pev->message ) );
+
+	char m_Nextmap[256];
+
+	pev->nextthink = gpGlobals->time + 7.0f;
+		sprintf( m_Nextmap, "changelevel %s\n", STRING(pev->netname) );
+		SERVER_COMMAND( m_Nextmap );*/
+}
+
+void CTriggerEndDecay::Changelevel()
+{
+	if (pev->spawnflags & SF_NOLEVELCHANGE)
+		return;
+
+	if (m_bIsSuccess != 1)
+	{
+		//CHANGE_LEVEL((char *)gpGlobals->mapname, NULL);
+		SERVER_COMMAND("restart\n");
+	}
+	else
+	{
+		if (m_Nextmap) {
+			char szMap[128];
+			strcpy(szMap, STRING(m_Nextmap));
+			CHANGE_LEVEL(szMap, NULL);
+		}
+		else {
+			g_engfuncs.pfnEndSection(STRING(pev->message));
+		}
+	}
 }

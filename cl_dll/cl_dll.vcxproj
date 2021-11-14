@@ -53,7 +53,7 @@
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>E:\team fortess 2\steamapps\common\Half-Life\ps2hlu\cl_dlls</OutDir>
+    <OutDir>E:\team fortess 2\steamapps\common\Half-Life\ps2hlu\cl_dlls\</OutDir>
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>

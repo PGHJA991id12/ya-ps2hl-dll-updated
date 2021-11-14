@@ -9,6 +9,9 @@
       <UniqueIdentifier>{bd3e5f1a-8eec-4e16-8750-27cd0296c164}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;fi;fd</Extensions>
     </Filter>
+    <Filter Include="Source Files\decay">
+      <UniqueIdentifier>{b7377a46-8c23-4dd4-8785-51f9b6c600a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aflock.cpp">
