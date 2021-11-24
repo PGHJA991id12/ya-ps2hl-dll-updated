@@ -1183,6 +1183,16 @@ int CStudioModelRenderer::StudioDrawModel( int flags )
 		lighting.plightvec = dir;
 		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting );
 
+		// PS2HLU
+		// Fullbright model rendering
+		// Thanks to Admer456 for helping me with this
+		if (m_pCurrentEntity->curstate.renderfx == kRenderFxFullbright)
+		{
+			lighting.color = Vector(1.0f, 1.0f, 1.0f);
+			lighting.ambientlight = 255;
+			lighting.shadelight = 0;
+		}
+
 		IEngineStudio.StudioEntityLight( &lighting );
 
 		// model and frame independant

@@ -293,7 +293,7 @@ BOOL CHalfLifeMultiplay::IsDeathmatch( void )
 //=========================================================
 BOOL CHalfLifeMultiplay::IsCoOp( void )
 {
-	return gpGlobals->coop;
+	return gpGlobals->coop ? TRUE : FALSE;
 }
 
 //=========================================================

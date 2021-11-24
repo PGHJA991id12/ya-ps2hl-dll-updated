@@ -313,6 +313,15 @@ CGameRules *InstallGameRules( void )
 	SERVER_COMMAND( "exec game.cfg\n" );
 	SERVER_EXECUTE( );
 
+	// PS2HLU
+	// Enables custom game mode for decay
+	// The 2008 PC port map extension is supported too
+	
+	const char *szMapName = (STRING(gpGlobals->mapname));
+
+	if (strncmp(szMapName, "ht", 2) == 0 || strncmp(szMapName, "dy_", 3) == 0)
+		return new CHalfLifeCoop();
+
 	if ( !gpGlobals->deathmatch )
 	{
 		// generic half-life
@@ -337,6 +346,18 @@ CGameRules *InstallGameRules( void )
 		else
 		{
 			// vanilla deathmatch??
+			g_teamplay = 0;
+			return new CHalfLifeMultiplay;
+		}
+		if ((int)gpGlobals->coop == 1)
+		{
+			// vanilla deathmatch
+			g_teamplay = 0;
+			return new CHalfLifeMultiplay;
+		}
+		else
+		{
+			// vanilla deathmatch
 			g_teamplay = 0;
 			return new CHalfLifeMultiplay;
 		}

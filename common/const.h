@@ -706,6 +706,8 @@ enum
 	kRenderFxExplode,			// Scale up really big!
 	kRenderFxGlowShell,			// Glowing Shell
 	kRenderFxClampMinScale,		// Keep this sprite from getting very small (SPRITES only!)
+	kRenderFxLightMultiplier,	// CZero makes iuser2 act as a light multiplier for the model
+	kRenderFxFullbright			// PS2HLU Renders stuff fullbright
 };
 
 

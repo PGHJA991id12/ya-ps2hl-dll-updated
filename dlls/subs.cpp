@@ -56,6 +56,24 @@ void CNullEntity :: Spawn( void )
 }
 LINK_ENTITY_TO_CLASS(info_null,CNullEntity);
 
+// PS2HLU
+// Focus emitter target, likely used for debugging during development
+// otherwise pretty pointless
+
+class CEmitterTarget : public CPointEntity
+{
+public:
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+};
+
+LINK_ENTITY_TO_CLASS(info_emittertarget, CEmitterTarget)
+
+void CEmitterTarget::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
+{
+	FireTargets(STRING(pev->target), this, this, USE_TOGGLE, 0);
+	ALERT(at_console, "info_emittertarget called Use! Firing %s\n", STRING(pev->target));
+}
+
 class CBaseDMStart : public CPointEntity
 {
 public:

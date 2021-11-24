@@ -12,6 +12,9 @@
     <Filter Include="Source Files\decay">
       <UniqueIdentifier>{b7377a46-8c23-4dd4-8785-51f9b6c600a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\decay">
+      <UniqueIdentifier>{04ed9554-44b6-454b-8c32-f464afedad89}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="aflock.cpp">
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="ps2hl_trigger_islave.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="coop_gamerules.cpp">
+      <Filter>Source Files\decay</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

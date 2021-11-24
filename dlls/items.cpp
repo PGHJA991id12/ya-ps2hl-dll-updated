@@ -413,13 +413,13 @@ void CFocusEmitter::Spawn()
 	SetThink(&CFocusEmitter::EmitterThink);
 
 	ChangeSequence( FOCUSEMITTER_IDLE_CLOSED );
-	//pev->effects |= EF_NOINTERP;
-	pev->effects |= EF_DIMLIGHT; // Temponary solution, need a better way to light this up
+	pev->renderfx = kRenderFxFullbright;
 	pev->takedamage = DAMAGE_NO;
 
 	pev->nextthink = -1;
 	
 	// What was I thinking when I wrote this? This is a mess, will require a complete rewrite sometime soon.
+
 }
 
 void CFocusEmitter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )

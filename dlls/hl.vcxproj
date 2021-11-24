@@ -65,7 +65,7 @@
     <GenerateManifest>false</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
-    <OutDir>D:\Games\HL\Xash3D\ps2hl\dlls</OutDir>
+    <OutDir>D:\team fortess 2\steamapps\common\Half-Life\ps2hlu\dlls\</OutDir>
     <IntDir>.\Profilehl\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
@@ -259,6 +259,7 @@
     <ClCompile Include="client.cpp" />
     <ClCompile Include="combat.cpp" />
     <ClCompile Include="controller.cpp" />
+    <ClCompile Include="coop_gamerules.cpp" />
     <ClCompile Include="crossbow.cpp" />
     <ClCompile Include="crowbar.cpp" />
     <ClCompile Include="defaultai.cpp" />

@@ -112,8 +112,10 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <CustomBuildStep>
-      <Command>copy "$(TargetPath)" "$(SolutionDir)..\..\cl_dlls\client.dll"</Command>
-      <Outputs>$(SolutionDir)..\..\cl_dlls\client.dll;%(Outputs)</Outputs>
+      <Command>
+      </Command>
+      <Outputs>
+      </Outputs>
     </CustomBuildStep>
     <Midl>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

@@ -256,8 +256,19 @@ void CEnvWarpBall::MakeMonster(void)
 	}
 
 	pevCreate = VARS(pent);
-	pevCreate->origin = pev->origin;
-	pevCreate->angles = pev->angles;
+
+	// PS2HLU
+	// Make monsters spawn at warp target
+	// not just play the effect, and spawn the monsters at origin
+	if (pev->message) {
+		pevCreate->origin = vecOrigin;
+		pevCreate->angles = pev->angles;
+	}
+	else
+	{
+		pevCreate->origin = pev->origin;
+		pevCreate->angles = pev->angles;
+	}
 	SetBits(pevCreate->spawnflags, SF_MONSTER_FALL_TO_GROUND);
 
 	// Children hit monsterclip brushes
