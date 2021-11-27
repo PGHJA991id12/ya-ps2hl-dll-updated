@@ -48,6 +48,11 @@ void CWorldItem::KeyValue(KeyValueData *pkvd)
 		m_iType = atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
+	else if (FStrEq(pkvd->szKeyName, "player_index"))
+	{
+		m_decayIndex = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
 	else
 		CBaseEntity::KeyValue( pkvd );
 }
@@ -103,6 +108,17 @@ void CItem::Spawn( void )
 	}
 }
 
+void CItem::KeyValue(KeyValueData *pkvd)
+{
+	 if (FStrEq(pkvd->szKeyName, "player_index"))
+	{
+		m_decayIndex = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else
+		CBaseEntity::KeyValue(pkvd);
+}
+
 extern int gEvilImpulse101;
 
 void CItem::ItemTouch( CBaseEntity *pOther )
@@ -114,6 +130,12 @@ void CItem::ItemTouch( CBaseEntity *pOther )
 	}
 
 	CBasePlayer *pPlayer = (CBasePlayer *)pOther;
+
+	// PS2HL
+	// Support for Player_Index
+	if (m_decayIndex)
+		if (!(pPlayer->m_decayIndex == this->m_decayIndex))
+			return;
 
 	// ok, a player is touching this item, but can he have it?
 	if ( !g_pGameRules->CanHaveItem( pPlayer, this ) )

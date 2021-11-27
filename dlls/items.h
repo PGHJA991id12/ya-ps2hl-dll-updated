@@ -23,6 +23,7 @@ public:
 	CBaseEntity*	Respawn( void );
 	void	EXPORT ItemTouch( CBaseEntity *pOther );
 	void	EXPORT Materialize( void );
+	void	KeyValue(KeyValueData *pkvd); // PS2HLU
 	virtual BOOL MyTouch( CBasePlayer *pPlayer ) { return FALSE; };
 };
 

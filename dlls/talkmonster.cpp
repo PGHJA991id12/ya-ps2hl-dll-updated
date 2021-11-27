@@ -1405,6 +1405,12 @@ BOOL CTalkMonster::CanFollow( void )
 		if ( !m_pCine->CanInterrupt() )
 			return FALSE;
 	}
+
+	// PS2HLU
+	// Blocks following the player when the flag is checked
+	// Used in ht05dorms and likely other maps
+	if (this->pev->spawnflags & 65536)
+		return FALSE;
 	
 	if ( !IsAlive() )
 		return FALSE;

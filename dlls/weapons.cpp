@@ -1270,6 +1270,11 @@ void CWeaponBox :: KeyValue( KeyValueData *pkvd )
 
 		pkvd->fHandled = TRUE;
 	}
+	else if (FStrEq(pkvd->szKeyName, "player_index"))
+	{
+		m_decayIndex = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
 	else
 	{
 		ALERT ( at_console, "WeaponBox too full! only %d ammotypes allowed\n", MAX_AMMO_SLOTS );
@@ -1339,6 +1344,12 @@ void CWeaponBox::Touch( CBaseEntity *pOther )
 		// no dead guys.
 		return;
 	}
+
+	// PS2HLU
+	// Player Index support
+	if(m_decayIndex)
+		if (!(pOther->m_decayIndex == this->m_decayIndex))
+			return;
 
 	CBasePlayer *pPlayer = (CBasePlayer *)pOther;
 	int i;

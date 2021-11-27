@@ -106,6 +106,42 @@ BOOL CBaseDMStart::IsTriggered( CBaseEntity *pEntity )
 	return master;
 }
 
+// PS2HLU
+// Coop start point (sets the decay index)
+class CBaseCoopStart : public CPointEntity
+{
+public:
+	void		KeyValue(KeyValueData *pkvd);
+	BOOL		IsTriggered(CBaseEntity *pEntity);
+
+private:
+};
+
+void CBaseCoopStart::KeyValue(KeyValueData *pkvd)
+{
+	if (FStrEq(pkvd->szKeyName, "master"))
+	{
+		pev->netname = ALLOC_STRING(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "index")) // Sets the index of the player
+	{
+		m_decayIndex = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else
+		CPointEntity::KeyValue(pkvd);
+}
+
+BOOL CBaseCoopStart::IsTriggered(CBaseEntity *pEntity)
+{
+	BOOL master = UTIL_IsMasterTriggered(pev->netname, pEntity);
+
+	return master;
+}
+
+LINK_ENTITY_TO_CLASS(info_player_coop, CBaseCoopStart);
+
 // This updates global tables that need to know about entities being removed
 void CBaseEntity::UpdateOnRemove( void )
 {

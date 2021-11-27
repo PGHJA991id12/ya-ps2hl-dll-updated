@@ -386,6 +386,23 @@ void ClientCommand( edict_t *pEntity )
 	{
 		Host_Say( pEntity, 0 );
 	}
+	// PS2HLU
+	// Shut up about VModEnable
+	else if (FStrEq(pcmd, "VModEnable"))
+	{
+		return;
+	}
+	else if (FStrEq(pcmd, "changeplayer2"))
+	{
+		if (g_pGameRules->IsCoOp())
+		{
+			// PS2HLU
+			// Code for switching player indexes
+			CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pev);
+			pPlayer->m_decayIndex = (pPlayer->m_decayIndex == 1) ? 2 : 1;
+			ALERT(at_console, "Player 1 index changed to %d\n", pPlayer->m_decayIndex);
+		}
+	}
 	else if ( FStrEq(pcmd, "say_team" ) )
 	{
 		Host_Say( pEntity, 1 );
@@ -735,6 +752,9 @@ void ClientPrecache( void )
 	PRECACHE_SOUND("player/pl_long_jump.wav");
 
 	PRECACHE_MODEL("models/player.mdl");
+
+	// PS2HLU Ginacol model
+	PRECACHE_MODEL("models/player/ginacol/ginacol.mdl");
 
 	// hud sounds
 

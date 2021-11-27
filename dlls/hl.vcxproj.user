@@ -14,7 +14,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerCommand>E:\team fortess 2\steamapps\common\Half-Life\hl.exe</LocalDebuggerCommand>
-    <LocalDebuggerCommandArguments>-game ps2hlu -dev -console -full</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-game ps2hlu -dev -console -windowed</LocalDebuggerCommandArguments>
     <LocalDebuggerWorkingDirectory>E:\team fortess 2\steamapps\common\Half-Life</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>

@@ -61,7 +61,7 @@ BOOL CHalfLifeRules::IsDeathmatch ( void )
 //=========================================================
 BOOL CHalfLifeRules::IsCoOp( void )
 {
-	return FALSE;
+	return gpGlobals->coop ? TRUE : FALSE;
 }
 
 

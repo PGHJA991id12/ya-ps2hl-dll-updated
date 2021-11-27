@@ -2710,8 +2710,11 @@ edict_t *EntSelectSpawnPoint( CBaseEntity *pPlayer )
 	if (g_pGameRules->IsCoOp())
 	{
 		pSpot = UTIL_FindEntityByClassname( g_pLastSpawn, "info_player_coop");
-		if ( !FNullEnt(pSpot) )
+		if (!FNullEnt(pSpot)) {
+			ALERT(at_console, "info_player_coop decayindex: %d\n", pSpot->m_decayIndex);
+			pPlayer->m_decayIndex = pSpot->m_decayIndex;
 			goto ReturnSpot;
+		}
 		pSpot = UTIL_FindEntityByClassname( g_pLastSpawn, "info_player_start");
 		if ( !FNullEnt(pSpot) ) 
 			goto ReturnSpot;
@@ -2878,6 +2881,27 @@ void CBasePlayer::Spawn( void )
 	m_flNextChatTime = gpGlobals->time;
 
 	g_pGameRules->PlayerSpawn( this );
+
+	if (g_pGameRules->IsCoOp()) {
+		ALERT(at_console, "GAMEMODE RECOGNIZED AS CO-OP!\n");
+		ALERT(at_console, "Player Decay Index is: %d\n", this->m_decayIndex);
+	}
+	
+
+	// Set bodygroup and skins
+	if (this->m_decayIndex == 1)
+	{
+		SetBodygroup(1, 4);
+		pev->skin = 1;
+	}
+	else if (this->m_decayIndex == 2)
+	{
+		SetBodygroup(1, 0);
+		pev->skin = 0;
+	}
+	else
+		SetBodygroup(0, 0);
+
 }
 
 

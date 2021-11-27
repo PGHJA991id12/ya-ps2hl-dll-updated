@@ -610,6 +610,11 @@ void CBaseTrigger :: KeyValue( KeyValueData *pkvd )
 		pev->dmg = atof(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
+	else if (FStrEq(pkvd->szKeyName, "player_index"))
+	{
+		m_decayIndex = atof(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
 	else if (FStrEq(pkvd->szKeyName, "count"))
 	{
 		m_cTriggersLeft = (int) atof(pkvd->szValue);
@@ -1231,6 +1236,12 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 
 	if (!UTIL_IsMasterTriggered(m_sMaster,pActivator))
 		return;
+
+	// PS2HLU
+	// Player_Index keyvalue stuff, mostly used in ht01accident
+	if (this->m_decayIndex)
+		if (!(pActivator->m_decayIndex == this->m_decayIndex))
+			return;
 
 	if (FClassnameIs(pev, "trigger_secret"))
 	{

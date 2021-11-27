@@ -158,9 +158,9 @@ void CEnvLight::KeyValue( KeyValueData* pkvd )
 		}
 		else if (j == 4)
 		{
-			r = r * (v / 255.0);
-			g = g * (v / 255.0);
-			b = b * (v / 255.0);
+			r = r * (v / 255.0f);
+			g = g * (v / 255.0f);
+			b = b * (v / 255.0f);
 		}
 
 		// simulate qrad direct, ambient,and gamma adjustments, as well as engine scaling

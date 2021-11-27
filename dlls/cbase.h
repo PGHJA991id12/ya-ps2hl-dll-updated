@@ -355,6 +355,8 @@ public:
 
 	enum EGON_FIRESTATE { FIRE_OFF, FIRE_CHARGE };
 	int m_fireState;
+
+	int m_decayIndex=0;
 };
 
 

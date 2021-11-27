@@ -225,9 +225,6 @@
     <ClCompile Include="..\dlls\hornetgun.cpp">
       <Filter>Source Files\hl</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\interface.cpp">
-      <Filter>Source Files\hl</Filter>
-    </ClCompile>
     <ClCompile Include="..\dlls\mp5.cpp">
       <Filter>Source Files\hl</Filter>
     </ClCompile>
@@ -266,6 +263,9 @@
     </ClCompile>
     <ClCompile Include="ps2hl_lock.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\interface.cpp">
+      <Filter>Source Files\hl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

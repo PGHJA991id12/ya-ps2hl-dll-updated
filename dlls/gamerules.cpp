@@ -349,18 +349,6 @@ CGameRules *InstallGameRules( void )
 			g_teamplay = 0;
 			return new CHalfLifeMultiplay;
 		}
-		if ((int)gpGlobals->coop == 1)
-		{
-			// vanilla deathmatch
-			g_teamplay = 0;
-			return new CHalfLifeMultiplay;
-		}
-		else
-		{
-			// vanilla deathmatch
-			g_teamplay = 0;
-			return new CHalfLifeMultiplay;
-		}
 	}
 }
 
