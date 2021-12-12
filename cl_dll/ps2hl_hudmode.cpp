@@ -69,7 +69,7 @@ int CHudMode::MsgFunc_HudMode(const char *pszName, int iSize, void *pbuf)
 int CHudMode::Draw(float flTime)
 {
 	// Do not draw if HUD is disabled
-	if (gHUD.m_iHideHUDDisplay & HIDEHUD_ALL)
+	if (gHUD.m_iHideHUDDisplay & (HIDEHUD_ALL | HIDEHUD_MISC) )
 		return 1;
 
 	// Do not draw if suit isn't equipped

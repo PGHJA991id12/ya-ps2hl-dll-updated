@@ -495,7 +495,7 @@ void CHalfLifeCoop::PlayerSpawn(CBasePlayer *pPlayer)
 
 	pPlayer->pev->weapons |= (1 << WEAPON_SUIT);
 
-	addDefault = TRUE;
+	addDefault = FALSE;
 
 	while (pWeaponEntity = UTIL_FindEntityByClassname(pWeaponEntity, "game_player_equip"))
 	{

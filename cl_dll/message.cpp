@@ -325,6 +325,12 @@ int CHudMessage::Draw( float fTime )
 
 	if ( m_gameTitleTime > 0 )
 	{
+		// PS2HLU
+		// Hide hud when logo is displayed
+		// This is used in ht01accident
+		// This doesnt do anything with HIDEHUD_WEAPONS or HIDEHUD_FLASHLIGHT
+		gHUD.m_iHideHUDDisplay |= HIDEHUD_HEALTH;
+		gHUD.m_iHideHUDDisplay |= HIDEHUD_MISC;
 		float localTime = gHUD.m_flTime - m_gameTitleTime;
 		float brightness;
 
@@ -332,8 +338,14 @@ int CHudMessage::Draw( float fTime )
 		if ( m_gameTitleTime > gHUD.m_flTime )
 			m_gameTitleTime = gHUD.m_flTime;
 
-		if ( localTime > (m_pGameTitle->fadein + m_pGameTitle->holdtime + m_pGameTitle->fadeout) )
+		if (localTime > (m_pGameTitle->fadein + m_pGameTitle->holdtime + m_pGameTitle->fadeout))
+		{
 			m_gameTitleTime = 0;
+			// PS2HLU
+			// Make hud stuff reappear
+			gHUD.m_iHideHUDDisplay &= ~HIDEHUD_HEALTH;
+			gHUD.m_iHideHUDDisplay &= ~HIDEHUD_MISC;
+		}
 		else
 		{
 			brightness = FadeBlend( m_pGameTitle->fadein, m_pGameTitle->fadeout, m_pGameTitle->holdtime, localTime );
@@ -355,6 +367,7 @@ int CHudMessage::Draw( float fTime )
 			drawn = 1;
 		}
 	}
+
 	// Fixup level transitions
 	for ( i = 0; i < maxHUDMessages; i++ )
 	{

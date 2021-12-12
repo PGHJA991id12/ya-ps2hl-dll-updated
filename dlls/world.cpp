@@ -635,8 +635,11 @@ void CWorld :: Precache( void )
 		CVAR_SET_FLOAT( "sv_zmax", pev->speed );
 	else
 		CVAR_SET_FLOAT( "sv_zmax", 4096 );
-
-	if ( pev->netname )
+	
+	// PS2HLU
+	// Dont display mission titles when loading map
+	// Currently only disabled for co-op (this feature might be entirely missing in ps2hl)
+	if ( pev->netname && !gpGlobals->coop )
 	{
 		ALERT( at_aiconsole, "Chapter title: %s\n", STRING(pev->netname) );
 		CBaseEntity *pEntity = CBaseEntity::Create( "env_message", g_vecZero, g_vecZero, NULL );
@@ -649,7 +652,7 @@ void CWorld :: Precache( void )
 			pEntity->pev->spawnflags = SF_MESSAGE_ONCE;
 		}
 	}
-
+	
 	if ( pev->spawnflags & SF_WORLD_DARK )
 		CVAR_SET_FLOAT( "v_dark", 1.0 );
 	else
