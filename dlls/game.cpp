@@ -24,6 +24,10 @@ cvar_t ps2hl_islave_cheat =		{ "cheat_slavemode", "0", FCVAR_SERVER };
 cvar_t ps2hl_debug =			{ "sv_supadupaplex", "0", FCVAR_SERVER  };
 cvar_t ps2hl_precache =			{ "sv_ps2_precache", "0", FCVAR_SERVER };
 
+// PS2HLU DEBUG
+// Show triggers command
+cvar_t showtriggers = { "showtriggers","0" };
+
 // multiplayer server rules
 cvar_t	fragsleft	= {"mp_fragsleft","0", FCVAR_SERVER | FCVAR_UNLOGGED };	  // Don't spam console/log files/users with this changing
 cvar_t	timeleft	= {"mp_timeleft","0" , FCVAR_SERVER | FCVAR_UNLOGGED };	  // "      "
@@ -470,6 +474,10 @@ void GameDLLInit( void )
 
 	// PS2HL - stronger gravity (helps to test mods for PS2)
 	//g_psv_gravity->value *= 1.05f;
+
+	// PS2HLU DEBUG
+	// Show triggers
+	CVAR_REGISTER(&showtriggers);
 
 	CVAR_REGISTER (&displaysoundlist);
 

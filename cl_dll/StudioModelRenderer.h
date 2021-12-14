@@ -123,6 +123,9 @@ public:
 	cvar_t			*m_pCvarDrawEntities;
 	// PS2HL - shadows hack cvar
 	cvar_t			*m_pCvarShadowHack;
+	// PS2HLU DEBUG
+	// Show triggers
+	cvar_t		*m_pCvarShowTriggers;
 
 	// The entity which we are currently rendering.
 	cl_entity_t		*m_pCurrentEntity;		

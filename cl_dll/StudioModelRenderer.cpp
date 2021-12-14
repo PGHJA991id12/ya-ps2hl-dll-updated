@@ -51,6 +51,10 @@ void CStudioModelRenderer::Init( void )
 	// PS2HL - shadows hack cvar
 	m_pCvarShadowHack		= gEngfuncs.pfnRegisterVariable("r_shadows_hack", "0", 0);
 
+	// PS2HLU DEBUG
+	// Command to show triggers
+	m_pCvarShowTriggers = IEngineStudio.GetCvar("showtriggers");
+
 	m_pChromeSprite			= IEngineStudio.GetChromeSprite();
 
 	IEngineStudio.GetModelCounters( &m_pStudioModelCount, &m_pModelsDrawn );
