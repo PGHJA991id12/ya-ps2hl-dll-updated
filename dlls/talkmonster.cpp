@@ -55,6 +55,8 @@ char *CTalkMonster::m_szFriends[TLK_CFRIENDS] =
 	"monster_barney",
 	"monster_scientist",
 	"monster_sitting_scientist",
+	"monster_rosenberg",
+	"monster_wheelchair",
 };
 
 
@@ -886,6 +888,11 @@ void CTalkMonster :: Touch( CBaseEntity *pOther )
 		if ( IsTalking() )
 			return;
 
+		// PS2HLU
+		// Dont get pushed if this flag is checked
+		if (pev->spawnflags & 16384)
+			return;
+
 		// Heuristic for determining if the player is pushing me away
 		float speed = fabs(pOther->pev->velocity.x) + fabs(pOther->pev->velocity.y);
 		if ( speed > 50 )
@@ -904,6 +911,11 @@ void CTalkMonster :: Touch( CBaseEntity *pOther )
 //=========================================================
 void CTalkMonster :: IdleRespond( void )
 {
+	// PS2HLU
+	// Dont respond to questions if this flag is checked
+	if (pev->spawnflags & 16384)
+		return;
+
 	int pitch = GetVoicePitch();
 	
 	// play response
@@ -973,6 +985,11 @@ int CTalkMonster :: FIdleStare( void )
 //=========================================================
 int CTalkMonster :: FIdleHello( void )
 {
+	// PS2HLU
+	// Dont speak idle lines if this flag is checked
+	if (pev->spawnflags & 16384)
+		return FALSE;
+
 	if (!FOkToSpeak())
 		return FALSE;
 
@@ -1030,6 +1047,11 @@ int CTalkMonster :: FIdleSpeak ( void )
 	const char *szIdleGroup;
 	const char *szQuestionGroup;
 	float duration;
+
+	// PS2HLU
+	// Dont speak idle lines if this flag is checked
+	if (pev->spawnflags & 16384)
+		return FALSE;
 
 	if (!FOkToSpeak())
 		return FALSE;
