@@ -39,6 +39,10 @@
 #include "usercmd.h"
 #include "netadr.h"
 
+void BotCreate();
+void DoBotSwap();
+CBasePlayer *CBasePlayerByIndex(int playerIndex);
+
 extern DLL_GLOBAL ULONG		g_ulModelIndexPlayer;
 extern DLL_GLOBAL BOOL		g_fGameOver;
 extern DLL_GLOBAL int		g_iSkillLevel;
@@ -401,7 +405,13 @@ void ClientCommand( edict_t *pEntity )
 			CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pev);
 			pPlayer->m_decayIndex = (pPlayer->m_decayIndex == 1) ? 2 : 1;
 			ALERT(at_console, "Player 1 index changed to %d\n", pPlayer->m_decayIndex);
+			DoBotSwap();
 		}
+	}
+	else if (FStrEq(pcmd, "addbot"))
+	{
+		if (g_pGameRules->IsCoOp())
+			BotCreate();
 	}
 	else if ( FStrEq(pcmd, "say_team" ) )
 	{
@@ -646,6 +656,26 @@ void ParmsChangeLevel( void )
 //
 void StartFrame( void )
 {
+
+	//START BOT
+	// loop through all the players...
+
+	for (int i = 1; i <= gpGlobals->maxClients; i++)
+	{
+		CBasePlayer *pPlayer = CBasePlayerByIndex(i);
+
+		if (!pPlayer)  // if invalid then continue with next index...
+			continue;
+
+		// check if this is a FAKECLIENT (i.e. is it a bot?)
+		if (FBitSet(pPlayer->pev->flags, FL_FAKECLIENT))
+		{
+			// call the think function for the bot...
+			pPlayer->Think();
+		}
+	}
+	//END BOT
+
 	if ( g_pGameRules )
 		g_pGameRules->Think();
 

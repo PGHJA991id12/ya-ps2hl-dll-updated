@@ -194,7 +194,8 @@ int gmsgStatusValue = 0;
 int gmsgHudMode = 0;	// HUD mode
 int gmsgHudLockOff = 0;	// HUD lock offset
 
-
+// PS2HLU
+int gmsgChangePlayer = 0;
 
 void LinkUserMessages( void )
 {
@@ -245,6 +246,8 @@ void LinkUserMessages( void )
 	gmsgHudMode = REG_USER_MSG("HudMode", 1);		// HUD mode
 	gmsgHudLockOff = REG_USER_MSG("HudLockOff", 8);	// HUD lock offset
 
+	// PS2HLU
+	gmsgChangePlayer = REG_USER_MSG("ChangePlr", 1);
 }
 
 LINK_ENTITY_TO_CLASS( player, CBasePlayer );
@@ -2901,6 +2904,17 @@ void CBasePlayer::Spawn( void )
 	}
 	else
 		SetBodygroup(0, 0);
+
+	//if (gmsgChangePlayer)
+	//{
+		MESSAGE_BEGIN(MSG_ONE, gmsgChangePlayer, NULL, pev);
+		WRITE_BYTE(m_decayIndex);
+		MESSAGE_END();
+	//}
+	//else
+	//{
+	//	ALERT(at_console, "Message gmsgChangePlayer not found in client!\n");
+	//}
 
 }
 

@@ -310,6 +310,8 @@
     <ClCompile Include="plane.cpp" />
     <ClCompile Include="plats.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="ps2hlu_fakeplayer_decay.cpp" />
+    <ClCompile Include="ps2hlu_monster_modeltrain.cpp" />
     <ClCompile Include="ps2hl_bshift.cpp" />
     <ClCompile Include="ps2hl_dbg.cpp" />
     <ClCompile Include="ps2hl_env_warpball.cpp" />
@@ -383,6 +385,7 @@
     <ClInclude Include="nodes.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="ps2hlu_bot_decay.h" />
     <ClInclude Include="ps2hl_dbg.h" />
     <ClInclude Include="ps2hl_item_eyescanner.h" />
     <ClInclude Include="ps2hl_item_generic.h" />

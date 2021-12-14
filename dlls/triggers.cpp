@@ -1219,6 +1219,16 @@ void CBaseTrigger :: MultiTouch( CBaseEntity *pOther )
 		}
 #endif
 		
+		// PS2HLU
+		// Player_Index keyvalue stuff, mostly used in ht01accident
+		ALERT(at_console, "TRIGGER has a m_decayIndex of %d\n", this->m_decayIndex);
+		if (FClassnameIs(pev, "trigger_multiple"))
+		if(this->m_decayIndex == 1 || this->m_decayIndex == 2)
+			if (!(pOther->m_decayIndex == this->m_decayIndex)) {
+				ALERT(at_console, "TRIGGER WONT ACTIVATE!!!\n");
+				return;
+			}
+
 		ActivateMultiTrigger( pOther );
 	}
 }
@@ -1238,9 +1248,10 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 		return;
 
 	// PS2HLU
-	// Player_Index keyvalue stuff, mostly used in ht01accident
-	if (this->m_decayIndex)
-		if (!(pActivator->m_decayIndex == this->m_decayIndex))
+	// Only activate trigger when both players
+	// are standing in it
+	if (pev->spawnflags & 256)
+		if (!this->m_decayIndex && !(pActivator->m_decayIndex == 1 && pActivator->m_decayIndex == 2))
 			return;
 
 	if (FClassnameIs(pev, "trigger_secret"))

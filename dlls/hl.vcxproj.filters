@@ -353,6 +353,12 @@
     <ClCompile Include="coop_gamerules.cpp">
       <Filter>Source Files\decay</Filter>
     </ClCompile>
+    <ClCompile Include="ps2hlu_fakeplayer_decay.cpp">
+      <Filter>Source Files\decay</Filter>
+    </ClCompile>
+    <ClCompile Include="ps2hlu_monster_modeltrain.cpp">
+      <Filter>Source Files\decay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="activity.h">
@@ -513,6 +519,9 @@
     </ClInclude>
     <ClInclude Include="ps2hl_trigger_islave.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ps2hlu_bot_decay.h">
+      <Filter>Header Files\decay</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
