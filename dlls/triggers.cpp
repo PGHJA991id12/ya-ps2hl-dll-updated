@@ -1868,6 +1868,10 @@ void CLadder :: Precache( void )
 	if ( CVAR_GET_FLOAT("showtriggers") == 0 )
 	{
 		pev->rendermode = kRenderTransTexture;
+		// PS2HLU
+		// Render shown triggers as fullbright
+		// like in the ps2 version
+		pev->renderfx = kRenderFxFullbright;
 		pev->renderamt = 0;
 	}
 	pev->effects &= ~EF_NODRAW;

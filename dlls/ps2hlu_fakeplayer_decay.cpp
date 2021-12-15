@@ -155,6 +155,8 @@ void CDecayBot::Spawn()
 	SetAnimation(PLAYER_IDLE);
 	pev->view_ofs = g_vecZero;
 
+	DROP_TO_FLOOR(ENT(pev));
+
 	m_pLastItem = NULL;
 	m_fInitHUD = TRUE;
 	m_iClientHideHUD = -1;     // force this to be recalculated

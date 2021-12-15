@@ -91,6 +91,13 @@ IMPLEMENT_SAVERESTORE(CGenericMonster, CBaseMonster);
 //=========================================================
 int	CGenericMonster :: Classify ( void )
 {
+	// PS2HLU
+	// Fix human grunts shooting at a soda can on ht07signal
+	// TODO: Need to figure out what the other flag does
+	// and also "trigger_hit" "4"
+	if (pev->spawnflags & 131072)
+		return CLASS_NONE;
+
 	return	CLASS_PLAYER_ALLY;
 }
 
