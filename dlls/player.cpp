@@ -2888,6 +2888,8 @@ void CBasePlayer::Spawn( void )
 	if (g_pGameRules->IsCoOp()) {
 		ALERT(at_console, "GAMEMODE RECOGNIZED AS CO-OP!\n");
 		ALERT(at_console, "Player Decay Index is: %d\n", this->m_decayIndex);
+		pev->modelindex = MODEL_INDEX("models/player/ginacol/ginacol.mdl");
+		pev->model = MAKE_STRING("models/player/ginacol/ginacol.mdl");
 	}
 	
 
@@ -2905,16 +2907,16 @@ void CBasePlayer::Spawn( void )
 	else
 		SetBodygroup(0, 0);
 
-	//if (gmsgChangePlayer)
-	//{
+	if (gmsgChangePlayer)
+	{
 		MESSAGE_BEGIN(MSG_ONE, gmsgChangePlayer, NULL, pev);
-		WRITE_BYTE(m_decayIndex);
+		WRITE_BYTE(this->m_decayIndex);
 		MESSAGE_END();
-	//}
-	//else
-	//{
-	//	ALERT(at_console, "Message gmsgChangePlayer not found in client!\n");
-	//}
+	}
+	else
+	{
+		ALERT(at_console, "Message gmsgChangePlayer not found in client!\n");
+	}
 
 }
 

@@ -890,7 +890,8 @@ void CTalkMonster :: Touch( CBaseEntity *pOther )
 
 		// PS2HLU
 		// Dont get pushed if this flag is checked
-		if (pev->spawnflags & 16384)
+		// Used on ht01accident, ht04dampen, ht05dorms, and more
+		if (pev->spawnflags & 65536)
 			return;
 
 		// Heuristic for determining if the player is pushing me away
