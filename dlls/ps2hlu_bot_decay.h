@@ -21,6 +21,8 @@ class CDecayBot : public CBasePlayer
 public:
 	void Spawn(void);
 	void BotThink(void);  // think function for the bot
+	void Killed(entvars_t *pevAttacker, int iGib);
+	void PlayerDeathThink(void);
 	void CreateBot();
 	void SwapBotWithPlayer();
 
