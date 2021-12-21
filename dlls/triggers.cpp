@@ -753,6 +753,14 @@ void PlayCDTrack( int iTrack )
 	if ( !pClient )
 		return;
 
+	// PS2HLU
+	// Play decay_girls.mp3 when track is set to 30
+	// Only used in ht01accident
+	if (iTrack == 30)
+	{
+		CLIENT_COMMAND(pClient, "mp3 play media/decay_girls.mp3\n");
+	}
+
 	if ( iTrack < -1 || iTrack > 30 )
 	{
 		ALERT ( at_console, "TriggerCDAudio - Track %d out of range\n" );
@@ -1250,8 +1258,9 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 	// PS2HLU
 	// Only activate trigger when both players
 	// are standing in it
-	if (pev->spawnflags & 256)
-		if (!this->m_decayIndex && !(pActivator->m_decayIndex == 1 && pActivator->m_decayIndex == 2))
+	// TODO: Somehow get this working
+	if (this->m_decayIndex)
+		if (!(pActivator->m_decayIndex == this->m_decayIndex)) // Had to break this for testing, and it wasnt even working to begin with
 			return;
 
 	if (FClassnameIs(pev, "trigger_secret"))
@@ -1619,7 +1628,14 @@ void CChangeLevel :: ChangeLevelNow( CBaseEntity *pActivator )
 	}
 //	ALERT( at_console, "Level touches %d levels\n", ChangeList( levels, 16 ) );
 	ALERT( at_console, "CHANGE LEVEL: %s %s\n", st_szNextMap, st_szNextSpot );
-	CHANGE_LEVEL( st_szNextMap, st_szNextSpot );
+
+	// PS2HLU
+	// Change level with no landmark
+	// Only used in ht01accident
+	if (!pev->spawnflags & 4)
+		CHANGE_LEVEL(st_szNextMap, st_szNextSpot);
+	else
+		CHANGE_LEVEL(st_szNextMap, NULL);
 }
 
 //

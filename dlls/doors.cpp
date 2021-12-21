@@ -74,6 +74,8 @@ public:
 	BYTE	m_bLockedSentence;	
 	BYTE	m_bUnlockedSound;	
 	BYTE	m_bUnlockedSentence;
+
+	CBaseEntity *prevActivator = NULL; //PS2HLU
 };
 
 
@@ -518,6 +520,17 @@ void CBaseDoor::DoorTouch( CBaseEntity *pOther )
 //
 void CBaseDoor::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
+	// PS2HLU
+	// Ignore previous door activator
+	if (pev->spawnflags & 65536 && FClassnameIs(pev, "func_door") )
+	{
+		//ALERT(at_console, "Door was activated by: %d", pActivator);
+		if (prevActivator == pActivator)
+			return;
+	}
+
+	prevActivator = pActivator;
+
 	m_hActivator = pActivator;
 	// if not ready to be used, ignore "use" command.
 	if (m_toggle_state == TS_AT_BOTTOM || FBitSet(pev->spawnflags, SF_DOOR_NO_AUTO_RETURN) && m_toggle_state == TS_AT_TOP)
