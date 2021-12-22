@@ -390,7 +390,7 @@ public:
 	void Killed( entvars_t *pevAttacker, int iGib );
 	void EXPORT DyingThink(void);
 	void EXPORT EmitterThink(void);
-	void TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage );
+	int TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 	void TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType );
 	void EXPORT Animate();
@@ -494,10 +494,13 @@ void CFocusEmitter::EmitterThink (void)
 
 void CFocusEmitter::TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType )
 {
+	if(!(bitsDamageType & DMG_ENERGYBEAM))
 	UTIL_Ricochet( ptr->vecEndPos, RANDOM_FLOAT(1.0, 2.0) ); // Make the focus emitter immune to all attacks except lasers!
+
+	CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
 }
 
-void CFocusEmitter::TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage )
+int CFocusEmitter::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
 
 	/*if (bitsDamageType & DMG_LASER)
@@ -507,6 +510,14 @@ void CFocusEmitter::TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker,
 		/*if (pevInflictor->owner == edict())
 		return 0;*/
 
+	if (IsAlive())
+	{
+		if (bitsDamageType & DMG_ENERGYBEAM)
+			SetConditions(bits_COND_LIGHT_DAMAGE);
+		else
+			return 0;
+	}
+
 		if (pev->health <= 4)
 		{
 		ChangeSequence( FOCUSEMITTER_BROKEN1 );
@@ -515,6 +526,8 @@ void CFocusEmitter::TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker,
 		{
 		ChangeSequence( FOCUSEMITTER_BROKEN2 );
 		} // I have no idea how this was meant to work.
+
+		return CBaseMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
 void CFocusEmitter::Killed( entvars_t *pevAttacker, int iGib )
