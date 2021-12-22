@@ -30,6 +30,7 @@
 #include "monsters.h"
 #include "weapons.h"
 #include "effects.h"
+#include "gamerules.h" // PS2HLU
 
 extern Vector VecBModelOrigin( entvars_t* pevBModel );
 
@@ -1152,6 +1153,7 @@ public:
 	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
 	void EXPORT SentryTouch( CBaseEntity *pOther );
 	void EXPORT SentryDeath( void );
+	void EXPORT SentryExplode();
 
 };
 
@@ -1160,7 +1162,8 @@ LINK_ENTITY_TO_CLASS( monster_sentry, CSentry );
 void CSentry::Precache()
 {
 	CBaseTurret::Precache( );
-	PRECACHE_MODEL ("models/sentry.mdl");	
+	PRECACHE_MODEL ("models/sentry.mdl");
+	PRECACHE_MODEL("sprites/explode1.spr"); // Explosion sprite
 }
 
 void CSentry::Spawn()
@@ -1238,7 +1241,6 @@ void CSentry::SentryTouch( CBaseEntity *pOther )
 	}
 }
 
-
 void CSentry ::	SentryDeath( void )
 {
 	BOOL iActive = FALSE;
@@ -1299,7 +1301,36 @@ void CSentry ::	SentryDeath( void )
 	if (m_fSequenceFinished && pev->dmgtime + 5 < gpGlobals->time)
 	{
 		pev->framerate = 0;
-		SetThink( NULL );
+		// PS2HLU
+		// Make sentries explode in decay
+		if (g_pGameRules->IsCoOp()) {
+			SetThink(&CSentry::SentryExplode);
+			pev->nextthink = gpGlobals->time + 0.9;
+		}
+		else
+			SetThink(NULL);
 	}
+}
+
+// PS2HLU
+void CSentry::SentryExplode()
+{
+	//Vector vecSrc, vecAng;
+	//GetAttachment(1, vecSrc, vecAng);
+
+	// play explosion effect
+	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+	WRITE_BYTE(TE_EXPLOSION);		// This makes a dynamic light and the explosion sprites/sound
+	WRITE_COORD(pev->origin.x);	// Send to PAS because of the sound
+	WRITE_COORD(pev->origin.y);
+	WRITE_COORD(pev->origin.z);
+	WRITE_SHORT(g_sModelIndexFireball);
+	WRITE_BYTE(13); // scale * 10
+	WRITE_BYTE(15); // framerate
+	WRITE_BYTE(TE_EXPLFLAG_NONE);
+	MESSAGE_END();
+
+	pev->effects |= EF_NODRAW; // Make sentry invisible
+	SetThink(NULL);
 }
 
