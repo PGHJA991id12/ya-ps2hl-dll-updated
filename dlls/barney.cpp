@@ -411,7 +411,13 @@ void CBarney :: Spawn()
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid			= SOLID_SLIDEBOX;
-	pev->movetype		= MOVETYPE_STEP;
+
+	// PS2HLU
+	// Dont fall, used in htoutro
+	if (pev->spawnflags & 8192)
+		pev->movetype = MOVETYPE_FLY;
+	else
+		pev->movetype		= MOVETYPE_STEP;
 	m_bloodColor		= BLOOD_COLOR_RED;
 	pev->health			= gSkillData.barneyHealth;
 	pev->view_ofs		= Vector ( 0, 0, 50 );// position of the eyes relative to monster's origin.

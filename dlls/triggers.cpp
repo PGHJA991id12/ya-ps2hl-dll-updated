@@ -1259,7 +1259,7 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 	// Only activate trigger when both players
 	// are standing in it
 	// TODO: Somehow get this working
-	if (this->m_decayIndex)
+	if (this->m_decayIndex && FClassnameIs(pev, "trigger_multiple"))
 		if (!(pActivator->m_decayIndex == this->m_decayIndex)) // Had to break this for testing, and it wasnt even working to begin with
 			return;
 

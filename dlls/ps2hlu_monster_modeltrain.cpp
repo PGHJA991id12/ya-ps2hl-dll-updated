@@ -8,6 +8,7 @@
 #include	"util.h"
 #include	"cbase.h"
 #include	"monsters.h"
+#include	"effects.h"
 
 // Spawnflags of CPathCorner
 #define SF_CORNER_WAITFORTRIG	0x001
@@ -50,6 +51,9 @@ public:
 	int m_speed;
 	entvars_t	*m_pevCurrentTarget;
 	BOOL		m_activated;
+	BOOL		locked=FALSE;
+	CSprite		*m_Sprite;
+	CBaseEntity *prevActivator = nullptr;
 private:
 };
 
@@ -73,26 +77,34 @@ void CModelTrain::Spawn()
 	pev->movetype = MOVETYPE_PUSH;
 	m_bloodColor = DONT_BLEED;
 	pev->takedamage = DAMAGE_NO;
+	pev->effects = 0;
+	SetBits(pev->flags, FL_MONSTER); // Count this as a monster
+	// This may or may not cause issues, im just leaving this here for now
 
 		if (!pev->framerate)
 			pev->framerate = 24.0;
 
-		//ALERT(at_console, "monster_modeltrain current framerate: %f\n", pev->framerate);
-		//ALERT(at_console, "monster_modeltrain current speed: %f\n", pev->speed);
+		if (!pev->scale)
+			pev->scale = 1.0;
+
 
 	pev->sequence = 0;
 	pev->frame = 0;
+
+	// PS2HLU
+	// This flag makes it so the sequence info wont be reset
+	// it causes a crash if a sprite is set as a model
+	if(!(pev->spawnflags & 262144))
 	ResetSequenceInfo();
+
 	pev->effects = 0;
 	pev->health = 9999;
 	//m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState = MONSTERSTATE_NONE;
 	m_activated = FALSE;
-	
+	locked = FALSE;
 
-		SetUse(&CModelTrain::Use);
-
-
+	SetUse(&CModelTrain::Use);
 }
 
 void CModelTrain::Precache()
@@ -110,6 +122,7 @@ void CModelTrain::SetYawSpeed(void)
 	pev->yaw_speed = newYawSpeed;
 	ALERT(at_console, "monster_modeltrain current yawspeed is:%d\n", pev->yaw_speed);
 }
+
 void CModelTrain::Blocked(CBaseEntity *pOther)
 
 {
@@ -121,9 +134,36 @@ void CModelTrain::Blocked(CBaseEntity *pOther)
 	pOther->TakeDamage(pev, pev, pev->dmg, DMG_CRUSH);
 }
 
-
 void CModelTrain::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
 {
+	// Dont allow same entity to trigger this more than once in a row
+	if (pev->spawnflags & 65536)
+	{
+		//ALERT(at_console, "Door was activated by: %d", pActivator);
+		if (prevActivator == pActivator)
+			return;
+	}
+
+	prevActivator = pActivator;
+	
+	if (pev->spawnflags & 262144) {
+		// Create the sprite
+		if (m_Sprite == NULL)
+		{
+			m_Sprite = CSprite::SpriteCreate((char *)STRING(pev->model), pev->origin, TRUE);
+			if (m_Sprite)
+			{
+				m_Sprite->SetTransparency(pev->rendermode, pev->rendercolor.x, pev->rendercolor.y, pev->rendercolor.z, pev->renderamt, pev->renderfx); // this may be broken
+				m_Sprite->SetAttachment(edict(), 0);
+				m_Sprite->Animate(pev->framerate);
+				m_Sprite->SetAttachment(pev->aiment, pev->body);
+				m_Sprite->SetScale(pev->scale);
+				m_Sprite->pev->framerate = pev->framerate;
+				m_Sprite->TurnOn();
+			}
+		}
+	}
+
 	if (pev->spawnflags & SF_TRAIN_WAIT_RETRIGGER)
 	{
 		// Move toward my target
@@ -181,13 +221,19 @@ void CModelTrain::Next(void)
 {
 	CBaseEntity	*pTarg;
 
-
 	// now find our next target
 	pTarg = GetNextTarget();
 
+	// This makes it so if an incorrect target is specified
+	// The train goes to the worldspawn, but if theres no target, it just stops
+	if (locked) return;
+
+	if (pTarg && !pTarg->pev->target) locked = TRUE;
+
 	if (!pTarg)
 	{
-		return;
+		pTarg = CBaseEntity::Instance(0);
+		locked = TRUE;
 	}
 
 	// Save last target in case we need to find it again
@@ -221,8 +267,6 @@ void CModelTrain::Next(void)
 	{
 		// Normal linear move.
 
-		// CHANGED this from CHAN_VOICE to CHAN_STATIC around OEM beta time because trains should
-		// use CHAN_STATIC for their movement sounds to prevent sound field problems.
 		// this is not a hack or temporary fix, this is how things should be. (sjb).
 		ClearBits(pev->effects, EF_NOINTERP);
 		SetMoveDone(&CModelTrain::Wait);
@@ -233,6 +277,7 @@ void CModelTrain::Next(void)
 
 void CModelTrain::Activate(void)
 {
+
 	// Not yet active, so teleport to first target
 	if (!m_activated)
 	{
@@ -254,6 +299,7 @@ void CModelTrain::Activate(void)
 	}
 }
 
+// Can this code run if the model is a sprite?
 void CModelTrain::HandleAnimEvent(MonsterEvent_t *pEvent)
 {
 	switch (pEvent->event)
