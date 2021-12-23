@@ -297,6 +297,7 @@ private:
 	}
 
 	CMultiManager *Clone( void );
+	CBaseEntity *m_pKillEnt = NULL;
 };
 LINK_ENTITY_TO_CLASS( multi_manager, CMultiManager );
 
@@ -398,11 +399,12 @@ void CMultiManager :: ManagerThink ( void )
 	{
 			if( FClassnameIs( pev, "multi_kill_manager" ) ) //PS2HLU Remove all entities listed in multi_kill_manager
 		{
-			CBaseEntity *m_pKillEnt;
-			m_pKillEnt = UTIL_FindEntityByTargetname( NULL, STRING( m_iTargetName[ m_index ] ) );
-				UTIL_Remove( m_pKillEnt );
-
-		//ALERT(at_console, "multi_kill_manager ran task\n" );
+				m_pKillEnt = UTIL_FindEntityByTargetname(NULL, STRING(m_iTargetName[m_index]));
+				while (m_pKillEnt)
+				{
+					UTIL_Remove(m_pKillEnt);
+					m_pKillEnt = UTIL_FindEntityByTargetname(m_pKillEnt, STRING(m_iTargetName[m_index]));
+				}
 
 		} else {
 		FireTargets( STRING( m_iTargetName[ m_index ] ), m_hActivator, this, USE_TOGGLE, 0 );
@@ -1632,7 +1634,7 @@ void CChangeLevel :: ChangeLevelNow( CBaseEntity *pActivator )
 	// PS2HLU
 	// Change level with no landmark
 	// Only used in ht01accident
-	if (!pev->spawnflags & 4)
+	if (!(pev->spawnflags & 4))
 		CHANGE_LEVEL(st_szNextMap, st_szNextSpot);
 	else
 		CHANGE_LEVEL(st_szNextMap, NULL);
