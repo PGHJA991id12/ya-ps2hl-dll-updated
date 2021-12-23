@@ -55,6 +55,7 @@ public:
 	
 	int  m_cLiveChildren;// how many monsters made by this monster maker that are currently alive
 	int	 m_iMaxLiveChildren;// max number of monsters that this maker may have out at one time.
+	int	 m_Spawnflags; // PS2HLU
 
 	float m_flGround; // z coord of the ground under me, used to make sure no monsters are under the maker when it drops a new child
 
@@ -73,6 +74,7 @@ TYPEDESCRIPTION	CMonsterMaker::m_SaveData[] =
 	DEFINE_FIELD( CMonsterMaker, m_iMaxLiveChildren, FIELD_INTEGER ),
 	DEFINE_FIELD( CMonsterMaker, m_fActive, FIELD_BOOLEAN ),
 	DEFINE_FIELD( CMonsterMaker, m_fFadeChildren, FIELD_BOOLEAN ),
+	DEFINE_FIELD(CMonsterMaker, m_Spawnflags, FIELD_INTEGER),
 };
 
 
@@ -94,6 +96,15 @@ void CMonsterMaker :: KeyValue( KeyValueData *pkvd )
 	else if ( FStrEq(pkvd->szKeyName, "monstertype") )
 	{
 		m_iszMonsterClassname = ALLOC_STRING( pkvd->szValue );
+		pkvd->fHandled = TRUE;
+	}
+	// PS2HLU
+	// sets the spawnflags for the spawned monster
+	// acts like "spawnflag" in .bsp files
+	// used on ht10focus
+	else if (FStrEq(pkvd->szKeyName, "monsterspawnflags"))
+	{
+		m_Spawnflags = atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else
@@ -213,6 +224,10 @@ void CMonsterMaker::MakeMonster( void )
 	// Children hit monsterclip brushes
 	if ( pev->spawnflags & SF_MONSTERMAKER_MONSTERCLIP )
 		SetBits( pevCreate->spawnflags, SF_MONSTER_HITMONSTERCLIP );
+
+	// PS2HLU
+	if ( m_Spawnflags )
+		SetBits( pevCreate->spawnflags, m_Spawnflags );
 
 	DispatchSpawn( ENT( pevCreate ) );
 	pevCreate->owner = edict();
