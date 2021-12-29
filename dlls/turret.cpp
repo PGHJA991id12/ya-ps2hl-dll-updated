@@ -948,6 +948,10 @@ void CBaseTurret ::	TurretDeath( void )
 		SetTurretAnim(TURRET_ANIM_DIE); 
 
 		EyeOn( );	
+
+		// PS2HLU
+		// Fix for broken TriggerTarget firing
+		if (m_iTriggerCondition == AITRIGGER_DEATH) FCheckAITrigger();
 	}
 
 	EyeOff( );
