@@ -1444,6 +1444,12 @@ BOOL CTalkMonster::CanFollow( void )
 
 void CTalkMonster :: FollowerUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
+	// PS2HLU
+	// Dont speak pre disaster lines when this flag is checked
+	// Used on ht01accident, ht04dampen, ht05dorms, and more
+	if (pev->spawnflags & 65536)
+		return;
+
 	// Don't allow use during a scripted_sentence
 	if ( m_useTime > gpGlobals->time )
 		return;

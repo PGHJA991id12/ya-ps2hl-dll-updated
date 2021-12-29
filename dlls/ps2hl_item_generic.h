@@ -29,6 +29,8 @@ private:
 	void Precache(void);					// Precache handler
 	void KeyValue(KeyValueData *pkvd);		// Parse keys
 	void Think(void);						// Think handler
+
+	int m_iSequence;
 };
 
 // Include guard: end
