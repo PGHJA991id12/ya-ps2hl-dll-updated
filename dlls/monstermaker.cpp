@@ -55,12 +55,16 @@ public:
 	
 	int  m_cLiveChildren;// how many monsters made by this monster maker that are currently alive
 	int	 m_iMaxLiveChildren;// max number of monsters that this maker may have out at one time.
-	int	 m_Spawnflags; // PS2HLU
+
+	// PS2HLU
+	int	 m_Spawnflags; // Spawned monsters spawnflags
+	string_t m_SpawnTarget; // Monster spawn target
 
 	float m_flGround; // z coord of the ground under me, used to make sure no monsters are under the maker when it drops a new child
 
 	BOOL m_fActive;
 	BOOL m_fFadeChildren;// should we make the children fadeout?
+	CBaseEntity *TargetEntity = NULL;
 };
 
 LINK_ENTITY_TO_CLASS( monstermaker, CMonsterMaker );
@@ -101,10 +105,15 @@ void CMonsterMaker :: KeyValue( KeyValueData *pkvd )
 	// PS2HLU
 	// sets the spawnflags for the spawned monster
 	// acts like "spawnflag" in .bsp files
-	// used on ht10focus
+	// used on ht10focus and ht04dampen
 	else if (FStrEq(pkvd->szKeyName, "monsterspawnflags"))
 	{
 		m_Spawnflags = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	else if (FStrEq(pkvd->szKeyName, "makertarget"))
+	{
+		m_SpawnTarget = ALLOC_STRING(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else
@@ -179,6 +188,15 @@ void CMonsterMaker::MakeMonster( void )
 		return;
 	}
 
+	TargetEntity = UTIL_FindEntityByTargetname(TargetEntity, (char *)STRING(m_SpawnTarget));
+	if (TargetEntity)
+	{
+		// This doesnt work
+		// dont have time to investigate
+		pev->origin = TargetEntity->pev->origin;
+		ALERT(at_console, "MonsterMaker SpawnTarget Found!\n");
+	}
+
 	if ( !m_flGround )
 	{
 		// set altitude. Now that I'm activated, any breakables, etc should be out from under me. 
@@ -217,7 +235,25 @@ void CMonsterMaker::MakeMonster( void )
 	}
 
 	pevCreate = VARS( pent );
+
+	// PS2HLU
+	// Target entity to spawn monster at
+	// Only used in ht04dampen
+	/*if (m_SpawnTarget)
+	{
+		TargetEntity = UTIL_FindEntityByTargetname(TargetEntity, (char *)STRING(m_SpawnTarget));
+		if (TargetEntity)
+		{
+			pevCreate->origin = TargetEntity->pev->origin;
+			ALERT(at_console, "MonsterMaker SpawnTarget Found!\n");
+		}
+	}
+	else
+	{
+		pevCreate->origin = pev->origin;
+	}*/
 	pevCreate->origin = pev->origin;
+
 	pevCreate->angles = pev->angles;
 	SetBits( pevCreate->spawnflags, SF_MONSTER_FALL_TO_GROUND );
 

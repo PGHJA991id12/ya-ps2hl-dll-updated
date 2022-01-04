@@ -47,6 +47,8 @@ public:
 	int	 m_iMaxLiveChildren;// max number of monsters that this maker may have out at one time.
 	float m_flGround; // z coord of the ground under me, used to make sure no monsters are under the maker when it drops a new child
 
+	int	 m_Spawnflags; // Spawned monsters spawnflags
+
 	static	TYPEDESCRIPTION m_SaveData[];
 	virtual int		Save(CSave &save);
 	virtual int		Restore(CRestore &restore);
@@ -90,6 +92,14 @@ void CEnvWarpBall::KeyValue(KeyValueData *pkvd)
 	else if (FStrEq(pkvd->szKeyName, "m_imaxlivechildren"))
 	{
 		m_iMaxLiveChildren = atoi(pkvd->szValue);
+		pkvd->fHandled = TRUE;
+	}
+	// PS2HLU
+	// works the same as in monstermaker
+	// used on ht04dampen
+	else if (FStrEq(pkvd->szKeyName, "monsterspawnflags"))
+	{
+		m_Spawnflags = atoi(pkvd->szValue);
 		pkvd->fHandled = TRUE;
 	}
 	else if (FStrEq(pkvd->szKeyName, "monstertype"))
@@ -274,6 +284,10 @@ void CEnvWarpBall::MakeMonster(void)
 	// Children hit monsterclip brushes
 	//if (pev->spawnflags & SF_MONSTERMAKER_MONSTERCLIP)
 	//	SetBits(pevCreate->spawnflags, SF_MONSTER_HITMONSTERCLIP);
+
+	// PS2HLU
+	if (m_Spawnflags)
+		SetBits(pevCreate->spawnflags, m_Spawnflags);
 
 	DispatchSpawn(ENT(pevCreate));
 	pevCreate->owner = edict();
