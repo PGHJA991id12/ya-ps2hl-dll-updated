@@ -473,6 +473,13 @@ BOOL CHGrunt :: CheckRangeAttack1 ( float flDot, float flDist )
 //=========================================================
 BOOL CHGrunt :: CheckRangeAttack2 ( float flDot, float flDist )
 {
+
+	// PS2HLU
+	// Dont throw grenades if set
+	// Used on ht10focus, ht91alien
+	if (pev->spawnflags & 0x8000)
+		return FALSE;
+
 	if (! FBitSet(pev->weapons, (HGRUNT_HANDGRENADE | HGRUNT_GRENADELAUNCHER)))
 	{
 		return FALSE;
