@@ -179,12 +179,12 @@ void CMultiSource::Spawn()
 void CMultiSource::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 { 
 	int i = 0;
-
+	
 	// Find the entity in our list
 	while (i < m_iTotal)
 		if ( m_rgEntities[i++] == pCaller )
 			break;
-
+	
 	// if we didn't find it, report error and leave
 	if (i > m_iTotal)
 	{
@@ -216,6 +216,15 @@ BOOL CMultiSource::IsTriggered( CBaseEntity * )
 	// Still initializing?
 	if ( pev->spawnflags & SF_MULTI_INIT )
 		return 0;
+
+	// PS2HLU
+	// Activate even if only 1 targeted (multiple entities, same targetname) entity is active 
+	// Only used on ht11lasers
+	if (pev->spawnflags & 2)
+	{
+		if (!m_globalstate || gGlobalState.EntityGetState(m_globalstate) == GLOBAL_ON)
+			return 1;
+	}
 
 	while (i < m_iTotal)
 	{

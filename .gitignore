@@ -16,3 +16,7 @@
 *.exp
 *.htm
 .vs
+*.bsc
+*.sbr
+*.ilk
+*.idb

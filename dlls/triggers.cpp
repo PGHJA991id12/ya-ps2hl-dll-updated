@@ -500,6 +500,8 @@ class CRenderFxManager : public CBaseEntity
 public:
 	void Spawn( void );
 	void Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+private:
+	CBaseEntity *prevActivator = NULL;
 };
 
 LINK_ENTITY_TO_CLASS( env_render, CRenderFxManager );
@@ -512,6 +514,17 @@ void CRenderFxManager :: Spawn ( void )
 
 void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
+	// PS2HLU
+	// Prev activator filter thing
+	if (pev->spawnflags & 65536)
+	{
+		if (prevActivator == pActivator)
+			return;
+		//prevActivator = pActivator;
+	}
+
+	prevActivator = pActivator;
+
 	if (!FStringNull(pev->target))
 	{
 		edict_t* pentTarget	= NULL;
@@ -536,16 +549,22 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 	// PS2HLU
 	// Searches for a group of other entities that all have the same netname & changes their rendering.
 
+	// BUGBUG:
+	// Finding an entity by netname only works once for beams,
+	// while using targetname works every time
+	// Need to investigate
+
 	if (!FStringNull(pev->netname))
 	{
-		edict_t* pentTarget = NULL;
-		pentTarget = FIND_ENTITY_BY_STRING(NULL, "netname", STRING(pev->netname));
-		while (pentTarget)
+		edict_t* pentTarget2 = NULL;
+		pentTarget2 = FIND_ENTITY_BY_STRING(NULL, "netname", STRING(pev->netname));
+		while ( pentTarget2 )
 		{
-			if (FNullEnt(pentTarget))
+			//pentTarget2 = FIND_ENTITY_BY_STRING(NULL, "netname", STRING(pev->netname));
+			if (FNullEnt(pentTarget2))
 				break;
 
-			entvars_t *pevNetname = VARS(pentTarget);
+			entvars_t *pevNetname = VARS(pentTarget2);
 			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKFX))
 				pevNetname->renderfx = pev->renderfx;
 			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKAMT))
@@ -555,7 +574,7 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKCOLOR))
 				pevNetname->rendercolor = pev->rendercolor;
 
-			pentTarget = FIND_ENTITY_BY_STRING(pentTarget, "netname", STRING(pev->netname));
+			pentTarget2 = FIND_ENTITY_BY_STRING(pentTarget2, "netname", STRING(pev->netname));
 		}
 	}
 	
@@ -2559,41 +2578,41 @@ class CTriggerBit : public CBaseDelay
 {
 public:
 	void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
+private:
+	BOOL boolean = TRUE;
 };
 
 LINK_ENTITY_TO_CLASS( trigger_bit, CTriggerBit )
 
 void CTriggerBit::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	SUB_UseTargets( this, USE_TOGGLE, pev->skin ); // This still requires some investigation
+	ALERT(at_console, "pev skin: %f\n", (float)pev->skin);
+
+	boolean = !boolean;
+
+	if(boolean)
+	SUB_UseTargets( this, USE_TOGGLE, (float)pev->skin ); // This still requires some investigation
+	else
+	SUB_UseTargets(this, USE_TOGGLE, -(float)pev->skin);
+
 }
 
 
 
-class CTriggerBitCounter : public CMultiSource
+class CTriggerBitCounter : public CPointEntity
 {
 public:
 	void KeyValue( KeyValueData *pkvd );
 	void Spawn();
         void Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value );
 
-	int Save( CSave &save );
-	int Restore( CRestore &restore );
-	static TYPEDESCRIPTION m_SaveData[];
 private:
-	int m_initialstate;
-	int m_iDesiredBit;
+	//int m_initialstate;
+	float bits = 0;
+	float m_iDesiredBit = 0;
 };
 
-LINK_ENTITY_TO_CLASS( trigger_bit_counter, CMultiSource )
-
-TYPEDESCRIPTION CTriggerBitCounter::m_SaveData[] =
-{
-	DEFINE_FIELD( CTriggerBitCounter, m_initialstate, FIELD_INTEGER ),
-	DEFINE_FIELD( CTriggerBitCounter, m_iDesiredBit, FIELD_INTEGER ),
-};
-
-IMPLEMENT_SAVERESTORE( CTriggerBitCounter, CMultiSource )
+LINK_ENTITY_TO_CLASS( trigger_bit_counter, CTriggerBitCounter )
 
 void CTriggerBitCounter::KeyValue( KeyValueData *pkvd )
 {
@@ -2602,65 +2621,46 @@ void CTriggerBitCounter::KeyValue( KeyValueData *pkvd )
 		m_iDesiredBit = atoi( pkvd->szValue );
 		pkvd->fHandled = TRUE;
 	}
-	else if( FStrEq( pkvd->szKeyName, "initialstate" ) )
-	{
-		m_initialstate = pev->skin = atoi( pkvd->szValue );
-		pkvd->fHandled = TRUE;
-	}
 	else
-		CMultiSource::KeyValue( pkvd );
+		CPointEntity::KeyValue( pkvd );
 }
 
 void CTriggerBitCounter::Spawn()
 {
+	/*
 	if( !m_globalstate )
 	{
 		REMOVE_ENTITY( ENT( pev ) );
 		return;
-	}
+	}*/
 
-	if( !gGlobalState.EntityInTable( m_globalstate ) )
-		gGlobalState.EntityAdd( m_globalstate, gpGlobals->mapname, (GLOBALESTATE)m_initialstate );
+	pev->solid = SOLID_NOT;
+	pev->movetype = MOVETYPE_NONE;
+	bits = pev->skin;
+
+	SetUse(&CTriggerBitCounter::Use);
+
+	pev->nextthink = gpGlobals->time + 0.1;
 }
 
 void CTriggerBitCounter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	int oldState, newState;
+	//int oldState, newState;
 
 	if( !pActivator )
 		return;
 
-	if( m_globalstate )
-		oldState = gGlobalState.EntityGetState( m_globalstate );
-	else
-		oldState = pev->skin;
+	bits = bits + value;
+	//m_iDesiredBit++;
+	//value--;
 
-	switch( useType )
-	{
-	case USE_OFF:
-		newState = ~pev->skin & oldState;
-		break;
-	case USE_ON:
-		newState = pev->skin | oldState;
-		break;
-	case USE_TOGGLE:
-	default:
-		newState = pev->skin ^ oldState;
-		break;
-	}
-
-	if( newState == m_iDesiredBit )
-		SUB_UseTargets( this, USE_TOGGLE, 0 );
-
-	if( m_globalstate )
-	{
-		if( gGlobalState.EntityInTable( m_globalstate ) )
-			gGlobalState.EntitySetState( m_globalstate, (GLOBALESTATE)newState );
-		else
-			gGlobalState.EntityAdd( m_globalstate, gpGlobals->mapname, (GLOBALESTATE)newState );
-	}
-	else
-		pev->skin = newState;
+	//ALERT(at_console, "bitcounter target value is: %f\n", value);
+	//ALERT(at_console, "bitcounter desired bit is: %f\n", m_iDesiredBit);
+	//ALERT(at_console, "bitcounter use ran!\n");
+	ALERT(at_console, "bitcounter bits value is:%f\n", bits);
+	if (m_iDesiredBit == bits)
+		SUB_UseTargets( this, USE_TOGGLE, pev->skin );
+		//FireTargets(STRING(pev->target), this, this, USE_TOGGLE, 0);
 }
 
 #include "shake.h"
