@@ -217,15 +217,6 @@ BOOL CMultiSource::IsTriggered( CBaseEntity * )
 	if ( pev->spawnflags & SF_MULTI_INIT )
 		return 0;
 
-	// PS2HLU
-	// Activate even if only 1 targeted (multiple entities, same targetname) entity is active 
-	// Only used on ht11lasers
-	if (pev->spawnflags & 2)
-	{
-		if (!m_globalstate || gGlobalState.EntityGetState(m_globalstate) == GLOBAL_ON)
-			return 1;
-	}
-
 	while (i < m_iTotal)
 	{
 		if (m_rgTriggered[i] == 0)
@@ -233,7 +224,11 @@ BOOL CMultiSource::IsTriggered( CBaseEntity * )
 		i++;
 	}
 
-	if (i == m_iTotal)
+	// PS2HLU
+	// Activate even if only 1 targeted (multiple entities, same targetname) entity is active
+	// When spawnflag 2 is checked
+	// Only used on ht11lasers
+	if (pev->spawnflags & 2 || i == m_iTotal)
 	{
 		if ( !m_globalstate || gGlobalState.EntityGetState( m_globalstate ) == GLOBAL_ON )
 			return 1;
@@ -1116,13 +1111,8 @@ void CMomentaryRotButton::Return( void )
 {
 	// PS2HLU This blocks the valve/button from returning when flag is checked
 	// This button return blocking with the firing was only used in ht04dampen IIRC
-	if (pev->spawnflags & 65536)
-		if ( m_end == pev->angles &&  m_lastUsed == 0 )
+	if (pev->spawnflags & 65536 && m_end == pev->angles)
 		return;
-
-	if (pev->spawnflags & 65536)
-	if ( m_end == pev->angles &&  m_lastUsed == 1 ) // This is here to prevent button from returning in some weird cases
-	return;
 
 	float value = CBaseToggle::AxisDelta( pev->spawnflags, pev->angles, m_start ) / m_flMoveDistance;
 
