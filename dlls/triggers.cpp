@@ -514,17 +514,6 @@ void CRenderFxManager :: Spawn ( void )
 
 void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value )
 {
-	// PS2HLU
-	// Prev activator filter thing
-	if (pev->spawnflags & 65536)
-	{
-		if (prevActivator == pActivator)
-			return;
-		//prevActivator = pActivator;
-	}
-
-	prevActivator = pActivator;
-
 	if (!FStringNull(pev->target))
 	{
 		edict_t* pentTarget	= NULL;
@@ -549,32 +538,42 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 	// PS2HLU
 	// Searches for a group of other entities that all have the same netname & changes their rendering.
 
-	// BUGBUG:
-	// Finding an entity by netname only works once for beams,
-	// while using targetname works every time
-	// Need to investigate
 
 	if (!FStringNull(pev->netname))
 	{
-		edict_t* pentTarget2 = NULL;
-		pentTarget2 = FIND_ENTITY_BY_STRING(NULL, "netname", STRING(pev->netname));
-		while ( pentTarget2 )
+		CBaseEntity *pentTarget2 = NULL;
+		pentTarget2 = UTIL_FindEntityByString(NULL, "netname", STRING(pev->netname));
+		while (pentTarget2)
 		{
-			//pentTarget2 = FIND_ENTITY_BY_STRING(NULL, "netname", STRING(pev->netname));
-			if (FNullEnt(pentTarget2))
-				break;
-
-			entvars_t *pevNetname = VARS(pentTarget2);
 			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKFX))
-				pevNetname->renderfx = pev->renderfx;
+				pentTarget2->pev->renderfx = pev->renderfx;
 			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKAMT))
-				pevNetname->renderamt = pev->renderamt;
+				pentTarget2->pev->renderamt = pev->renderamt;
 			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKMODE))
-				pevNetname->rendermode = pev->rendermode;
-			if (!FBitSet(pev->spawnflags, SF_RENDER_MASKCOLOR))
-				pevNetname->rendercolor = pev->rendercolor;
+				pentTarget2->pev->rendermode = pev->rendermode;
 
-			pentTarget2 = FIND_ENTITY_BY_STRING(pentTarget2, "netname", STRING(pev->netname));
+			// PS2HLU
+			// Had to use this extremely weird solution
+			// to update laser colors...
+
+			if(!pev->spawnflags & (65536 | 8))
+			{
+				// This line somehow locks the laser color ???
+				// so not executing it fixes the bug
+				pentTarget2->pev->rendercolor = pev->rendercolor;
+			}
+
+			
+			if (FClassnameIs(pentTarget2->pev, "env_beam") || FClassnameIs(pentTarget2->pev, "env_lightning") || FClassnameIs(pentTarget2->pev, "env_laser") || FClassnameIs(pentTarget2->pev, "beam"))
+			//if(pev->spawnflags & 65536)
+			{
+				// SetColor almost does the exact same thing
+				// but it works somehow
+				pentTarget2->SetColor((int)pev->rendercolor.x, (int)pev->rendercolor.y, (int)pev->rendercolor.z);
+				pentTarget2->pev->nextthink = gpGlobals->time + 0.1;
+			}
+
+			pentTarget2 = UTIL_FindEntityByString(pentTarget2, "netname", STRING(pev->netname));
 		}
 	}
 	
