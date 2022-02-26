@@ -556,7 +556,7 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 			// Had to use this extremely weird solution
 			// to update laser colors...
 
-			if(!pev->spawnflags & (65536 | 8))
+			if(!pev->spawnflags & (65536 | 8) || FClassnameIs(pentTarget2->pev, "env_sprite") && !FBitSet(pev->spawnflags, SF_RENDER_MASKCOLOR))
 			{
 				// This line somehow locks the laser color ???
 				// so not executing it fixes the bug
@@ -572,7 +572,7 @@ void CRenderFxManager :: Use ( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 				pentTarget2->SetColor((int)pev->rendercolor.x, (int)pev->rendercolor.y, (int)pev->rendercolor.z);
 				pentTarget2->pev->nextthink = gpGlobals->time + 0.1;
 			}
-
+			
 			pentTarget2 = UTIL_FindEntityByString(pentTarget2, "netname", STRING(pev->netname));
 		}
 	}
