@@ -1167,6 +1167,10 @@ void CSentry::Precache()
 {
 	CBaseTurret::Precache( );
 	PRECACHE_MODEL ("models/sentry.mdl");
+
+	// PS2HLU
+	// Precache explosion sprite only if we are in co-op mode
+	if (g_pGameRules->IsCoOp())
 	PRECACHE_MODEL("sprites/explode1.spr"); // Explosion sprite
 }
 

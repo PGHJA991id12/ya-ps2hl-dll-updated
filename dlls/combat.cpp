@@ -29,6 +29,8 @@
 #include "animation.h"
 #include "weapons.h"
 #include "func_break.h"
+#include "player.h"
+#include "gamerules.h"
 
 extern DLL_GLOBAL Vector		g_vecAttackDir;
 extern DLL_GLOBAL int			g_iSkillLevel;
@@ -601,6 +603,19 @@ void CBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	}
 
 	Remember( bits_MEMORY_KILLED );
+
+	// PS2HLU
+	// Add points to player for killing monsters
+	// Only in co-op
+	if (pevAttacker && FClassnameIs(pevAttacker, "player") && g_pGameRules->IsCoOp())
+	{
+		// TODO: Calculate player's accuracy
+		//ALERT(at_console, "player should get a point!\n");
+
+		auto *peKiller = CBaseEntity::Instance(pevAttacker);
+
+		peKiller->AddPoints(1, FALSE);
+	}
 
 	// clear the deceased's sound channels.(may have been firing or reloading when killed)
 	EMIT_SOUND(ENT(pev), CHAN_WEAPON, "common/null.wav", 1, ATTN_NORM);

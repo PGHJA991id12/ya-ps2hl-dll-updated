@@ -947,13 +947,6 @@ void CBasePlayer::Killed( entvars_t *pevAttacker, int iGib )
 	pev->angles.x = 0;
 	pev->angles.z = 0;
 
-	// PS2HLU
-	// End mission target fire
-	if(this->m_decayIndex == 1)
-	FireTargets("decay_player1_dead", this, this, USE_TOGGLE, 0);
-	if(this->m_decayIndex == 2)
-	FireTargets("decay_player2_dead", this, this, USE_TOGGLE, 0);
-
 	SetThink(&CBasePlayer::PlayerDeathThink);
 	pev->nextthink = gpGlobals->time + 0.1;
 }

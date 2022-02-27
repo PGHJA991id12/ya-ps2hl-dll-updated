@@ -536,7 +536,7 @@ BOOL CHalfLifeCoop::AllowAutoTargetCrosshair(void)
 //=========================================================
 int CHalfLifeCoop::IPointsForKill(CBasePlayer *pAttacker, CBasePlayer *pKilled)
 {
-	return 1;
+	return 0;
 }
 
 
@@ -605,6 +605,14 @@ void CHalfLifeCoop::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entva
 		DeactivateSatchels(pVictim);
 	}
 #endif
+
+	// PS2HLU
+	// End mission target fire
+	if (pVictim->m_decayIndex == 1)
+		FireTargets("decay_player1_dead", pVictim, pVictim, USE_TOGGLE, 0);
+	if (pVictim->m_decayIndex == 2)
+		FireTargets("decay_player2_dead", pVictim, pVictim, USE_TOGGLE, 0);
+
 }
 
 //=========================================================
@@ -612,6 +620,9 @@ void CHalfLifeCoop::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entva
 //=========================================================
 void CHalfLifeCoop::DeathNotice(CBasePlayer *pVictim, entvars_t *pKiller, entvars_t *pevInflictor)
 {
+	// test
+	return;
+
 	// Work out what killed the player, and send a message to all clients about it
 	CBaseEntity *Killer = CBaseEntity::Instance(pKiller);
 
@@ -1037,7 +1048,7 @@ edict_t *CHalfLifeCoop::GetPlayerSpawnSpot(CBasePlayer *pPlayer)
 int CHalfLifeCoop::PlayerRelationship(CBaseEntity *pPlayer, CBaseEntity *pTarget)
 {
 	// half life deathmatch has only enemies
-	return GR_NOTTEAMMATE;
+	return GR_TEAMMATE;
 }
 
 BOOL CHalfLifeCoop::PlayFootstepSounds(CBasePlayer *pl, float fvol)
@@ -1160,5 +1171,3 @@ void CHalfLifeCoop::SendMOTDToClient(edict_t *client)
 
 	FREE_FILE(aFileList);
 }
-
-
