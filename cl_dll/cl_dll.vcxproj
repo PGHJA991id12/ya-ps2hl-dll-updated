@@ -232,6 +232,7 @@
     <ClCompile Include="ps2hl_hudmode.cpp" />
     <ClCompile Include="ps2hl_lock.cpp" />
     <ClCompile Include="saytext.cpp" />
+    <ClCompile Include="scoreboard.cpp" />
     <ClCompile Include="statusbar.cpp" />
     <ClCompile Include="status_icons.cpp" />
     <ClCompile Include="StudioModelRenderer.cpp" />

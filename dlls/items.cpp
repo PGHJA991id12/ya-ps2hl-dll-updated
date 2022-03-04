@@ -518,11 +518,11 @@ int CFocusEmitter::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, f
 			return 0;
 	}
 
-		if (pev->health <= 4)
+		if (pev->health = 2)
 		{
 		ChangeSequence( FOCUSEMITTER_BROKEN1 );
 		}
-		else if (pev->health <= 2)
+		else if (pev->health = 1)
 		{
 		ChangeSequence( FOCUSEMITTER_BROKEN2 );
 		} // I have no idea how this was meant to work.
@@ -646,3 +646,4 @@ void CFocusEmitter::ChangeSequence(int NewSequence)
 		pev->frame = 0;
 		ResetSequenceInfo(); 
 }
+

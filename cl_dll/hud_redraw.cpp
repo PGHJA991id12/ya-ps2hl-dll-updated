@@ -106,6 +106,9 @@ int CHud :: Redraw( float flTime, int intermission )
 			gViewPort->HideScoreBoard();
 			gViewPort->UpdateSpectatorPanel();
 		}
+		// PS2HLU
+		// Dont show VGUI1 scoreboard at the end of games/missions
+		/*
 		else if ( !m_iIntermission && intermission )
 		{
 			m_iIntermission = intermission;
@@ -118,6 +121,7 @@ int CHud :: Redraw( float flTime, int intermission )
 			if ( CVAR_GET_FLOAT( "hud_takesshots" ) != 0 )
 				m_flShotTime = flTime + 1.0;	// Take a screenshot in a second
 		}
+		*/
 	}
 
 	if (m_flShotTime && m_flShotTime < flTime)

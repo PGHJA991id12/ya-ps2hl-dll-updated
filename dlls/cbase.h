@@ -361,7 +361,13 @@ public:
 	enum EGON_FIRESTATE { FIRE_OFF, FIRE_CHARGE };
 	int m_fireState;
 
-	int m_decayIndex=0;
+	// PS2HLU
+	int m_decayIndex = 0;
+
+	// used for calculating player accuracy
+	int p_shotsFired = 0;
+	int p_shotsHit = 0;
+	float wpn_accuracy = 0.0f;
 };
 
 

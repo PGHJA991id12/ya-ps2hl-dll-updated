@@ -42,6 +42,8 @@ extern entvars_t *g_pevLastInflictor;
 #define	HUMAN_GIB_COUNT			6
 #define ALIEN_GIB_COUNT			4
 
+// PS2HLU
+extern int gmsgScoreInfo;
 
 // HACKHACK -- The gib velocity equations don't work
 void CGib :: LimitVelocity( void )
@@ -609,9 +611,6 @@ void CBaseMonster :: Killed( entvars_t *pevAttacker, int iGib )
 	// Only in co-op
 	if (pevAttacker && FClassnameIs(pevAttacker, "player") && g_pGameRules->IsCoOp())
 	{
-		// TODO: Calculate player's accuracy
-		//ALERT(at_console, "player should get a point!\n");
-
 		auto *peKiller = CBaseEntity::Instance(pevAttacker);
 
 		peKiller->AddPoints(1, FALSE);
@@ -1590,6 +1589,58 @@ Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecD
 				}
 
 				break;
+			}
+			// PS2HLU
+			// Calculate accuracy
+
+			/*
+			if (pEntity->pev->solid == SOLID_BSP)
+				ALERT(at_console, "missed shot!\n");
+			*/
+			if (FClassnameIs(pevAttacker, "player"))
+			{
+				CBaseEntity *pPlayer = CBaseEntity::Instance(pevAttacker);
+				p_shotsFired++;
+
+				// TODO: dont count hits if target entity is player and the game mode is decay
+
+					if (pEntity->pev->solid != SOLID_BSP && pEntity->IsAlive())
+					{
+						p_shotsHit++;
+					}
+
+				float accuracy = 0.0f;
+				accuracy = 100.0f / p_shotsFired * p_shotsHit;
+
+				//ALERT(at_console, "player accuracy: %f, total shots: %f, total hits: %i \n", trunc(accuracy), p_shotsFired, p_shotsHit);
+
+				// Does this solution cause problems?
+
+				pPlayer->wpn_accuracy = trunc(accuracy);
+
+				// Message only used for testing
+				/*
+				MESSAGE_BEGIN(MSG_ONE, gmsgAccuracy, NULL, pevAttacker);
+				WRITE_BYTE(ENTINDEX(pPlayer->edict()));
+				WRITE_SHORT(trunc(accuracy));
+				MESSAGE_END();
+				*/
+
+				// Only update when not in singleplayer
+				
+				if( g_pGameRules->IsCoOp() || g_pGameRules->IsDeathmatch() || g_pGameRules->IsTeamplay() )
+				{
+				MESSAGE_BEGIN(MSG_ALL, gmsgScoreInfo);
+				WRITE_BYTE(ENTINDEX(pPlayer->edict()));
+				WRITE_SHORT(pPlayer->pev->frags);
+				WRITE_SHORT(0); // Write 0 here, like in decay
+				WRITE_SHORT(0);
+				WRITE_SHORT(0);
+				WRITE_BYTE(pPlayer->wpn_accuracy);
+				WRITE_BYTE(pPlayer->pev->dmg_save);
+				WRITE_BYTE(pPlayer->pev->dmg_take);
+				MESSAGE_END();
+				}
 			}
 		}
 		// make bullet trails

@@ -516,22 +516,31 @@ void IN_Impulse (void)
 	in_impulse = atoi( gEngfuncs.Cmd_Argv(1) );
 }
 
+// PS2HLU
+// Show & hide WON/Opfor/PS2 scoreboard
+
 void IN_ScoreDown(void)
 {
 	KeyDown(&in_score);
+	gHUD.m_Scoreboard.UserCmd_ShowScores();
+	/*
 	if ( gViewPort )
 	{
 		gViewPort->ShowScoreBoard();
 	}
+	*/
 }
 
 void IN_ScoreUp(void)
 {
 	KeyUp(&in_score);
+	gHUD.m_Scoreboard.UserCmd_HideScores();
+	/*
 	if ( gViewPort )
 	{
 		gViewPort->HideScoreBoard();
 	}
+	*/
 }
 
 void IN_MLookUp (void)

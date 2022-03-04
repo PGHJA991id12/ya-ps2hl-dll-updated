@@ -312,7 +312,7 @@ protected:
 //
 // REMOVED: Vgui has replaced this.
 //
-/*
+
 class CHudScoreboard: public CHudBase
 {
 public:
@@ -340,7 +340,7 @@ private:
 	struct cvar_s *cl_showpacketloss;
 
 };
-*/
+
 
 struct extra_player_info_t 
 {
@@ -349,6 +349,10 @@ struct extra_player_info_t
 	short playerclass;
 	short teamnumber;
 	char teamname[MAX_TEAM_NAME];
+
+	// PS2HLU
+	__int16 damageTaken;	// Damage taken by player (lost armor doesnt count)
+	__int8 accuracy;		// Accuracy of players shots
 };
 
 struct team_info_t 
@@ -669,6 +673,9 @@ public:
 	// PS2HL
 	CHudMode		m_HudMode;
 	CHudLock		m_HudLock;
+
+	// PS2HLU
+	CHudScoreboard	m_Scoreboard;
 
 	void Init( void );
 	void VidInit( void );

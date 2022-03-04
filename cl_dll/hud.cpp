@@ -229,7 +229,7 @@ int __MsgFunc_ServerName(const char *pszName, int iSize, void *pbuf)
 		return gViewPort->MsgFunc_ServerName( pszName, iSize, pbuf );
 	return 0;
 }
-
+/*
 int __MsgFunc_ScoreInfo(const char *pszName, int iSize, void *pbuf)
 {
 	if (gViewPort)
@@ -250,7 +250,7 @@ int __MsgFunc_TeamInfo(const char *pszName, int iSize, void *pbuf)
 		return gViewPort->MsgFunc_TeamInfo( pszName, iSize, pbuf );
 	return 0;
 }
-
+*/
 int __MsgFunc_Spectator(const char *pszName, int iSize, void *pbuf)
 {
 	if (gViewPort)
@@ -291,9 +291,16 @@ void CHud :: Init( void )
 	HOOK_MESSAGE( BuildSt );
 	HOOK_MESSAGE( RandomPC );
 	HOOK_MESSAGE( ServerName );
+
+	// PS2HLU
+	// Removed from here,
+	// beacuse scoreboard.cpp hooks the messages
+	/*
 	HOOK_MESSAGE( ScoreInfo );
 	HOOK_MESSAGE( TeamScore );
 	HOOK_MESSAGE( TeamInfo );
+	*/
+	//HOOK_MESSAGE( Accuracy );
 
 	HOOK_MESSAGE( Spectator );
 	HOOK_MESSAGE( AllowSpec );
@@ -351,6 +358,11 @@ void CHud :: Init( void )
 	// PS2HL
 	m_HudMode.Init();
 	m_HudLock.Init();
+	
+	// PS2HLU
+	// WON/Opfor/PS2 Scoreboard
+	m_Scoreboard.Init();
+
 
 	m_Menu.Init();
 	
@@ -504,6 +516,10 @@ void CHud :: VidInit( void )
 	// PS2HL
 	m_HudMode.VidInit();
 	m_HudLock.VidInit();
+
+	// PS2HLU
+	// WON/Opfor/PS2 Scoreboard
+	m_Scoreboard.VidInit();
 }
 
 int CHud::MsgFunc_Logo(const char *pszName,  int iSize, void *pbuf)

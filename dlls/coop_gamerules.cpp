@@ -379,6 +379,9 @@ void CHalfLifeCoop::InitHUD(CBasePlayer *pl)
 	WRITE_SHORT(0);
 	WRITE_SHORT(0);
 	WRITE_SHORT(0);
+	WRITE_BYTE(0);
+	WRITE_BYTE(0);
+	WRITE_BYTE(0);
 	MESSAGE_END();
 
 	SendMOTDToClient(pl->edict());
@@ -397,6 +400,9 @@ void CHalfLifeCoop::InitHUD(CBasePlayer *pl)
 			WRITE_SHORT(plr->m_iDeaths);
 			WRITE_SHORT(0);
 			WRITE_SHORT(GetTeamIndex(plr->m_szTeamName) + 1);
+			WRITE_BYTE(plr->wpn_accuracy);
+			WRITE_BYTE(plr->pev->dmg_save);
+			WRITE_BYTE(plr->pev->dmg_take);
 			MESSAGE_END();
 		}
 	}
@@ -556,10 +562,14 @@ void CHalfLifeCoop::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entva
 	if (ktmp && (ktmp->Classify() == CLASS_PLAYER))
 		peKiller = (CBasePlayer*)ktmp;
 
+	// PS2HLU
+	// Dont lose a frag for killing yourself like in decay
+/*
 	if (pVictim->pev == pKiller)
 	{  // killed self
 		pKiller->frags -= 1;
 	}
+*/
 	else if (ktmp && ktmp->IsPlayer())
 	{
 		// if a player dies in a deathmatch game and the killer is a client, award the killer some points
@@ -580,6 +590,9 @@ void CHalfLifeCoop::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entva
 	WRITE_SHORT(pVictim->m_iDeaths);
 	WRITE_SHORT(0);
 	WRITE_SHORT(GetTeamIndex(pVictim->m_szTeamName) + 1);
+	WRITE_BYTE(pVictim->wpn_accuracy);
+	WRITE_BYTE(pVictim->pev->dmg_save);
+	WRITE_BYTE(pVictim->pev->dmg_take);
 	MESSAGE_END();
 
 	// killers score, if it's a player
@@ -594,6 +607,9 @@ void CHalfLifeCoop::PlayerKilled(CBasePlayer *pVictim, entvars_t *pKiller, entva
 		WRITE_SHORT(PK->m_iDeaths);
 		WRITE_SHORT(0);
 		WRITE_SHORT(GetTeamIndex(PK->m_szTeamName) + 1);
+		WRITE_BYTE(PK->wpn_accuracy);
+		WRITE_BYTE(PK->pev->dmg_save);
+		WRITE_BYTE(PK->pev->dmg_take);
 		MESSAGE_END();
 
 		// let the killer paint another decal as soon as he'd like.
