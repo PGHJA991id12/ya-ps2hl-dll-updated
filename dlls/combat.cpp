@@ -1637,8 +1637,7 @@ Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecD
 				WRITE_SHORT(0);
 				WRITE_SHORT(0);
 				WRITE_BYTE(pPlayer->wpn_accuracy);
-				WRITE_BYTE(pPlayer->pev->dmg_save);
-				WRITE_BYTE(pPlayer->pev->dmg_take);
+				WRITE_SHORT(pPlayer->p_dmgTaken);
 				MESSAGE_END();
 				}
 			}

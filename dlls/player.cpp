@@ -681,6 +681,19 @@ int CBasePlayer :: TakeDamage( entvars_t *pevInflictor, entvars_t *pevAttacker, 
 				SetSuitUpdate("!HEV_HLTH1", FALSE, SUIT_NEXT_IN_10MIN);	// health dropping
 		}
 
+	if(g_pGameRules->IsCoOp() || g_pGameRules->IsDeathmatch() || g_pGameRules->IsTeamplay())
+	{
+	MESSAGE_BEGIN(MSG_ALL, gmsgScoreInfo);
+	WRITE_BYTE(ENTINDEX(edict()));
+	WRITE_SHORT(pev->frags);
+	WRITE_SHORT(m_iDeaths);
+	WRITE_SHORT(0);
+	WRITE_SHORT(g_pGameRules->GetTeamIndex(m_szTeamName) + 1);
+	WRITE_BYTE(wpn_accuracy);
+	WRITE_SHORT(p_dmgTaken);
+	MESSAGE_END();
+	}
+
 	return fTookDamage;
 }
 
@@ -1663,8 +1676,7 @@ void CBasePlayer::AddPoints( int score, BOOL bAllowNegativeScore )
 		WRITE_SHORT( 0 );
 		WRITE_SHORT( g_pGameRules->GetTeamIndex( m_szTeamName ) + 1 );
 		WRITE_BYTE(wpn_accuracy);
-		WRITE_BYTE(pev->dmg_save);
-		WRITE_BYTE(pev->dmg_take);
+		WRITE_SHORT(p_dmgTaken);
 	MESSAGE_END();
 }
 
@@ -4011,6 +4023,11 @@ void CBasePlayer :: UpdateClientData( void )
 
 	if (pev->dmg_take || pev->dmg_save || m_bitsHUDDamage != m_bitsDamageType)
 	{
+		// PS2HLU
+		// Store damage in a seperate integer,
+		// beacuse pev->dmg_take gets nulled out
+		p_dmgTaken += pev->dmg_take;
+
 		// Comes from inside me if not set
 		Vector damageOrigin = pev->origin;
 		// send "damage" message

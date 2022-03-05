@@ -368,6 +368,8 @@ public:
 	int p_shotsFired = 0;
 	int p_shotsHit = 0;
 	float wpn_accuracy = 0.0f;
+
+	int p_dmgTaken = 0;
 };
 
 

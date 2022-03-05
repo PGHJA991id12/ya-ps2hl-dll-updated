@@ -501,8 +501,7 @@ int CHudScoreboard :: MsgFunc_ScoreInfo( const char *pszName, int iSize, void *p
 	// PS2HLU
 	// Note: Damage value isnt updating, only after death, need to investigate
 	short accuracy = READ_BYTE();
-	int armor = READ_BYTE();	// armor
-	int damageTaken = READ_BYTE();	// health
+	int damageTaken = READ_SHORT();	// health
 
 	if ( cl > 0 && cl <= MAX_PLAYERS )
 	{
@@ -510,7 +509,7 @@ int CHudScoreboard :: MsgFunc_ScoreInfo( const char *pszName, int iSize, void *p
 		g_PlayerExtraInfo[cl].deaths = deaths;
 		g_PlayerExtraInfo[cl].playerclass = playerclass;
 		g_PlayerExtraInfo[cl].teamnumber = teamnumber;
-		g_PlayerExtraInfo[cl].damageTaken += (damageTaken + armor);
+		g_PlayerExtraInfo[cl].damageTaken = damageTaken;
 		g_PlayerExtraInfo[cl].accuracy = accuracy;
 
 		gViewPort->UpdateOnPlayerInfo();

@@ -304,8 +304,7 @@ void CHalfLifeTeamplay::ChangePlayerTeam( CBasePlayer *pPlayer, const char *pTea
 		WRITE_SHORT( 0 );
 		WRITE_SHORT( g_pGameRules->GetTeamIndex( pPlayer->m_szTeamName ) + 1 );
 		WRITE_BYTE(pPlayer->wpn_accuracy);
-		WRITE_BYTE(pPlayer->pev->dmg_save);
-		WRITE_BYTE(pPlayer->pev->dmg_take);
+		WRITE_SHORT(pPlayer->p_dmgTaken);
 	MESSAGE_END();
 }
 
