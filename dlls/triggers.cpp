@@ -596,6 +596,11 @@ public:
 	void InitTrigger( void );
 
 	virtual int	ObjectCaps( void ) { return CBaseToggle :: ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+private:
+	// PS2HLU
+	// Trigger stuff for decay
+	CBaseEntity *prevActivator = NULL;
+	BOOL canTriggerProceed = FALSE;
 };
 
 LINK_ENTITY_TO_CLASS( trigger, CBaseTrigger );
@@ -1246,16 +1251,6 @@ void CBaseTrigger :: MultiTouch( CBaseEntity *pOther )
 				return;         // not facing the right way
 		}
 #endif
-		
-		// PS2HLU
-		// Player_Index keyvalue stuff, mostly used in ht01accident
-		ALERT(at_console, "TRIGGER has a m_decayIndex of %d\n", this->m_decayIndex);
-		if (FClassnameIs(pev, "trigger_multiple"))
-		if(this->m_decayIndex == 1 || this->m_decayIndex == 2)
-			if (!(pOther->m_decayIndex == this->m_decayIndex)) {
-				ALERT(at_console, "TRIGGER WONT ACTIVATE!!!\n");
-				return;
-			}
 
 		ActivateMultiTrigger( pOther );
 	}
@@ -1269,6 +1264,9 @@ void CBaseTrigger :: MultiTouch( CBaseEntity *pOther )
 //
 void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 {
+	// Dont allow trigger to proceed
+	canTriggerProceed = FALSE;
+
 	if (pev->nextthink > gpGlobals->time)
 		return;         // still waiting for reset time
 
@@ -1276,12 +1274,31 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 		return;
 
 	// PS2HLU
-	// Only activate trigger when both players
-	// are standing in it
-	// TODO: Somehow get this working
-	if (this->m_decayIndex && FClassnameIs(pev, "trigger_multiple"))
-		if (!(pActivator->m_decayIndex == this->m_decayIndex)) // Had to break this for testing, and it wasnt even working to begin with
-			return;
+	// Allow trigger to activate only when both players are
+	// standing in it, or the player's decay Index matches the trigger's
+	if (pev->spawnflags & 256 && prevActivator && pActivator->Classify() == CLASS_PLAYER)
+	{
+		if (!m_decayIndex)
+		{
+			if (prevActivator->m_decayIndex != pActivator->m_decayIndex)
+				canTriggerProceed = TRUE;
+
+		}
+		else
+		{
+			if (pActivator->m_decayIndex == this->m_decayIndex)
+				canTriggerProceed = TRUE;
+		}
+	}
+
+	// set previous activator only after the value was needed
+		prevActivator = pActivator;
+
+	if (!(pev->spawnflags & 256 &&  pActivator->Classify() == CLASS_PLAYER))
+		canTriggerProceed = TRUE;
+
+	if (!canTriggerProceed)
+		return;
 
 	if (FClassnameIs(pev, "trigger_secret"))
 	{

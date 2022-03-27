@@ -948,12 +948,7 @@ void CHalfLifeCoop::PlayerGotItem(CBasePlayer *pPlayer, CItem *pItem)
 //=========================================================
 int CHalfLifeCoop::ItemShouldRespawn(CItem *pItem)
 {
-	if (pItem->pev->spawnflags & SF_NORESPAWN)
-	{
 		return GR_ITEM_RESPAWN_NO;
-	}
-
-	return GR_ITEM_RESPAWN_YES;
 }
 
 

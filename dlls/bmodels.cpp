@@ -97,6 +97,10 @@ LINK_ENTITY_TO_CLASS( func_wall_toggle, CFuncWallToggle );
 
 void CFuncWallToggle :: Spawn( void )
 {
+	// PS2HLU
+	// TODO: Add spawnflag 2 & 4
+	// spawnflag 4 allows monsters to see throught the wall
+	// spawnflag 2 certainly does something, but not sure what
 	CFuncWall::Spawn();
 	if ( pev->spawnflags & SF_WALL_START_OFF )
 		TurnOff();
