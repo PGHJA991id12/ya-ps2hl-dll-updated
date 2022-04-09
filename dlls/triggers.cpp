@@ -1236,6 +1236,14 @@ void CBaseTrigger :: MultiTouch( CBaseEntity *pOther )
 
 	pevToucher = pOther->pev;
 
+	// PS2HLU
+	// Set to true if the player is in the trigger
+	// Used to make sure both activators are standing
+	// in the trigger
+	if(g_pGameRules->IsCoOp())
+		if (pOther->Classify() == CLASS_PLAYER)
+			pOther->m_bIsInTrigger = TRUE;
+
 	// Only touch clients, monsters, or pushables (depending on flags)
 	if ( ((pevToucher->flags & FL_CLIENT) && !(pev->spawnflags & SF_TRIGGER_NOCLIENTS)) ||
 		 ((pevToucher->flags & FL_MONSTER) && (pev->spawnflags & SF_TRIGGER_ALLOWMONSTERS)) ||
@@ -1280,7 +1288,7 @@ void CBaseTrigger :: ActivateMultiTrigger( CBaseEntity *pActivator )
 	{
 		if (!m_decayIndex)
 		{
-			if (prevActivator->m_decayIndex != pActivator->m_decayIndex)
+			if ((prevActivator->m_decayIndex != pActivator->m_decayIndex) && prevActivator->m_bIsInTrigger && pActivator->m_bIsInTrigger)
 				canTriggerProceed = TRUE;
 
 		}

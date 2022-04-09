@@ -370,6 +370,10 @@ public:
 	float wpn_accuracy = 0.0f;
 
 	int p_dmgTaken = 0;
+
+	// used to determine if player is still
+	// standing in the trigger
+	BOOL m_bIsInTrigger = FALSE;
 };
 
 

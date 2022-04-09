@@ -1821,6 +1821,9 @@ void CBasePlayer::PreThink(void)
 
 	g_pGameRules->PlayerThink( this );
 
+	// PS2HLU
+	m_bIsInTrigger = FALSE;
+
 	if ( g_fGameOver )
 		return;         // intermission or finale
 
@@ -2817,7 +2820,12 @@ void CBasePlayer::Spawn( void )
 	pev->solid			= SOLID_SLIDEBOX;
 	pev->movetype		= MOVETYPE_WALK;
 	pev->max_health		= pev->health;
-	pev->flags		   &= FL_PROXY;	// keep proxy flag sey by engine
+
+	// PS2HLU
+	// Dont clear FL_FAKECLIENT flag, beacuse it breaks bots (broke my implementation)
+	// This fix belongs to SoloKiller
+	// https://github.com/SamVanheer/halflife-updated/commit/812766c12c563cfc4e2948acd967bc1cee3347b2
+	pev->flags		   &= FL_PROXY | FL_FAKECLIENT;	// keep proxy flag and fakeclient flags set sey by engine
 	pev->flags		   |= FL_CLIENT;
 	pev->air_finished	= gpGlobals->time + 12;
 	pev->dmg			= 2;				// initial water damage
