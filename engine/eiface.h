@@ -379,10 +379,9 @@ typedef struct
 	short			flags;
 } TYPEDESCRIPTION;
 
-#ifdef ARRAYSIZE
-#undef ARRAYSIZE
-#endif
+#ifndef ARRAYSIZE
 #define ARRAYSIZE(p)		(sizeof(p)/sizeof(p[0]))
+#endif
 
 typedef struct 
 {
