@@ -848,6 +848,16 @@ int	CCineMonster::IgnoreConditions( void )
 {
 	if ( CanInterrupt() )
 		return 0;
+
+	// PS2HLU
+
+	// TODO: Figure this out later
+
+	// Why would they do this?
+	//CBaseEntity *pTarget = m_hTargetEnt;
+	//if (pTarget->pev->spawnflags & 32768)
+	//	return 0;
+
 	return SCRIPT_BREAK_CONDITIONS;
 }
 

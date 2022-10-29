@@ -407,6 +407,10 @@ public:
 	int m_Emitterbeam;
 	//int m_iExplode;
 	CBeam *m_pBeam;
+	Vector targetVector;
+	float AimBlendStart = 0.0f;
+	float AimBlendEnd = 0.0f;
+	float weight = 0.0f;
 };
 
 void CFocusEmitter::Precache()
@@ -432,6 +436,7 @@ void CFocusEmitter::Spawn()
 	// used for sequence handleing
 	//SetSequenceBox(); // This was a temponary solution
 	SetBodygroup( 2,2 );
+	InitBoneControllers();
 	SetThink(&CFocusEmitter::EmitterThink);
 
 	ChangeSequence( FOCUSEMITTER_IDLE_CLOSED );
@@ -457,8 +462,42 @@ void CFocusEmitter::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 void CFocusEmitter::EmitterThink (void)
 {
 	StudioFrameAdvance( 0 );
-	SetThink(&CFocusEmitter::EmitterThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+
+	
+	if (pev->target)
+	{
+		//ALERT(at_console, "FocusEmitter Target found!\n");
+		CBaseEntity *aimtarget = UTIL_FindEntityByTargetname(NULL, STRING(pev->target));
+		Vector targetVector = aimtarget->pev->origin;
+
+		float yaw = VecToYaw(targetVector - pev->origin) - pev->angles.y;
+		if (yaw > 360) yaw -= 360;
+		if (yaw < 0) yaw += 360;
+
+		// Same behaviour like in the PS2 version
+		// NOTE: commenting this out doesnt break anything
+		if (AimBlendStart == 0.0f) AimBlendStart = yaw;
+
+
+		AimBlendEnd = yaw;
+		// TODO:
+		// Get the movement speed to somewhat match the
+		// one in the ps2 version
+		if(weight < 1.0) weight = weight + 0.01;
+		float finalBlend = (AimBlendEnd * weight) + (AimBlendStart * (1 - weight));
+
+		// turn towards vector
+		SetBoneController(0, finalBlend);
+
+		if (weight >= 1.0)
+		{
+			//ALERT(at_console, "Focus emitter Blend Animation finished!\n");
+			pev->target = NULL;
+			weight = 0;
+			AimBlendStart = yaw;
+		}
+	}
+	
 
 	switch (pev->sequence)
 	{
@@ -489,7 +528,8 @@ void CFocusEmitter::EmitterThink (void)
 		// Do nothing
 		break;
 	}
-
+	SetThink(&CFocusEmitter::EmitterThink);
+	pev->nextthink = gpGlobals->time + 0.1;
 }
 
 void CFocusEmitter::TraceAttack( entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType )
