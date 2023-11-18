@@ -222,6 +222,12 @@ void CGameRules::RefreshSkillData ( void )
 	// Sentry Turret
 	gSkillData.sentryHealth = GetSkillCvar( "sk_sentry_health");
 
+	// PS2HLU
+	// Decay definitions
+	gSkillData.flyerDmg = GetSkillCvar("sk_flyer_damage");
+	gSkillData.flyerHealth = GetSkillCvar("sk_flyer_health");
+	gSkillData.focusHealth = GetSkillCvar("sk_focus_health");
+
 // PLAYER WEAPONS
 
 	// Crowbar whack

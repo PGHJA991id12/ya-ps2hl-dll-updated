@@ -286,6 +286,21 @@ cvar_t	sk_sentry_health1 = {"sk_sentry_health1","0"};
 cvar_t	sk_sentry_health2 = {"sk_sentry_health2","0"};
 cvar_t	sk_sentry_health3 = {"sk_sentry_health3","0"};
 
+// PS2HLU
+
+// Focus emitter
+cvar_t	sk_focus_health1 = { "sk_focus_health1","0" };
+cvar_t	sk_focus_health2 = { "sk_focus_health2","0" };
+cvar_t	sk_focus_health3 = { "sk_focus_health3","0" };
+
+// Flyer
+cvar_t	sk_flyer_health1 = { "sk_flyer_health1","0" };
+cvar_t	sk_flyer_health2 = { "sk_flyer_health2","0" };
+cvar_t	sk_flyer_health3 = { "sk_flyer_health3","0" };
+
+cvar_t	sk_flyer_damage1 = { "sk_flyer_damage1","0" };
+cvar_t	sk_flyer_damage2 = { "sk_flyer_damage2","0" };
+cvar_t	sk_flyer_damage3 = { "sk_flyer_damage3","0" };
 
 // PLAYER WEAPONS
 
@@ -734,6 +749,17 @@ void GameDLLInit( void )
 	CVAR_REGISTER ( &sk_sentry_health2 );// {"sk_sentry_health2","0"};
 	CVAR_REGISTER ( &sk_sentry_health3 );// {"sk_sentry_health3","0"};
 
+	// PS2HLU
+	// Decay stuff
+	CVAR_REGISTER(&sk_flyer_health1);
+	CVAR_REGISTER(&sk_flyer_health2);
+	CVAR_REGISTER(&sk_flyer_health3);
+	CVAR_REGISTER(&sk_flyer_damage1);
+	CVAR_REGISTER(&sk_flyer_damage2);
+	CVAR_REGISTER(&sk_flyer_damage3);
+	CVAR_REGISTER(&sk_focus_health1);
+	CVAR_REGISTER(&sk_focus_health2);
+	CVAR_REGISTER(&sk_focus_health3);
 
 	// PLAYER WEAPONS
 

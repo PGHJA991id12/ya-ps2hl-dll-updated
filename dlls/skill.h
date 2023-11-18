@@ -90,6 +90,17 @@ struct skilldata_t
 	float miniturretHealth;
 	float sentryHealth;
 
+	// PS2HLU
+	// Decay skill variables
+	float flyerHealth;
+	float flyerDmg;
+	float focusHealth;
+
+	// PS2HLU
+	// NOTE: Decay also uses variables defined here to store
+	// mission details eg. player1 kills, damage, accuracy, grade, whether it was completed, etc...
+	// Interestingly it also defines a quite a few extra mission variables, these ones are likely placeholders
+	// ht21 - ht23 (???), ht91 - ht93 (ht91 = alien bonus mission)
 
 // Player Weapons
 	float plrDmgCrowbar;
