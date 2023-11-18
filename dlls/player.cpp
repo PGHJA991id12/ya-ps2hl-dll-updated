@@ -1822,6 +1822,8 @@ void CBasePlayer::PreThink(void)
 	g_pGameRules->PlayerThink( this );
 
 	// PS2HLU
+	// TODO: instead of this, just count the
+	// number of players inside the trigger
 	m_bIsInTrigger = FALSE;
 
 	if ( g_fGameOver )

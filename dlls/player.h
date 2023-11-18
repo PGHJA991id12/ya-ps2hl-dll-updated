@@ -206,7 +206,8 @@ public:
 	virtual BOOL ShouldFadeOnDeath( void ) { return FALSE; }
 	virtual	BOOL IsPlayer( void ) { return TRUE; }			// Spectators should return FALSE for this, they aren't "players" as far as game logic is concerned
 
-	virtual BOOL IsNetClient( void ) { return TRUE; }		// Bots should return FALSE for this, they can't receive NET messages
+	BOOL IsNetClient() override { return (pev->flags & FL_FAKECLIENT) == 0; }
+	// Bots should return FALSE for this, they can't receive NET messages
 															// Spectators should return TRUE for this
 	virtual const char *TeamID( void );
 

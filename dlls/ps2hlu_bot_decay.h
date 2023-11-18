@@ -20,11 +20,23 @@ class CDecayBot : public CBasePlayer
 {
 public:
 	void Spawn(void);
-	void BotThink(void);  // think function for the bot
+	void EXPORT BotThink(void);  // think function for the bot
 	void Killed(entvars_t *pevAttacker, int iGib);
-	void PlayerDeathThink(void);
-	void CreateBot();
-	void SwapBotWithPlayer();
+	void EXPORT PlayerDeathThink(void);
+	void EXPORT CreateBot();
+	void EXPORT SwapBotWithPlayer();
+	virtual void Crouch(void);
+	BOOL IsCrouching(void) const { return m_fIsCrouching; }
+	virtual void ExecuteCommand(void);
+	virtual Vector GetAutoaimVector(float delta);
+
+	// actual AI part of the bot
+	CBasePlayer *GetEnemy();
+	CBaseMonster *GetAttacker() const;
+	CBaseMonster *m_attacker;
+	BOOL IsEnemy(CBaseEntity *enemy);
+	virtual void PrimaryAttack(void);
+	virtual void ClearPrimaryAttack(void);
 
 	// Bots should return FALSE for this, they can't receive NET messages
 	virtual BOOL IsNetClient(void) { return FALSE; }
@@ -33,7 +45,30 @@ public:
 	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker,
 		float flDamage, int bitsDamageType);
 	int ObjectCaps() { return FCAP_IMPULSE_USE; };
-
-
+	mutable EHANDLE m_enemy;
 private:
+	
+	BOOL m_fIsCrouching = FALSE;
+	unsigned short m_buttonFlags;
+	float m_forwardSpeed;
+
+	// Think mechanism variables
+	float m_flNextBotThink;
+	float m_flNextFullBotThink;
+
+	// Command interface variables
+	float m_flPreviousCommandTime;
+
+	float g_flBotCommandInterval = 1.0 / 30.0;
+
+	// full AI only 10 times per second
+	float g_flBotFullThinkInterval = 1.0 / 10.0;
+
+	float m_verticalSpeed;
+	byte ThrottledMsec(void) const;
 };
+
+inline CBasePlayer *CDecayBot::GetEnemy()
+{
+	return (CBasePlayer*)(CBaseEntity*)m_enemy;
+}

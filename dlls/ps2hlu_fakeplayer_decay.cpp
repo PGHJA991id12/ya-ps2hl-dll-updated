@@ -83,12 +83,12 @@ CBasePlayer *CBasePlayerByIndex(int playerIndex)
 //END BOT
 
 
-void CDecayBot::SwapBotWithPlayer()
+void EXPORT CDecayBot::SwapBotWithPlayer()
 {
 
 	CBaseEntity *pPlayer = CBaseEntity::Instance(g_engfuncs.pfnPEntityOfEntIndex(1));
-	Vector BotOrigin;
-	Vector PlayerOrigin;
+	//Vector BotOrigin;
+	//Vector PlayerOrigin;
 	Vector BotAngles;
 	Vector PlayerAngles;
 	Vector BotMins;
@@ -97,10 +97,16 @@ void CDecayBot::SwapBotWithPlayer()
 	Vector PlayerMaxs;
 	Vector BotVAngles;
 	Vector PlayerVAngles;
+	Vector BotVelocity;
+	Vector PlayerVelocity;
 	int PlayerSkin=0;
 	int BotSkin=0;
 	int PlayerBody = 0;
 	int BotBody = 0;
+	/*
+	int PlayerButton = 0;
+	int BotButton = 0;
+	*/
 
 
 	for (int i = 1; i <= gpGlobals->maxClients; i++)
@@ -113,9 +119,13 @@ void CDecayBot::SwapBotWithPlayer()
 		// check if this is a FAKECLIENT (i.e. is it a bot?)
 		if (FBitSet(pPlayer2->pev->flags, FL_FAKECLIENT))
 		{
+			//pPlayer->m_decayIndex = (pPlayer->m_decayIndex == 1) ? 2 : 1;
+			//pPlayer2->m_decayIndex = (pPlayer2->m_decayIndex == 1) ? 2 : 1;
+			//ALERT(at_console, "Player 1 index changed to %d\n", pPlayer->m_decayIndex);
+			//ALERT(at_console, "Player 2 index changed to %d\n", pPlayer2->m_decayIndex);
 			// Set Data
-			BotOrigin = pPlayer2->pev->origin;
-			PlayerOrigin = pPlayer->pev->origin;
+			//BotOrigin = pPlayer2->pev->origin;
+			//PlayerOrigin = pPlayer->pev->origin;
 			BotAngles = pPlayer2->pev->angles;
 			PlayerAngles = pPlayer->pev->angles;
 			PlayerMins = pPlayer->pev->mins;
@@ -128,22 +138,60 @@ void CDecayBot::SwapBotWithPlayer()
 			BotSkin = pPlayer2->pev->skin;
 			PlayerBody = pPlayer->pev->body;
 			BotBody = pPlayer2->pev->body;
+			/*
+			PlayerButton = pPlayer->pev->button;
+			BotButton = pPlayer2->pev->button;
+			*/
+			PlayerVelocity = pPlayer->pev->velocity;
+			BotVelocity = pPlayer2->pev->velocity;
+			
+			Vector tmp = pPlayer->pev->origin;
+			Vector tmp2 = pPlayer2->pev->origin;
+
+			//pPlayer->pev->flags &= ~FL_ONGROUND;
+			//pPlayer2->pev->flags &= ~FL_ONGROUND;
 
 			// Do the actual switch
-			UTIL_SetOrigin(pPlayer->pev, BotOrigin);
-			UTIL_SetOrigin(pPlayer2->pev, PlayerOrigin);
+			pPlayer->m_bIsInTrigger = FALSE;
+			pPlayer2->m_bIsInTrigger = FALSE;
+			UTIL_SetOrigin(pPlayer->pev, tmp2);
+			UTIL_SetOrigin(pPlayer2->pev, tmp);
 			pPlayer->pev->angles = BotAngles;
 			pPlayer2->pev->angles = PlayerAngles;
 			pPlayer->pev->v_angle = BotVAngles;
 			pPlayer2->pev->v_angle = PlayerVAngles;
-			UTIL_SetSize(pPlayer->pev, BotMins, BotMaxs);
-			UTIL_SetSize(pPlayer2->pev, PlayerMins, PlayerMaxs);
+			//UTIL_SetSize(pPlayer->pev, BotMins, BotMaxs);
+			//UTIL_SetSize(pPlayer2->pev, PlayerMins, PlayerMaxs);
 			//pPlayer2->pev->absmax = pPlayer->pev->absmax;
 			//pPlayer2->pev->absmin = pPlayer->pev->absmax;
 			pPlayer->pev->skin = BotSkin;
 			pPlayer2->pev->skin = PlayerSkin;
 			pPlayer->pev->body = BotBody;
 			pPlayer2->pev->body = PlayerBody;
+			pPlayer->pev->velocity = BotVelocity;
+			pPlayer2->pev->velocity = PlayerVelocity;
+			/*
+			pPlayer2->pev->avelocity = pPlayer->pev->avelocity;
+			pPlayer2->pev->basevelocity = pPlayer->pev->basevelocity;
+			pPlayer2->pev->flFallVelocity = pPlayer->pev->flFallVelocity;
+			pPlayer2->pev->clbasevelocity = pPlayer->pev->clbasevelocity;
+			*/
+			//pPlayer->m_bIsInTrigger = FALSE;
+			//pPlayer2->m_bIsInTrigger = FALSE;
+
+			// This doesnt help in getting the bot unstuck from the ground
+
+			//pPlayer->pev->button = pPlayer2->pev->button = 0;
+			// fix bot getting stuck in floor
+			//if (FBitSet(pPlayer->pev->flags, FL_DUCKING))
+			//	pPlayer2->Crouch();
+			/*
+			if (FBitSet(pPlayer->pev->flags, FL_DUCKING))
+			{
+				ALERT(at_console, "player is crouched!\n");
+				CDecayBot *bot = static_cast<CDecayBot *>(pPlayer2);
+				bot->Crouch();
+			}*/
 
 			// This is important!!!
 			// Make sure bot & player face in the right direction
@@ -151,6 +199,9 @@ void CDecayBot::SwapBotWithPlayer()
 			// Its always weird
 			pPlayer2->pev->fixangle = 1;
 			pPlayer->pev->fixangle = 1;
+
+			//pPlayer->pev->flags &= ~FL_ONGROUND;
+			//pPlayer2->pev->flags &= ~FL_ONGROUND;
 
 			// TODO: Send over health, armor, ammo, and weapons
 		}
@@ -164,186 +215,41 @@ void CDecayBot::Spawn()
 
 	pev->flags = FL_CLIENT | FL_FAKECLIENT;
 
-	pev->sequence = LookupActivity(ACT_IDLE);
-	SetAnimation(PLAYER_IDLE);
-	pev->view_ofs = g_vecZero;
-
-	DROP_TO_FLOOR(ENT(pev));
-
-	m_pLastItem = NULL;
-	m_fInitHUD = TRUE;
-	m_iClientHideHUD = -1;     // force this to be recalculated
-	m_fWeapon = FALSE;
-	m_pClientActiveItem = NULL;
-	m_iClientBattery = -1;
-
-	g_ulModelIndexPlayer = pev->modelindex;
-
 	SetThink(&CDecayBot::BotThink);
-	pev->nextthink = gpGlobals->time + .1;
+
+	m_flNextBotThink = gpGlobals->time + g_flBotCommandInterval;
+	m_flNextFullBotThink = gpGlobals->time + g_flBotFullThinkInterval;
+	m_flPreviousCommandTime = gpGlobals->time;
+
+	m_fIsCrouching = FALSE;
+	m_forwardSpeed = 0.0f;
+	m_buttonFlags = 0;
+
+	pev->nextthink = gpGlobals->time + 0.1;
 }
 
 int CDecayBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
+	CBaseEntity *attacker = GetClassPtr((CBaseEntity *)pevInflictor);
+	if(IsEnemy(attacker))
+		m_attacker = static_cast<CBaseMonster *>(attacker);
+
 	return CBasePlayer::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
-void CDecayBot::PlayerDeathThink(void)
+void EXPORT CDecayBot::PlayerDeathThink(void)
 {
-	float flForward;
-
-	pev->nextthink = gpGlobals->time + 0.1;
-
-	if (FBitSet(pev->flags, FL_ONGROUND))
-	{
-		flForward = pev->velocity.Length() - 20;
-		if (flForward <= 0)
-			pev->velocity = g_vecZero;
-		else
-			pev->velocity = flForward * pev->velocity.Normalize();
-	}
-
-	if (HasWeapons())
-	{
-		/*
-		we drop the guns here because weapons that have an area effect and can kill their user
-		will sometimes crash coming back from CBasePlayer::Killed() if they kill their owner because the
-		player class sometimes is freed. It's safer to manipulate the weapons once we know
-		we aren't calling into any of their code anymore through the player pointer.
-		*/
-		PackDeadPlayerItems();
-	}
-
-	if (pev->modelindex && (!m_fSequenceFinished) && (pev->deadflag == DEAD_DYING))
-	{
-		StudioFrameAdvance();
-
-		m_iRespawnFrames++;
-		if (m_iRespawnFrames < 60)  // animations should be no longer than this
-			return;
-	}
-
-	if (pev->deadflag == DEAD_DYING)
-	{
-		pev->deadflag = DEAD_DEAD;
-		DROP_TO_FLOOR(ENT(pev));  // put the body on the ground
-	}
-
-	StopAnimation();
-
-	pev->effects |= EF_NOINTERP;
-	pev->framerate = 0.0;
-
-	if (pev->deadflag == DEAD_DEAD)
-	{
-		if (g_pGameRules->FPlayerCanRespawn(this))
-		{
-			m_fDeadTime = gpGlobals->time;
-			pev->deadflag = DEAD_RESPAWNABLE;
-		}
-
-		return;
-	}
-
-	// check if time to respawn...
-	if (gpGlobals->time > (m_fDeadTime + 5.0))
-	{
-		pev->button = 0;
-		m_iRespawnFrames = 0;
-
-		//ALERT( at_console, "Respawn\n" );
-
-		respawn(pev, !(m_afPhysicsFlags & PFLAG_OBSERVER));
-		pev->nextthink = -1;
-	}
+	CBasePlayer::PlayerDeathThink();
 }
 
 void CDecayBot::Killed(entvars_t *pevAttacker, int iGib)
 {
-	CSound *pSound;
-
-	g_pGameRules->PlayerKilled(this, pevAttacker, g_pevLastInflictor);
-
-	if (m_pTank != NULL)
-	{
-		m_pTank->Use(this, this, USE_OFF, 0);
-		m_pTank = NULL;
-	}
-
-	// this client isn't going to be thinking for a while, so reset the sound
-	// until they respawn
-	pSound = CSoundEnt::SoundPointerForIndex(CSoundEnt::ClientSoundIndex(edict()));
-	{
-		if (pSound)
-		{
-			pSound->Reset();
-		}
-	}
-
-	SetAnimation(PLAYER_DIE);
-
-	pev->modelindex = g_ulModelIndexPlayer;    // don't use eyes
-
-#if !defined(DUCKFIX)
-	pev->view_ofs = Vector(0, 0, -8);
-#endif
-	pev->deadflag = DEAD_DYING;
-	pev->solid = SOLID_NOT;
-	pev->movetype = MOVETYPE_TOSS;
-	//   pev->movetype      = MOVETYPE_NONE;  // should we use this instead???
-
-	ClearBits(pev->flags, FL_ONGROUND);
-
-	if (pev->velocity.z < 10)
-		pev->velocity.z += RANDOM_FLOAT(0, 300);
-
-	// clear out the suit message cache so we don't keep chattering
-	SetSuitUpdate(NULL, FALSE, 0);
-
-	// send "health" update message to zero
-	m_iClientHealth = 0;
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgHealth, NULL, pev);
-	WRITE_BYTE(m_iClientHealth);
-	MESSAGE_END();
-
-	// Tell Ammo Hud that the player is dead
-	MESSAGE_BEGIN(MSG_ONE, gmsgCurWeapon, NULL, pev);
-	WRITE_BYTE(0);
-	WRITE_BYTE(0xFF);
-	WRITE_BYTE(0xFF);
-	MESSAGE_END();
-
-	// reset FOV
-	m_iFOV = m_iClientFOV = 0;
-
-	MESSAGE_BEGIN(MSG_ONE, gmsgSetFOV, NULL, pev);
-	WRITE_BYTE(0);
-	MESSAGE_END();
-
-	if ((pev->health < -40 && iGib != GIB_NEVER) || iGib == GIB_ALWAYS)
-	{
-		GibMonster();   // This clears pev->model
-	}
-
-	DeathSound();
-
-	pev->angles.x = 0;  // don't let the player tilt
-	pev->angles.z = 0;
-
-	// PS2HLU
-	// End mission target fire
-	if (m_decayIndex == 1)
-		FireTargets("decay_player1_dead", this, this, USE_TOGGLE, 0);
-	if (m_decayIndex == 2)
-		FireTargets("decay_player2_dead", this, this, USE_TOGGLE, 0);
-
-	SetThink(&CDecayBot::PlayerDeathThink);
-	pev->nextthink = gpGlobals->time + 0.1;
+	CBasePlayer::Killed(pevAttacker, iGib);
 }
 
-void CDecayBot::BotThink(void)
+void EXPORT CDecayBot::BotThink(void)
 {
+	/*
 	if (!IsInWorld())
 	{
 		SetTouch(NULL);
@@ -358,10 +264,40 @@ void CDecayBot::BotThink(void)
 		pev->solid = SOLID_NOT;
 
 		return;
-	}
+	}*/
 
+	//m_forwardSpeed = 0;
+	//pev->button = 0;
+	//pev->angles.z = 0;
+	//pev->angles.y = pev->v_angle.y;
+	/*
 	StudioFrameAdvance();
 	ItemPostFrame();
+	*/
+	
+	// this causes an access violation for some reason, ill just disable it for now
+#if 0
+	if (/*GetAttacker() != NULL && GetAttacker() != this->GetEnemy() && */m_attacker != NULL)
+	{
+		//GetAttacker();
+		CBaseMonster *m_attacker2 = GetAttacker();
+
+		if (!m_attacker2)
+			return;
+
+		pev->angles.x = 0;
+		
+		Vector enemyorigin = ((m_attacker2->pev->origin + m_attacker2->pev->view_ofs));
+		enemyorigin.z -= m_attacker2->pev->size.z * 0.1f;
+		enemyorigin = (enemyorigin + ((m_attacker2->pev->size / 2 + m_attacker2->pev->velocity) / 3)) - GetGunPosition();
+		pev->v_angle = UTIL_VecToAngles(enemyorigin);
+		pev->v_angle.z = 0;
+		pev->fixangle = 1;
+		PrimaryAttack();
+	}
+	else
+		ClearPrimaryAttack();
+#endif
 	/*
 	// DEBUG
 	// This code visualizes the bounding box
@@ -377,4 +313,103 @@ void CDecayBot::BotThink(void)
 			DBG_RenderBBox(pPlayer2->pev->origin, pPlayer2->pev->mins, pPlayer2->pev->maxs, 10, 10, 10);
 	}
 	*/
+
+	if (gpGlobals->time >= m_flNextBotThink)
+	{
+		m_flNextBotThink = gpGlobals->time + g_flBotCommandInterval;
+
+		if (gpGlobals->time >= m_flNextFullBotThink)
+		{
+			m_flNextFullBotThink = gpGlobals->time + g_flBotFullThinkInterval;
+			m_fIsCrouching = FALSE;
+			m_buttonFlags = 0;
+			m_forwardSpeed = 0.0f;
+		}
+
+		//m_forwardSpeed = GetMoveSpeed();
+		ExecuteCommand();
+		//ALERT(at_console, "bot is thinking! \n");
+	}
+	pev->nextthink = gpGlobals->time + 0.1;
 }
+
+
+void CDecayBot::ExecuteCommand(void)
+{
+	byte adjustedMSec;
+
+	// Adjust msec to command time interval
+	adjustedMSec = ThrottledMsec();
+
+	// player model is "munged"
+	pev->angles = pev->v_angle;
+	pev->angles.x /= -3.0;
+
+	// save the command time
+	m_flPreviousCommandTime = gpGlobals->time;
+
+
+	// this doesnt work for some reason, the bot gets stuck in the ground when
+	// swapping players when crouched
+	if (m_fIsCrouching)
+		SetBits(m_buttonFlags, IN_DUCK);
+
+	// Run the command
+	(*g_engfuncs.pfnRunPlayerMove)(edict(), pev->v_angle, m_forwardSpeed, 0, 0,
+		m_buttonFlags, 0, adjustedMSec);
+}
+
+byte CDecayBot::ThrottledMsec(void) const
+{
+	int iNewMsec;
+
+	// Estimate Msec to use for this command based on time passed from the previous command
+	iNewMsec = (int)((gpGlobals->time - m_flPreviousCommandTime) * 1000);
+	if (iNewMsec > 255)  // Doh, bots are going to be slower than they should if this happens.
+		iNewMsec = 255;		 // Upgrade that CPU or use less bots!
+
+	return (byte)iNewMsec;
+}
+
+
+Vector CDecayBot::GetAutoaimVector(float flDelta)
+{
+	UTIL_MakeVectors(pev->v_angle + pev->punchangle);
+
+	return gpGlobals->v_forward;
+}
+
+void CDecayBot::Crouch(void)
+{
+	m_fIsCrouching = TRUE;
+}
+
+void CDecayBot::PrimaryAttack(void)
+{
+	SetBits(m_buttonFlags, IN_ATTACK);
+}
+
+//--------------------------------------------------------------------------------------------------------------
+void CDecayBot::ClearPrimaryAttack(void)
+{
+	ClearBits(m_buttonFlags, IN_ATTACK);
+}
+
+CBaseMonster *CDecayBot::GetAttacker() const
+{
+	if (m_attacker != NULL && m_attacker->IsAlive())
+		return m_attacker;
+
+	return NULL;
+}
+
+BOOL CDecayBot::IsEnemy(CBaseEntity *enemy)
+{
+	// TODO: better check if it classifies as hostile against the player
+	if(enemy != NULL && enemy->IsAlive() && enemy->Classify() == CLASS_ALIEN_MILITARY)
+	return TRUE;
+
+	return FALSE;
+}
+
+
