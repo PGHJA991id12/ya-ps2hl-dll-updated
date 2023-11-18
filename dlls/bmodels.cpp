@@ -98,12 +98,20 @@ LINK_ENTITY_TO_CLASS( func_wall_toggle, CFuncWallToggle );
 void CFuncWallToggle :: Spawn( void )
 {
 	// PS2HLU
-	// TODO: Add spawnflag 2 & 4
-	// spawnflag 4 allows monsters to see throught the wall
-	// spawnflag 2 certainly does something, but not sure what
+	// TODO: Figure out how to add spawnflag 2
+	// spawnflag 4 allows monsters and players to shoot through the wall
+	// spawnflag 2 allows monsters to see throught the wall
+
 	CFuncWall::Spawn();
 	if ( pev->spawnflags & SF_WALL_START_OFF )
 		TurnOff();
+
+	// PS2HLU
+	// Notify client that shots pass throught wall
+	if (pev->spawnflags & 4)
+		pev->iuser4 = 1; // !! Change this to something better if other things 
+						 //    need to be sent over the network in the future
+						 // !! This requires modified delta.lst file to work!
 }
 
 

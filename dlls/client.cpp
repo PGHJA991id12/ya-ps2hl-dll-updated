@@ -400,11 +400,13 @@ void ClientCommand( edict_t *pEntity )
 	{
 		if (g_pGameRules->IsCoOp())
 		{
+			
 			// PS2HLU
 			// Code for switching player indexes
 			CBasePlayer *pPlayer = GetClassPtr((CBasePlayer *)pev);
 			pPlayer->m_decayIndex = (pPlayer->m_decayIndex == 1) ? 2 : 1;
-			ALERT(at_console, "Player 1 index changed to %d\n", pPlayer->m_decayIndex);
+			//ALERT(at_console, "Player 1 index changed to %d\n", pPlayer->m_decayIndex);
+			
 			DoBotSwap();
 		}
 	}
@@ -1143,6 +1145,9 @@ int AddToFullPack( struct entity_state_s *state, int e, edict_t *ent, edict_t *h
 	if ( !player )
 	{
 		state->playerclass  = ent->v.playerclass;
+		// PS2HLU
+		// Network over iuser4 for entities
+		state->iuser4 = ent->v.iuser4;
 	}
 
 	// Special stuff for players only

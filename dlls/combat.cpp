@@ -1251,7 +1251,7 @@ BOOL CBaseEntity :: FVisible ( CBaseEntity *pEntity )
 	vecTargetOrigin = pEntity->EyePosition();
 
 	UTIL_TraceLine(vecLookerOrigin, vecTargetOrigin, ignore_monsters, ignore_glass, ENT(pev)/*pentIgnore*/, &tr);
-	
+
 	if (tr.flFraction != 1.0)
 	{
 		return FALSE;// Line of sight is not established
@@ -1387,7 +1387,7 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 {
 	static int tracerCount;
 	int tracer;
-	TraceResult tr;
+	TraceResult tr2;
 	Vector vecRight = gpGlobals->v_right;
 	Vector vecUp = gpGlobals->v_up;
 
@@ -1413,8 +1413,18 @@ void CBaseEntity::FireBullets(ULONG cShots, Vector vecSrc, Vector vecDirShooting
 		Vector vecEnd;
 
 		vecEnd = vecSrc + vecDir * flDistance;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
 
+		// PS2HLU
+		// Allow bullets to pass throught func_wall_toggle with spawnflag 4 set
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr2);
+
+		CBaseEntity *pEntity = CBaseEntity::Instance(tr2.pHit);
+		TraceResult tr;
+		if (pEntity && pEntity->pev->spawnflags & 4 && FStrEq(STRING(pEntity->pev->classname), "func_wall_toggle"))
+			UTIL_TraceLine((tr2.vecEndPos + vecDir), vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
+		else
+			tr = tr2;
+		
 		tracer = 0;
 		if (iTracerFreq != 0 && (tracerCount++ % iTracerFreq) == 0)
 		{
@@ -1520,7 +1530,7 @@ This version is used by Players, uses the random seed generator to sync client a
 Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecDirShooting, Vector vecSpread, float flDistance, int iBulletType, int iTracerFreq, int iDamage, entvars_t *pevAttacker, int shared_rand )
 {
 	static int tracerCount;
-	TraceResult tr;
+	TraceResult tr2;
 	Vector vecRight = gpGlobals->v_right;
 	Vector vecUp = gpGlobals->v_up;
 	float x, y, z;
@@ -1545,8 +1555,18 @@ Vector CBaseEntity::FireBulletsPlayer ( ULONG cShots, Vector vecSrc, Vector vecD
 		Vector vecEnd;
 
 		vecEnd = vecSrc + vecDir * flDistance;
-		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
+		// PS2HLU
+		// Allow bullets to pass throught func_wall_toggle with spawnflag 4 set
+		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr2);
+
+		CBaseEntity *pEntity = CBaseEntity::Instance(tr2.pHit);
+		TraceResult tr;
+		if (pEntity && pEntity->pev->spawnflags & 4 && FStrEq(STRING(pEntity->pev->classname), "func_wall_toggle"))
+			UTIL_TraceLine((tr2.vecEndPos + vecDir), vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
+		else
+			tr = tr2;
 		
+
 		// do damage, paint decals
 		if (tr.flFraction != 1.0)
 		{

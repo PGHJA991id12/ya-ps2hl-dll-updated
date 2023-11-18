@@ -398,8 +398,23 @@ void EV_HLDM_FireBullets( int idx, float *forward, float *right, float *up, int 
 		gEngfuncs.pEventAPI->EV_SetTraceHull( 2 );
 		gEngfuncs.pEventAPI->EV_PlayerTrace( vecSrc, vecEnd, PM_STUDIO_BOX, -1, &tr );
 
+		// PS2HLU
+		// Make sure decals and shotgun particle
+		// appear in correct place when shooting throught an invisible wall
+		if (tr.fraction != 1.0)
+		{
+			physent_t *entity = gEngfuncs.pEventAPI->EV_GetPhysent(tr.ent);
+			
+			if (entity != NULL && entity->iuser4 == 1)
+			{
+			//gEngfuncs.Con_Printf("Bullet hit!\n");
+			gEngfuncs.pEventAPI->EV_PlayerTrace(tr.endpos, vecEnd, PM_STUDIO_BOX, tr.ent, &tr);
+			}
+		}
+
 		tracer = EV_HLDM_CheckTracer( idx, vecSrc, tr.endpos, forward, right, iBulletType, iTracerFreq, tracerCount );
 
+		
 		// do damage, paint decals
 		if ( tr.fraction != 1.0 )
 		{
