@@ -221,7 +221,7 @@
       <AdditionalIncludeDirectories>..\engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <OutputFile>.\debughl/hl.dll</OutputFile>
+      <OutputFile>E:\team fortess 2\steamapps\common\Half-Life\ps2hlu\dlls\ps2hl.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\hl.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -311,6 +311,7 @@
     <ClCompile Include="plats.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="ps2hlu_fakeplayer_decay.cpp" />
+    <ClCompile Include="ps2hlu_monster_alienflyer.cpp" />
     <ClCompile Include="ps2hlu_monster_modeltrain.cpp" />
     <ClCompile Include="ps2hl_bshift.cpp" />
     <ClCompile Include="ps2hl_dbg.cpp" />
@@ -383,6 +384,7 @@
     <ClInclude Include="monsterevent.h" />
     <ClInclude Include="monsters.h" />
     <ClInclude Include="nodes.h" />
+    <ClInclude Include="osprey.h" />
     <ClInclude Include="plane.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="ps2hlu_bot_decay.h" />
