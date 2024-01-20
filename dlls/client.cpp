@@ -396,7 +396,7 @@ void ClientCommand( edict_t *pEntity )
 	{
 		return;
 	}
-	else if (FStrEq(pcmd, "changeplayer2"))
+	else if (FStrEq(pcmd, "coopswitch"))
 	{
 		if (g_pGameRules->IsCoOp())
 		{
@@ -410,7 +410,7 @@ void ClientCommand( edict_t *pEntity )
 			DoBotSwap();
 		}
 	}
-	else if (FStrEq(pcmd, "addbot"))
+	else if (FStrEq(pcmd, "coopsidekick"))
 	{
 		if (g_pGameRules->IsCoOp())
 			BotCreate();
