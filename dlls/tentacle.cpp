@@ -69,6 +69,7 @@ public:
 	int TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType );
 	void HandleAnimEvent( MonsterEvent_t *pEvent );
 	void Killed( entvars_t *pevAttacker, int iGib );
+	void EXPORT Crushed(void);
 
 	MONSTERSTATE GetIdealState ( void ) { return MONSTERSTATE_IDLE; };
 	int CanPlaySequence( BOOL fDisregardState ) { return TRUE; };
@@ -114,6 +115,12 @@ int CTentacle :: g_fFlySound;
 int CTentacle :: g_fSquirmSound;
 
 LINK_ENTITY_TO_CLASS( monster_tentacle, CTentacle );
+
+//	PS2HLU
+//	Only thing changed (from the normal tenticle) is an added animation
+//	event for its head getting cut off in originally the 9th, now cut mission
+//	The smash animation can only be started with a scripted_sequence
+LINK_ENTITY_TO_CLASS(monster_tentacle_decay, CTentacle);
 
 // stike sounds
 #define TE_NONE -1
@@ -913,6 +920,18 @@ void CTentacle :: HandleAnimEvent( MonsterEvent_t *pEvent )
 
 		UTIL_EmitAmbientSound(ENT(pev), pev->origin + Vector( 0, 0, MyHeight()), sound, 1.0, ATTN_NORM, 0, 100);
 		break;
+		// PS2HLU
+		// Tentacle head chop off
+		// and blood animation
+	case 10:
+		if (FClassnameIs(pev, "monster_tentacle_decay"))
+		{
+			SetBodygroup(1, 1);
+			SetThink(&CTentacle::Crushed);
+
+			pev->nextthink = gpGlobals->time + 0.1;
+		}
+		break;
 
 	default:
 		CBaseMonster::HandleAnimEvent( pEvent );
@@ -948,6 +967,11 @@ void CTentacle :: Start( void )
 
 void CTentacle :: HitTouch( CBaseEntity *pOther )
 {
+	// PS2HLU
+	// Dont hurt the player if were dead
+	if (pev->deadflag == DEAD_DYING)
+		return;
+
 	TraceResult tr = UTIL_GetGlobalTrace( );
 
 	if (pOther->pev->modelindex == pev->modelindex)
@@ -1005,7 +1029,30 @@ void CTentacle :: Killed( entvars_t *pevAttacker, int iGib )
 	return;
 }
 
+// PS2HLU
+// Crushed bleeding loop
+void CTentacle::Crushed(void)
+{
+	DispatchAnimEvents();
+	StudioFrameAdvance();
 
+	Vector bloodPos, bloodAng = {0, 0, 0};
+	GetAttachment(1, bloodPos, bloodAng);
+
+	SetThink(&CTentacle::Crushed);
+
+	if (pev->deadflag != DEAD_DYING)
+	{
+			UTIL_BloodStream(bloodPos, bloodAng - Vector(0.0f, 50.0f, 0.0f), BLOOD_COLOR_GREEN, 50);
+			pev->nextthink = gpGlobals->time + 0.1f;
+	}
+	else
+	{
+		UTIL_BloodStream(bloodPos, bloodAng - Vector(0.0f, 50.0f, 0.0f), BLOOD_COLOR_GREEN, 50);
+		pev->nextthink = gpGlobals->time + 2.0f;
+	}
+
+}
 
 class CTentacleMaw : public CBaseMonster
 {
