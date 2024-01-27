@@ -1018,6 +1018,14 @@ void CGargantua::HandleAnimEvent(MonsterEvent_t *pEvent)
 		EMIT_SOUND_DYN ( edict(), CHAN_VOICE, pBreatheSounds[ RANDOM_LONG(0,ARRAYSIZE(pBreatheSounds)-1) ], 1.0, ATTN_GARG, 0, PITCH_NORM + RANDOM_LONG(-10,10) );
 		break;
 
+		// PS2HLU
+		// Gargantua bridge crush explosion
+		// Unused but the effect is still present in the ps2 version
+	case 20:
+		pev->spawnflags &= 512;
+		DeathEffect();
+		break;
+
 	default:
 		CBaseMonster::HandleAnimEvent(pEvent);
 		break;
