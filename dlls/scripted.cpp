@@ -210,22 +210,22 @@ void CCineMonster::Spawn()
 					if (!ptrFile)
 						return;
 
-					sprintf_s(Buff, sizeof(Buff), "\nmap: %s, scripted_sequence: %s\n",
+					snprintf(Buff, sizeof(Buff), "\nmap: %s, scripted_sequence: %s\n",
 						STRING(gpGlobals->mapname), STRING(pev->targetname));
 					fputs(Buff, ptrFile);
 					
-					sprintf_s(Buff, sizeof(Buff), " Model: %s [", STRING(pTarget->pev->model));
+					snprintf(Buff, sizeof(Buff), " Model: %s [", STRING(pTarget->pev->model));
 					fputs(Buff, ptrFile);
 
 					if (piseqdesc)
 					{
-						sprintf_s(Buff, sizeof(Buff), "%d", piseqdesc->seqgroup);
+						snprintf(Buff, sizeof(Buff), "%d", piseqdesc->seqgroup);
 						fputs(Buff, ptrFile);
 					}
 					fputc(',', ptrFile);
 					if (ppseqdesc)
 					{
-						sprintf_s(Buff, sizeof(Buff), "%d", ppseqdesc->seqgroup);
+						snprintf(Buff, sizeof(Buff), "%d", ppseqdesc->seqgroup);
 						fputs(Buff, ptrFile);
 					}
 

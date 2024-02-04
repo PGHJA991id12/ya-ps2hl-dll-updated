@@ -126,8 +126,8 @@ public:
 	bool Draw(float flTime) override;
 	void Reset(void) override;
 	
-	void CHudLock::SetSprite	(HSPRITE hspr, Rect rc);
-	void CHudLock::SetState		(bool Active);
+	void SetSprite	(HSPRITE hspr, Rect rc);
+	void SetState		(bool Active);
 	//void CHudLock::SetOffsets	(int OffsetX, int OffsetY);
 	//int MsgFunc_HudLockOff(const char *pszName, int iSize, void *pbuf);
 
@@ -319,8 +319,8 @@ struct extra_player_info_t
 	char teamname[MAX_TEAM_NAME];
 
 	// PS2HLU
-	__int16 damageTaken;	// Damage taken by player (lost armor doesnt count)
-	__int8 accuracy;		// Accuracy of players shots
+	int16 damageTaken;	// Damage taken by player (lost armor doesnt count)
+	int8 accuracy;		// Accuracy of players shots
 };
 
 struct team_info_t
