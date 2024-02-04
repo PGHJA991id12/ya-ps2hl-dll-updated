@@ -8,34 +8,25 @@
 #include "effects.h"
 #include "osprey.h"
 
-#define		AFLOCK_FLY_SPEED			800
-#define		AFLOCK_TURN_RATE			75
-#define		AFLOCK_ACCELERATE			10
-#define		AFLOCK_CHECK_DIST			192
-
-
 class CAlienFlyer : public COsprey
 {
 public:
-	void Spawn(void) override;
-	void Precache(void) override;
-	int  Classify(void) { return CLASS_NONE; };
-	int  BloodColor(void) { return BLOOD_COLOR_GREEN; }
+	void Spawn() override;
+	void Precache() override;
+	int  Classify() { return CLASS_NONE; };
+	int  BloodColor() override { return BLOOD_COLOR_YELLOW; }
 	void Killed(entvars_t *pevAttacker, int iGib) override;
 	bool KeyValue(KeyValueData *pkvd) override;
 
 	void UpdateGoal(void);
-	bool HasDead(void);
 	void EXPORT FlyThink(void);
-	void EXPORT DeployThink(void);
 	void Flight(void);
-	void EXPORT HitTouch(CBaseEntity *pOther);
 	void EXPORT FindAllThink(void);
 	void EXPORT HoverThink(void);
-	CBaseMonster *MakeGrunt(Vector vecSrc);
 	void EXPORT CrashTouch(CBaseEntity *pOther);
 	void EXPORT DyingThink(void);
 	void EXPORT CommandUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void EXPORT AttackThink(void);
 
 	//int  TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType );
 	void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType) override;
@@ -55,12 +46,6 @@ public:
 	float m_flIdealtilt;
 	float m_flRotortilt;
 
-	int	m_iUnits;
-	EHANDLE m_hGrunt[MAX_CARRY];
-	Vector m_vecOrigin[MAX_CARRY];
-	EHANDLE m_hRepel[4];
-
-	int m_iSoundState;
 	int m_iSpriteTexture;
 
 	int m_iPitch;
@@ -82,15 +67,17 @@ void CAlienFlyer::Spawn(void)
 	Precache();
 	// motor
 	pev->movetype = MOVETYPE_FLY;
-	//pev->solid = SOLID_BBOX;
+	pev->solid = SOLID_BBOX;
 
 	SET_MODEL(ENT(pev), "models/flyer.mdl");
 	UTIL_SetSize(pev, Vector(-400, -400, -100), Vector(400, 400, 32));
 	UTIL_SetOrigin(pev, pev->origin);
 
-	pev->flags |= FL_MONSTER;
+	// Set FL_FLY so the model is interpolated
+	pev->flags |= FL_MONSTER | FL_FLY;
 	pev->takedamage = DAMAGE_YES;
 	pev->health = gSkillData.flyerHealth;
+	m_bloodColor = BLOOD_COLOR_YELLOW;
 
 	m_flFieldOfView = 0; // 180 degrees
 
@@ -103,11 +90,17 @@ void CAlienFlyer::Spawn(void)
 	SetThink(&CAlienFlyer::FindAllThink);
 	SetUse(&CAlienFlyer::CommandUse);
 
-	pev->effects |= EF_NODRAW;
-	pev->solid = SOLID_NOT;
-	if (!(pev->spawnflags & SF_WAITFORTRIGGER))
+
+
+
+	if ((pev->spawnflags & SF_WAITFORTRIGGER) == 0)
 	{
 		pev->nextthink = gpGlobals->time + 1.0;
+	}
+	else
+	{
+		pev->effects |= EF_NODRAW;
+		pev->solid = SOLID_NOT;
 	}
 
 	m_pos2 = pev->origin;
@@ -126,7 +119,7 @@ void CAlienFlyer::Precache(void)
 	//PRECACHE_SOUND("apache/ap_rotor4.wav");
 	PRECACHE_SOUND("weapons/mortarhit.wav");
 
-	m_iSpriteTexture = PRECACHE_MODEL("sprites/rope.spr");
+	m_iSpriteTexture = PRECACHE_MODEL("sprites/xenobeam.spr");
 	PRECACHE_SOUND("debris/beamstart1.wav");
 	m_iExplode = PRECACHE_MODEL("sprites/fexplo.spr");
 	//m_iTailGibs = PRECACHE_MODEL("models/osprey_tailgibs.mdl");
@@ -179,7 +172,8 @@ void CAlienFlyer::TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vec
 void CAlienFlyer::Flight()
 {
 	float t = (gpGlobals->time - m_startTime);
-	//Only update if delta time is non-zero. It's zero if we're not moving at all (usually because we have no target).
+
+	// Only update if delta time is non-zero. It's zero if we're not moving at all (usually because we have no target).
 	if (m_dTime != 0)
 	{
 		float scale = 1.0 / m_dTime;
@@ -193,6 +187,7 @@ void CAlienFlyer::Flight()
 		UTIL_SetOrigin(pev, pos);
 		pev->angles = ang;
 	}
+
 	UTIL_MakeAimVectors(pev->angles);
 	float flSpeed = DotProduct(gpGlobals->v_forward, m_velocity);
 
@@ -257,7 +252,6 @@ void CAlienFlyer::Flight()
 
 void CAlienFlyer::FindAllThink(void)
 {
-	m_iUnits = 0;
 	SetThink(&CAlienFlyer::FlyThink);
 	pev->nextthink = gpGlobals->time + 0.1;
 	m_startTime = gpGlobals->time;
@@ -276,32 +270,24 @@ void CAlienFlyer::FlyThink(void)
 
 	if (gpGlobals->time > m_startTime + m_dTime)
 	{
-		// Temponary solution
-
-		//ALERT(at_console, "Alien flyer destination target name: %s \n", STRING(m_pGoalEnt->pev->targetname));
-		//ALERT(at_console, "Alien flyer destination target speed: %f \n", m_pGoalEnt->pev->speed);
-		// the speed check doesnt work for some weird reason
-		if (FStrEq(STRING(m_pGoalEnt->pev->targetname), "af_path14") || FStrEq(STRING(m_pGoalEnt->pev->targetname), "af_path41"))
+		if (m_pGoalEnt != nullptr)
 		{
-			//ALERT(at_console, "Alien flyer has stopped!\n");
-			//pev->speed = 0; // doesnt solve the visual bug
-			UTIL_MakeAimVectors(pev->angles);
-			SetThink(&CAlienFlyer::HoverThink);
-			pev->nextthink = gpGlobals->time + 0.1;
-		}
-		do {
+			if (m_pGoalEnt->pev->speed == 0)
+			{
+				// ALERT(at_console, "Alien flyer has stopped!\n");
+				// pev->speed = 0; // doesnt solve the visual bug
+				SetThink(&CAlienFlyer::AttackThink);
+				pev->nextthink = gpGlobals->time + 0.1;
+			}
+			// removed the flyer speed check it was causing the previous check to fail
 			FireTargets(STRING(m_pGoalEnt->pev->message), this, this, USE_TOGGLE, 0);
 			m_pGoalEnt = CBaseEntity::Instance(FIND_ENTITY_BY_TARGETNAME(NULL, STRING(m_pGoalEnt->pev->target)));
-		} while (m_pGoalEnt->pev->speed < 400 && !HasDead());
-		UpdateGoal();
+
+			UpdateGoal();
+		}
 	}
 
 	Flight();
-}
-
-bool CAlienFlyer::HasDead()
-{
-	return false;
 }
 
 void CAlienFlyer::UpdateGoal()
@@ -339,14 +325,50 @@ void CAlienFlyer::UpdateGoal()
 	}
 }
 
+void CAlienFlyer::AttackThink(void)
+{
+	UTIL_MakeAimVectors(pev->angles);
+	CBaseEntity* emitter = CBaseEntity::Instance(FIND_ENTITY_BY_CLASSNAME(NULL, "item_focusemitter"));
+		if (emitter != NULL)
+			{
+				EMIT_SOUND(ENT(pev), CHAN_STATIC, "debris/beamstart1.wav", 1.0, 0.15);
+
+				CBeam* pBeam = CBeam::BeamCreate("sprites/xenobeam.spr", 255);
+				pBeam->PointEntInit(pev->origin + Vector(0, 0, 15), emitter->entindex());
+				// commented out to mathch the ps2 version
+				// pBeam->SetFlags(0x80); // shade end
+				pBeam->SetScrollRate(40);
+				pBeam->SetNoise(3);
+				pBeam->SetColor(254, 244, 233);
+				pBeam->SetBrightness(150);
+				pBeam->SetThink(&CBaseEntity::SUB_Remove);
+				pBeam->pev->nextthink = gpGlobals->time + 1.0f;
+
+				CBeam* pBeam2 = CBeam::BeamCreate("sprites/laserbeam.spr", 30);
+				pBeam2->PointEntInit(pev->origin + Vector(0, 0, 15), emitter->entindex());
+				// pBeam2->SetFlags(0x80); // shade end
+				pBeam2->SetScrollRate(35);
+				pBeam2->SetNoise(100);
+				pBeam2->SetColor(255, 255, 255);
+				pBeam2->SetBrightness(125);
+				pBeam2->SetThink(&CBaseEntity::SUB_Remove);
+				pBeam2->pev->nextthink = gpGlobals->time + 1.0f;
+
+				// TODO: Add beam cylinder
+
+				// Skill level in PS2 Decay is 2
+				emitter->TakeDamage(pev, pev, (gSkillData.flyerDmg / 40.0f), DMG_ENERGYBEAM);
+				ALERT(at_console, "focus emitter health: %f \n", (int)emitter->pev->health);
+			}
+			else
+			ALERT(at_console, "Focus emitter not found!");
+
+	SetThink(&CAlienFlyer::HoverThink);
+	pev->nextthink = gpGlobals->time + 0.1;
+}
+
 void CAlienFlyer::HoverThink(void)
 {
-	// Do the laser attack thing here!!!
-	EMIT_SOUND(ENT(pev), CHAN_STATIC, "debris/beamstart1.wav", 1.0, 1.0);
-	CBaseEntity* emitter = CBaseEntity::Instance(FIND_ENTITY_BY_CLASSNAME(NULL, "item_focusemitter"));
-	//if(emitter)
-		emitter->TakeDamage(pev, pev, 2.0f, DMG_ENERGYBEAM);
-
 	m_startTime = gpGlobals->time;
 	SetThink(&CAlienFlyer::FlyThink);
 

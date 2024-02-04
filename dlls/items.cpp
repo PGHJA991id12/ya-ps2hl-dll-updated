@@ -422,6 +422,7 @@ void CFocusEmitter::Spawn()
 	Vector Zero;
 	Zero.x = Zero.y = Zero.z = 0;
 	UTIL_SetSize(pev, Zero, Zero);
+	pev->health = 5;
 	pev->solid = SOLID_NOT;
 	// used for sequence handleing
 	//SetSequenceBox(); // This was a temponary solution
@@ -496,6 +497,8 @@ void CFocusEmitter::TraceAttack( entvars_t *pevAttacker, float flDamage, Vector 
 
 bool CFocusEmitter::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
 {
+	// TODO: Fix this
+	// make the focus emitter not die at 1 health but at zero
 
 	/*if (bitsDamageType & DMG_LASER)
 	{
@@ -503,14 +506,9 @@ bool CFocusEmitter::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, 
 	}*/
 		/*if (pevInflictor->owner == edict())
 		return 0;*/
-
-	if (IsAlive())
-	{
-		if (bitsDamageType & DMG_ENERGYBEAM)
-			SetConditions(bits_COND_LIGHT_DAMAGE);
-		else
-			return false;
-	}
+	
+	if (!(bitsDamageType & DMG_ENERGYBEAM))
+		flDamage = 0;
 
 		if (pev->health = 2)
 		{
@@ -519,8 +517,8 @@ bool CFocusEmitter::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, 
 		else if (pev->health = 1)
 		{
 		ChangeSequence( FOCUSEMITTER_BROKEN2 );
-		} // I have no idea how this was meant to work.
-
+		}
+		
 		return CBaseMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 }
 
@@ -529,7 +527,7 @@ void CFocusEmitter::Killed( entvars_t *pevAttacker, int iGib )
 	ChangeSequence( FOCUSEMITTER_DEATH );
 	SetThink(&CFocusEmitter::DyingThink);
 	pev->nextthink = gpGlobals->time + 0.1;
-	pev->takedamage = DAMAGE_NO;
+	//pev->takedamage = DAMAGE_NO;
 	if (m_pBeam)
 	{
 		UTIL_Remove( m_pBeam );
