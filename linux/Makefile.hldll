@@ -101,7 +101,7 @@ HLDLL_OBJS = \
 	$(HLDLL_OBJ_DIR)/ps2hl_trigger_islave.o \
 	$(HLDLL_OBJ_DIR)/ps2hl_trigger_playerfreeze.o \
 	$(HLDLL_OBJ_DIR)/ps2hl_trigger_random.o \
-	$(HLDLL_OBJ_DIR)/ps2hlu_ps2hlu_fakeplayer_decay.o \
+	$(HLDLL_OBJ_DIR)/ps2hlu_fakeplayer_decay.o \
 	$(HLDLL_OBJ_DIR)/ps2hlu_monster_alienflyer.o \
 	$(HLDLL_OBJ_DIR)/ps2hlu_monster_modeltrain.o \
 	$(HLDLL_OBJ_DIR)/python.o \

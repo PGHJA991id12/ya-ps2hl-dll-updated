@@ -117,8 +117,6 @@ public:
 	// Draw entities bone hit boxes, etc?
 	cvar_t* m_pCvarDrawEntities;
 
-	// PS2HL - shadows hack cvar
-	cvar_t			*m_pCvarShadowHack;
 	// PS2HLU DEBUG
 	// Show triggers
 	cvar_t		*m_pCvarShowTriggers;

@@ -103,7 +103,7 @@ void CTriggerRandom::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE
 
 	// Generate full target name
 	char szTargetName[128];
-	sprintf_s(szTargetName, sizeof(szTargetName), "%s%d", STRING(pev->target), RandomVal);
+	snprintf(szTargetName, sizeof(szTargetName), "%s%d", STRING(pev->target), RandomVal);
 
 	// Fire target
 	FireTargets(szTargetName, this, this, USE_ON, 1);

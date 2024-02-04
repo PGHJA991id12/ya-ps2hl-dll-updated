@@ -1427,7 +1427,7 @@ void CFurniture::Spawn()
 
 			if (ptrFile)
 			{
-				sprintf_s(Buff, sizeof(Buff), "\n===== WARNING =====\nmonster_furniture entity found: %s\n\n", STRING(pev->targetname));
+				snprintf(Buff, sizeof(Buff), "\n===== WARNING =====\nmonster_furniture entity found: %s\n\n", STRING(pev->targetname));
 				fputs(Buff, ptrFile);
 				fclose(ptrFile);
 			}

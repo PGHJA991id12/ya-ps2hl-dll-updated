@@ -51,8 +51,6 @@ void CStudioModelRenderer::Init()
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
 	m_pCvarDeveloper = IEngineStudio.GetCvar("developer");
 	m_pCvarDrawEntities = IEngineStudio.GetCvar("r_drawentities");
-	// PS2HL - shadows hack cvar
-	m_pCvarShadowHack		= gEngfuncs.pfnRegisterVariable("r_shadows_hack", "0", 0);
 
 	// PS2HLU DEBUG
 	// Command to show triggers
@@ -67,21 +65,7 @@ void CStudioModelRenderer::Init()
 	m_paliastransform = (float(*)[3][4])IEngineStudio.StudioGetAliasTransform();
 	m_protationmatrix = (float(*)[3][4])IEngineStudio.StudioGetRotationMatrix();
 }
-/*
-// PS2HL - shadow hack
-// Source: http://hl-improvement.com/forums/index.php?topic=3527.45
-*/
 
-void(*GL_StudioDrawShadow)(void);
-
-__declspec(naked) void ShadowHack(void)
-{
-	_asm
-	{
-		push ecx;
-		jmp[GL_StudioDrawShadow];
-	}
-}
 /*
 ====================
 CStudioModelRenderer
@@ -1735,18 +1719,7 @@ void CStudioModelRenderer::StudioRenderFinal_Hardware()
 
 			IEngineStudio.GL_SetRenderMode(rendermode);
 			IEngineStudio.StudioDrawPoints();
-						// PS2HL - shadow hack
-			// Source: http://hl-improvement.com/forums/index.php?topic=3527.45
-			if (m_pCvarShadowHack->value == 0)
-			{
-				IEngineStudio.GL_StudioDrawShadow();
-			}
-			else
-			{
-				GL_StudioDrawShadow = (void(*)(void))(((unsigned int)IEngineStudio.GL_StudioDrawShadow) + 32);
-				if (IEngineStudio.GetCurrentEntity() != gEngfuncs.GetViewModel())
-					ShadowHack();
-			}
+			IEngineStudio.GL_StudioDrawShadow();
 		}
 	}
 
