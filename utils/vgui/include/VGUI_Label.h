@@ -1,16 +1,16 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef VGUI_LABEL_H
-#define VGUI_LABEL_H
+#pragma once
 
 #include<VGUI.h>
 #include<VGUI_Panel.h>
 #include<VGUI_Scheme.h>
+#include<VGUI_Image.h>
 
 //TODO: this should use a TextImage for the text
 
@@ -76,5 +76,3 @@ protected:
 };
 
 }
-
-#endif

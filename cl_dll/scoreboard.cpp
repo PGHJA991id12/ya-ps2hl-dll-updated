@@ -33,7 +33,7 @@ DECLARE_MESSAGE( m_Scoreboard, ScoreInfo );
 DECLARE_MESSAGE( m_Scoreboard, TeamInfo );
 DECLARE_MESSAGE( m_Scoreboard, TeamScore );
 
-int CHudScoreboard :: Init( void )
+bool CHudScoreboard :: Init( void )
 {
 	gHUD.AddHudElem( this );
 
@@ -49,15 +49,15 @@ int CHudScoreboard :: Init( void )
 
 	cl_showpacketloss = CVAR_CREATE( "cl_showpacketloss", "0", FCVAR_ARCHIVE );
 
-	return 1;
+	return true;
 }
 
 
-int CHudScoreboard :: VidInit( void )
+bool CHudScoreboard :: VidInit( void )
 {
 	// Load sprites here
 
-	return 1;
+	return true;
 }
 
 void CHudScoreboard :: InitHUDData( void )
@@ -100,7 +100,7 @@ int SCOREBOARD_WIDTH = 320;
 #define ROW_RANGE_MIN 15
 #define ROW_RANGE_MAX ( ScreenHeight - 50 )
 
-int CHudScoreboard :: Draw( float fTime )
+bool CHudScoreboard :: Draw( float fTime )
 {
 	int can_show_packetloss = 0;
 	int FAR_RIGHT;
@@ -218,15 +218,15 @@ int CHudScoreboard :: Draw( float fTime )
 		g_TeamInfo[j].packetloss += g_PlayerInfoList[i].packetloss;
 
 		if ( g_PlayerInfoList[i].thisplayer )
-			g_TeamInfo[j].ownteam = TRUE;
+			g_TeamInfo[j].ownteam = true;
 		else
-			g_TeamInfo[j].ownteam = FALSE;
+			g_TeamInfo[j].ownteam = false;
 	}
 
 	// find team ping/packetloss averages
 	for ( int i = 1; i <= m_iNumTeams; i++ )
 	{
-		g_TeamInfo[i].already_drawn = FALSE;
+		g_TeamInfo[i].already_drawn = false;
 
 		if ( g_TeamInfo[i].players > 0 )
 		{
@@ -318,7 +318,7 @@ int CHudScoreboard :: Draw( float fTime )
 			gHUD.DrawHudString( xpos, ypos, xpos+50, buf, r, g, b );
 		}
 
-		team_info->already_drawn = TRUE;  // set the already_drawn to be TRUE, so this team won't get drawn again
+		team_info->already_drawn = false;  // set the already_drawn to be TRUE, so this team won't get drawn again
 		list_slot++;
 
 		// draw all the players that belong to this team, indented slightly
@@ -329,7 +329,7 @@ int CHudScoreboard :: Draw( float fTime )
 	list_slot += 0.5;
 	DrawPlayers( xpos_rel, list_slot, 0, "" );
 
-	return 1;
+	return true;
 }
 
 // returns the ypos where it finishes drawing
@@ -480,7 +480,7 @@ void CHudScoreboard :: GetAllPlayersInfo( void )
 {
 	for ( int i = 1; i < MAX_PLAYERS; i++ )
 	{
-		GetPlayerInfo( i, &g_PlayerInfoList[i] );
+		gEngfuncs.pfnGetPlayerInfo( i, &g_PlayerInfoList[i] );
 
 		if ( g_PlayerInfoList[i].thisplayer )
 			m_iPlayerNum = i;  // !!!HACK: this should be initialized elsewhere... maybe gotten from the engine
@@ -570,7 +570,7 @@ int CHudScoreboard :: MsgFunc_TeamInfo( const char *pszName, int iSize, void *pb
 				if ( g_TeamInfo[j].name[0] == '\0' )
 					break;
 			}
-			m_iNumTeams = max( j, m_iNumTeams );
+			m_iNumTeams = V_max( j, m_iNumTeams );
 
 			strncpy( g_TeamInfo[j].name, g_PlayerExtraInfo[i].teamname, MAX_TEAM_NAME );
 			g_TeamInfo[j].players = 0;
@@ -611,7 +611,7 @@ int CHudScoreboard :: MsgFunc_TeamScore( const char *pszName, int iSize, void *p
 		return 1;
 
 	// use this new score data instead of combined player scores
-	g_TeamInfo[i].scores_overriden = TRUE;
+	g_TeamInfo[i].scores_overriden = true;
 	g_TeamInfo[i].frags = READ_SHORT();
 	g_TeamInfo[i].deaths = READ_SHORT();
 	
@@ -635,10 +635,10 @@ void CHudScoreboard :: DeathMsg( int killer, int victim )
 
 void CHudScoreboard :: UserCmd_ShowScores( void )
 {
-	m_iShowscoresHeld = TRUE;
+	m_iShowscoresHeld = true;
 }
 
 void CHudScoreboard :: UserCmd_HideScores( void )
 {
-	m_iShowscoresHeld = FALSE;
+	m_iShowscoresHeld = false;
 }

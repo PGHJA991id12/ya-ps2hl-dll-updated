@@ -58,18 +58,18 @@ private:
 	float StartupTime;					// Time when scanner received use request (used to to track states)
 
 	// Methods
-	void Spawn(void);							// Spawn handler
-	void Precache(void);						// Precache handler
-	void KeyValue(KeyValueData *pkvd);			// Parse keys
+	void Spawn(void) override;							// Spawn handler
+	void Precache(void) override;						// Precache handler
+	bool KeyValue(KeyValueData *pkvd);			// Parse keys
 	void Think(void);							// Think handler
-	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);	// Use handler
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;	// Use handler
 	void SetSequenceBox(void);					// Get BBox (this one considers rotation unlike ExtractBbox())
 	void ChangeSequence(int Sequence);			// Set new animation
 	void ChangeState(ScanState NewState, int NewSequence);	// Set new state
 
 	// Save/restore
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
+	bool		Save(CSave &save);
+	bool		Restore(CRestore &restore);
 	static	TYPEDESCRIPTION m_SaveData[];
 };
 

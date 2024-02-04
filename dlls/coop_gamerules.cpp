@@ -12,12 +12,12 @@
 #include	"gamerules.h"
 
 extern DLL_GLOBAL CGameRules	*g_pGameRules;
-extern DLL_GLOBAL BOOL	g_fGameOver;
+extern DLL_GLOBAL bool	g_fGameOver;
 extern int gmsgDeathMsg;	// client dll messages
 extern int gmsgScoreInfo;
 extern int gmsgMOTD;
 extern int gmsgServerName;
-extern int g_teamplay;
+extern bool g_teamplay;
 //static CMultiplayGameMgrHelper g_GameMgrHelper;
 
 // TODO:
@@ -67,7 +67,7 @@ CHalfLifeCoop::CHalfLifeCoop()
 	}
 }
 
-BOOL CHalfLifeCoop::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
+bool CHalfLifeCoop::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 {
 
 	return CGameRules::ClientCommand(pPlayer, pcmd);
@@ -212,56 +212,56 @@ void CHalfLifeCoop::Think(void)
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::IsMultiplayer(void)
+bool CHalfLifeCoop::IsMultiplayer(void)
 {
-	return TRUE;
+	return true;
 }
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::IsDeathmatch(void)
+bool CHalfLifeCoop::IsDeathmatch(void)
 {
-	return FALSE;
+	return false;
 }
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::IsCoOp(void)
+bool CHalfLifeCoop::IsCoOp(void)
 {
-	return TRUE;
+	return true;
 }
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::FShouldSwitchWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon)
+bool CHalfLifeCoop::FShouldSwitchWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pWeapon)
 {
 	if (!pWeapon->CanDeploy())
 	{
 		// that weapon can't deploy anyway.
-		return FALSE;
+		return false;
 	}
 
 	if (!pPlayer->m_pActiveItem)
 	{
 		// player doesn't have an active item!
-		return TRUE;
+		return true;
 	}
 
 	if (!pPlayer->m_pActiveItem->CanHolster())
 	{
 		// can't put away the active item.
-		return FALSE;
+		return false;
 	}
 
 	if (pWeapon->iWeight() > pPlayer->m_pActiveItem->iWeight())
 	{
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
 
-BOOL CHalfLifeCoop::GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCurrentWeapon)
+bool CHalfLifeCoop::GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCurrentWeapon)
 {
 
 	CBasePlayerItem *pCheck;
@@ -275,7 +275,7 @@ BOOL CHalfLifeCoop::GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCu
 	if (!pCurrentWeapon->CanHolster())
 	{
 		// can't put this gun away right now, so can't switch.
-		return FALSE;
+		return false;
 	}
 
 	for (i = 0; i < MAX_ITEM_TYPES; i++)
@@ -291,7 +291,7 @@ BOOL CHalfLifeCoop::GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCu
 				{
 					if (pPlayer->SwitchWeapon(pCheck))
 					{
-						return TRUE;
+						return true;
 					}
 				}
 			}
@@ -320,19 +320,19 @@ BOOL CHalfLifeCoop::GetNextBestWeapon(CBasePlayer *pPlayer, CBasePlayerItem *pCu
 	// at least get the crowbar, but ya never know.
 	if (!pBest)
 	{
-		return FALSE;
+		return false;
 	}
 
 	pPlayer->SwitchWeapon(pBest);
 
-	return TRUE;
+	return true;
 }
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128])
+bool CHalfLifeCoop::ClientConnected(edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[128])
 {
-	return TRUE;
+	return true;
 }
 
 extern int gmsgSayText;
@@ -442,7 +442,7 @@ void CHalfLifeCoop::ClientDisconnected(edict_t *pClient)
 					GETPLAYERUSERID(pPlayer->edict()));
 			}
 
-			pPlayer->RemoveAllItems(TRUE);// destroy all of the players weapons and items
+			pPlayer->RemoveAllItems(true);// destroy all of the players weapons and items
 		}
 	}
 }
@@ -468,9 +468,9 @@ float CHalfLifeCoop::FlPlayerFallDamage(CBasePlayer *pPlayer)
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
+bool CHalfLifeCoop::FPlayerCanTakeDamage(CBasePlayer *pPlayer, CBaseEntity *pAttacker)
 {
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -481,7 +481,7 @@ void CHalfLifeCoop::PlayerThink(CBasePlayer *pPlayer)
 	{
 		// check for button presses
 		if (pPlayer->m_afButtonPressed & (IN_DUCK | IN_ATTACK | IN_ATTACK2 | IN_USE | IN_JUMP))
-			m_iEndIntermissionButtonHit = TRUE;
+			m_iEndIntermissionButtonHit = true;
 
 		// clear attack/use commands from player
 		pPlayer->m_afButtonPressed = 0;
@@ -494,32 +494,38 @@ void CHalfLifeCoop::PlayerThink(CBasePlayer *pPlayer)
 //=========================================================
 void CHalfLifeCoop::PlayerSpawn(CBasePlayer *pPlayer)
 {
-	BOOL		addDefault;
-	CBaseEntity	*pWeaponEntity = NULL;
+	bool addDefault;
+	CBaseEntity* pWeaponEntity = NULL;
 
-	pPlayer->pev->weapons |= (1 << WEAPON_SUIT);
+	// Ensure the player switches to the Glock on spawn regardless of setting
+	const int originalAutoWepSwitch = pPlayer->m_iAutoWepSwitch;
+	pPlayer->m_iAutoWepSwitch = 1;
 
-	addDefault = FALSE;
+	pPlayer->SetHasSuit(true);
+
+	addDefault = false;
 
 	while (pWeaponEntity = UTIL_FindEntityByClassname(pWeaponEntity, "game_player_equip"))
 	{
 		pWeaponEntity->Touch(pPlayer);
-		addDefault = FALSE;
+		addDefault = false;
 	}
 
 	if (addDefault)
 	{
 		pPlayer->GiveNamedItem("weapon_crowbar");
 		pPlayer->GiveNamedItem("weapon_9mmhandgun");
-		pPlayer->GiveAmmo(68, "9mm", _9MM_MAX_CARRY);// 4 full reloads
+		pPlayer->GiveAmmo(68, "9mm", _9MM_MAX_CARRY); // 4 full reloads
 	}
+
+	pPlayer->m_iAutoWepSwitch = originalAutoWepSwitch;
 }
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::FPlayerCanRespawn(CBasePlayer *pPlayer)
+bool CHalfLifeCoop::FPlayerCanRespawn(CBasePlayer *pPlayer)
 {
-	return FALSE;
+	return false;
 }
 
 //=========================================================
@@ -529,9 +535,9 @@ float CHalfLifeCoop::FlPlayerSpawnTime(CBasePlayer *pPlayer)
 	return gpGlobals->time;//now!
 }
 
-BOOL CHalfLifeCoop::AllowAutoTargetCrosshair(void)
+bool CHalfLifeCoop::AllowAutoTargetCrosshair(void)
 {
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -901,10 +907,10 @@ int CHalfLifeCoop::WeaponShouldRespawn(CBasePlayerItem *pWeapon)
 }
 
 //=========================================================
-// CanHaveWeapon - returns FALSE if the player is not allowed
+// CanHaveWeapon - returns false if the player is not allowed
 // to pick up this weapon
 //=========================================================
-BOOL CHalfLifeCoop::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem)
+bool CHalfLifeCoop::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pItem)
 {
 	if (weaponstay.value > 0)
 	{
@@ -920,7 +926,7 @@ BOOL CHalfLifeCoop::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pIt
 			{
 				if (it->m_iId == pItem->m_iId)
 				{
-					return FALSE;
+					return false;
 				}
 
 				it = it->m_pNext;
@@ -933,9 +939,9 @@ BOOL CHalfLifeCoop::CanHavePlayerItem(CBasePlayer *pPlayer, CBasePlayerItem *pIt
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::CanHaveItem(CBasePlayer *pPlayer, CItem *pItem)
+bool CHalfLifeCoop::CanHaveItem(CBasePlayer *pPlayer, CItem *pItem)
 {
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -977,12 +983,12 @@ void CHalfLifeCoop::PlayerGotAmmo(CBasePlayer *pPlayer, char *szName, int iCount
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::IsAllowedToSpawn(CBaseEntity *pEntity)
+bool CHalfLifeCoop::IsAllowedToSpawn(CBaseEntity *pEntity)
 {
 	//	if ( pEntity->pev->flags & FL_MONSTER )
-	//		return FALSE;
+	//		return false;
 
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -1058,27 +1064,27 @@ int CHalfLifeCoop::PlayerRelationship(CBaseEntity *pPlayer, CBaseEntity *pTarget
 	return GR_TEAMMATE;
 }
 
-BOOL CHalfLifeCoop::PlayFootstepSounds(CBasePlayer *pl, float fvol)
+bool CHalfLifeCoop::PlayFootstepSounds(CBasePlayer *pl, float fvol)
 {
 	if (g_footsteps && g_footsteps->value == 0)
-		return FALSE;
+		return false;
 
 	if (pl->IsOnLadder() || pl->pev->velocity.Length2D() > 220)
-		return TRUE;  // only make step sounds in multiplayer if the player is moving fast enough
+		return true;  // only make step sounds in multiplayer if the player is moving fast enough
 
-	return FALSE;
+	return false;
 }
 
-BOOL CHalfLifeCoop::FAllowFlashlight(void)
+bool CHalfLifeCoop::FAllowFlashlight(void)
 {
 	return flashlight.value != 0;
 }
 
 //=========================================================
 //=========================================================
-BOOL CHalfLifeCoop::FAllowMonsters(void)
+bool CHalfLifeCoop::FAllowMonsters(void)
 {
-	return TRUE;
+	return true;
 }
 
 //=========================================================
@@ -1098,7 +1104,7 @@ void CHalfLifeCoop::GoToIntermission(void)
 	if (time < 1)
 		CVAR_SET_STRING("mp_chattime", "1");
 
-	g_fGameOver = TRUE;
+	g_fGameOver = true;
 }
 
 #define MAX_RULE_BUFFER 1024
@@ -1127,7 +1133,7 @@ Server is changing to a new level, check mapcycle.txt for map name and setup inf
 */
 void CHalfLifeCoop::ChangeLevel(void)
 {
-	g_fGameOver = TRUE;
+	g_fGameOver = true;
 
 	CHANGE_LEVEL("decaymapselect", NULL);
 }
@@ -1171,7 +1177,7 @@ void CHalfLifeCoop::SendMOTDToClient(edict_t *client)
 			*pFileList = 0;
 
 		MESSAGE_BEGIN(MSG_ONE, gmsgMOTD, NULL, client);
-		WRITE_BYTE(*pFileList ? FALSE : TRUE);	// FALSE means there is still more message to come
+		WRITE_BYTE(*pFileList ? false : true);	// false means there is still more message to come
 		WRITE_STRING(chunk);
 		MESSAGE_END();
 	}

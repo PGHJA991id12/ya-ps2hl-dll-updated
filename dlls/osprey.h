@@ -6,8 +6,8 @@ typedef struct
 {
 	int isValid;
 	EHANDLE hGrunt;
-	Vector	vecOrigin;
-	Vector  vecAngles;
+	Vector vecOrigin;
+	Vector vecAngles;
 } t_ospreygrunt;
 
 
@@ -19,35 +19,36 @@ typedef struct
 class COsprey : public CBaseMonster
 {
 public:
-	int		Save(CSave &save);
-	int		Restore(CRestore &restore);
-	static	TYPEDESCRIPTION m_SaveData[];
-	int		ObjectCaps(void) { return CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
+	static TYPEDESCRIPTION m_SaveData[];
+	int ObjectCaps() override { return CBaseMonster::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 
-	void Spawn(void);
-	void Precache(void);
-	int  Classify(void) { return CLASS_MACHINE; };
-	int  BloodColor(void) { return DONT_BLEED; }
-	void Killed(entvars_t *pevAttacker, int iGib);
+	void Spawn() override;
+	void Precache() override;
+	int Classify() override { return CLASS_MACHINE; }
+	int BloodColor() override { return DONT_BLEED; }
+	void Killed(entvars_t* pevAttacker, int iGib) override;
 
-	void UpdateGoal(void);
-	BOOL HasDead(void);
-	void EXPORT FlyThink(void);
-	void EXPORT DeployThink(void);
-	void Flight(void);
-	void EXPORT HitTouch(CBaseEntity *pOther);
-	void EXPORT FindAllThink(void);
-	void EXPORT HoverThink(void);
-	CBaseMonster *MakeGrunt(Vector vecSrc);
-	void EXPORT CrashTouch(CBaseEntity *pOther);
-	void EXPORT DyingThink(void);
-	void EXPORT CommandUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void UpdateGoal();
+	bool HasDead();
+	void EXPORT FlyThink();
+	void EXPORT DeployThink();
+	void Flight();
+	void EXPORT HitTouch(CBaseEntity* pOther);
+	void EXPORT FindAllThink();
+	void EXPORT HoverThink();
+	CBaseMonster* MakeGrunt(Vector vecSrc);
+	void EXPORT CrashTouch(CBaseEntity* pOther);
+	void EXPORT DyingThink();
+	void EXPORT CommandUse(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value);
 
-	// int  TakeDamage( entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType );
-	void TraceAttack(entvars_t *pevAttacker, float flDamage, Vector vecDir, TraceResult *ptr, int bitsDamageType);
-	void ShowDamage(void);
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override;
+	void ShowDamage();
+	void Update();
 
-	CBaseEntity *m_pGoalEnt;
+	CBaseEntity* m_pGoalEnt;
 	Vector m_vel1;
 	Vector m_vel2;
 	Vector m_pos1;
@@ -65,7 +66,7 @@ public:
 	float m_flRightHealth;
 	float m_flLeftHealth;
 
-	int	m_iUnits;
+	int m_iUnits;
 	EHANDLE m_hGrunt[MAX_CARRY];
 	Vector m_vecOrigin[MAX_CARRY];
 	EHANDLE m_hRepel[4];
@@ -76,14 +77,12 @@ public:
 	int m_iPitch;
 
 	int m_iExplode;
-	int	m_iTailGibs;
-	int	m_iBodyGibs;
-	int	m_iEngineGibs;
+	int m_iTailGibs;
+	int m_iBodyGibs;
+	int m_iEngineGibs;
 
 	int m_iDoLeftSmokePuff;
 	int m_iDoRightSmokePuff;
 };
-
-
 
 #endif

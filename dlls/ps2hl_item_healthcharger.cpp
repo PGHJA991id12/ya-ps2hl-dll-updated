@@ -180,7 +180,7 @@ void CItemHealthCharger::Spawn(void)
 	pev->nextthink = gpGlobals->time + HCHG_DELAY_THINK;
 }
 
-void CItemHealthCharger::KeyValue(KeyValueData *pkvd)
+bool CItemHealthCharger::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "style") ||
 		FStrEq(pkvd->szKeyName, "height") ||
@@ -188,15 +188,14 @@ void CItemHealthCharger::KeyValue(KeyValueData *pkvd)
 		FStrEq(pkvd->szKeyName, "value2") ||
 		FStrEq(pkvd->szKeyName, "value3"))
 	{
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "dmdelay"))
 	{
 		m_iReactivate = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
-	else
-		CBaseButton::KeyValue(pkvd);
+	return CBaseButton::KeyValue(pkvd);
 }
 
 void CItemHealthCharger::Think(void)
@@ -270,7 +269,7 @@ void CItemHealthCharger::Think(void)
 		// Just wait until animation is played
 		if (m_fSequenceFinished)
 		{
-			PS2HL_DEBUG(ALERT(at_console, "\n\nitem_healthcharger: ready\n\n\n"));
+			PS2HL_DEBUG(ALERT(at_console, "\n\nitem_healthcharger: (activate) ready\n\n\n"));
 			ChangeState(HCHG_STATE_READY, HCHG_SEQ_RDY);
 		}
 		break;
@@ -326,7 +325,7 @@ void CItemHealthCharger::Think(void)
 		// Just wait until animation is played
 		if (m_fSequenceFinished)
 		{
-			PS2HL_DEBUG(ALERT(at_console, "\n\nitem_healthcharger: ready\n\n\n"));
+			PS2HL_DEBUG(ALERT(at_console, "\n\nitem_healthcharger: (stop) ready\n\n\n"));
 			Off();
 			ChangeState(HCHG_STATE_READY, HCHG_SEQ_RDY);
 		}
@@ -460,7 +459,7 @@ CBaseEntity * CItemHealthCharger::FindPlayer(float Radius)
 }
 
 // Based on "func_healthcharger"
-void CItemHealthCharger::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
+void CItemHealthCharger::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {
 	// Make sure that we have a caller
 	if (!pActivator)
@@ -468,6 +467,8 @@ void CItemHealthCharger::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 	// if it's not a player, ignore
 	if (!pActivator->IsPlayer())
 		return;
+
+	auto player = static_cast<CBasePlayer*>(pActivator);
 
 	#ifdef HCHG_NO_BACK_USE
 	// PS2HL - prevent back side usage
@@ -477,7 +478,7 @@ void CItemHealthCharger::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 	#ifdef HCHG_NO_BACK_USE
 	// Check distance
-	Vector Dist = pev->origin - pActivator->pev->origin;
+	Vector Dist = pev->origin - player->pev->origin;
 	if (Dist.Length2D() > HCHG_USE_RADIUS)
 	{
 		PS2HL_DEBUG(ALERT(at_console, "\n\nitem_healthcharger: player is too far ...\n\n\n"));
@@ -506,7 +507,7 @@ void CItemHealthCharger::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 	}
 
 	// if the player doesn't have the suit, or there is no juice left, make the deny noise
-	if ((m_iJuice <= 0) || (!(pActivator->pev->weapons & (1 << WEAPON_SUIT))))
+	if ((m_iJuice <= 0) || !player->HasSuit())
 	{
 		if (m_flSoundTime <= gpGlobals->time)
 		{
@@ -554,7 +555,7 @@ void CItemHealthCharger::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 
 	// charge the player
-	if (pActivator->TakeHealth(1, DMG_GENERIC))
+	if (player->TakeHealth(1, DMG_GENERIC))
 	{
 		m_iJuice--;
 	}

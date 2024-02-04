@@ -49,22 +49,22 @@ class CItemArmorVest : public CItem
 		PRECACHE_MODEL("models/barney_vest.mdl");
 		PRECACHE_SOUND("items/gunpickup2.wav");
 	}
-	BOOL MyTouch(CBasePlayer *pPlayer)
+	bool MyTouch(CBasePlayer *pPlayer)
 	{
 		if ((pPlayer->pev->armorvalue < MAX_NORMAL_BATTERY) &&
 			(pPlayer->pev->weapons & (1 << WEAPON_SUIT)))
 		{
 			pPlayer->pev->armorvalue += 60;
-			pPlayer->pev->armorvalue = min(pPlayer->pev->armorvalue, MAX_NORMAL_BATTERY);
+			pPlayer->pev->armorvalue = V_min(pPlayer->pev->armorvalue, MAX_NORMAL_BATTERY);
 
 			EMIT_SOUND(pPlayer->edict(), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, NULL, pPlayer->pev);
 			WRITE_STRING(STRING(pev->classname));
 			MESSAGE_END();
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 };
 
@@ -89,22 +89,22 @@ class CItemHelmet : public CItem
 		PRECACHE_MODEL("models/barney_helmet.mdl");
 		PRECACHE_SOUND("items/gunpickup2.wav");
 	}
-	BOOL MyTouch(CBasePlayer *pPlayer)
+	bool MyTouch(CBasePlayer *pPlayer)
 	{
 		if ((pPlayer->pev->armorvalue < MAX_NORMAL_BATTERY) &&
 			(pPlayer->pev->weapons & (1 << WEAPON_SUIT)))
 		{
 			pPlayer->pev->armorvalue += 40;
-			pPlayer->pev->armorvalue = min(pPlayer->pev->armorvalue, MAX_NORMAL_BATTERY);
+			pPlayer->pev->armorvalue = V_min(pPlayer->pev->armorvalue, MAX_NORMAL_BATTERY);
 
 			EMIT_SOUND(pPlayer->edict(), CHAN_ITEM, "items/gunpickup2.wav", 1, ATTN_NORM);
 
 			MESSAGE_BEGIN(MSG_ONE, gmsgItemPickup, NULL, pPlayer->pev);
 			WRITE_STRING(STRING(pev->classname));
 			MESSAGE_END();
-			return TRUE;
+			return true;
 		}
-		return FALSE;
+		return false;
 	}
 };
 
@@ -160,26 +160,26 @@ enum
 class CRosenberg : public CTalkMonster
 {
 public:
-	void Spawn(void);
-	void Precache(void);
+	void Spawn(void) override;
+	void Precache(void) override;
 
-	void SetYawSpeed(void);
-	int Classify(void);
+	void SetYawSpeed(void) override;
+	int Classify(void) override;
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
-	void RunTask(Task_t *pTask);
-	void StartTask(Task_t *pTask);
+	void RunTask(Task_t *pTask) override;
+	void StartTask(Task_t *pTask) override;
 	int ObjectCaps(void) { return CTalkMonster::ObjectCaps() | FCAP_IMPULSE_USE; }
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType);
-	virtual int FriendNumber(int arrayNumber);
-	void SetActivity(Activity newActivity);
-	Activity GetStoppedActivity(void);
+	bool TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) override;
+	virtual int FriendNumber(int arrayNumber) override;
+	void SetActivity(Activity newActivity) override;
+	Activity GetStoppedActivity(void) override;
 	int ISoundMask(void);
 	void DeclineFollowing(void);
 
 	float CoverRadius(void) { return 1200; }		// Need more room for cover because scientists want to get far away!
-	BOOL DisregardEnemy(CBaseEntity *pEnemy) { return !pEnemy->IsAlive() || (gpGlobals->time - m_fearTime) > 15; }
+	bool DisregardEnemy(CBaseEntity *pEnemy) { return !pEnemy->IsAlive() || (gpGlobals->time - m_fearTime) > 15; }
 
-	BOOL CanHeal(void);
+	bool CanHeal(void);
 	void Heal(void);
 	void Scream(void);
 
@@ -195,8 +195,8 @@ public:
 
 	void Killed(entvars_t *pevAttacker, int iGib);
 
-	virtual int Save(CSave &save);
-	virtual int Restore(CRestore &restore);
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
 	static TYPEDESCRIPTION m_SaveData[];
 
 	CUSTOM_SCHEDULES
@@ -871,14 +871,14 @@ void CRosenberg::TalkInit()
 	}
 }
 
-int CRosenberg::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+bool CRosenberg::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
 	if (pevInflictor && pevInflictor->flags & FL_CLIENT)
 	{
 		//if (!FClassnameIs(pev, "monster_rosenberg"))
 		//{
 		//	Remember(bits_MEMORY_PROVOKED);
-			StopFollowing(TRUE);
+			StopFollowing(true);
 		//}
 	}
 
@@ -1064,7 +1064,7 @@ Schedule_t *CRosenberg::GetSchedule(void)
 			if (!m_hTargetEnt->IsAlive())
 			{
 				// UNDONE: Comment about the recently dead player here?
-				StopFollowing(FALSE);
+				StopFollowing(false);
 				break;
 			}
 
@@ -1136,14 +1136,14 @@ MONSTERSTATE CRosenberg::GetIdealState(void)
 					m_IdealMonsterState = MONSTERSTATE_ALERT;
 					return m_IdealMonsterState;
 				}
-				StopFollowing(TRUE);
+				StopFollowing(true);
 			}
 		}
 		else if (HasConditions(bits_COND_LIGHT_DAMAGE | bits_COND_HEAVY_DAMAGE))
 		{
 			// Stop following if you take damage
 			if (IsFollowing())
-				StopFollowing(TRUE);
+				StopFollowing(true);
 		}
 		break;
 	case MONSTERSTATE_COMBAT:
@@ -1182,12 +1182,12 @@ MONSTERSTATE CRosenberg::GetIdealState(void)
 	return CTalkMonster::GetIdealState();
 }
 
-BOOL CRosenberg::CanHeal(void)
+bool CRosenberg::CanHeal(void)
 {
 	if ((m_healTime > gpGlobals->time) || (m_hTargetEnt == NULL) || (m_hTargetEnt->pev->health > (m_hTargetEnt->pev->max_health * 0.5)))
-		return FALSE;
+		return false;
 
-	return TRUE;
+	return true;
 }
 
 void CRosenberg::Heal(void)

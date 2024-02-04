@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2001, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -15,14 +15,15 @@
 //=========================================================
 // Generic Monster - purely for scripted sequence work.
 //=========================================================
-#include	"extdll.h"
-#include	"util.h"
-#include	"cbase.h"
-#include	"monsters.h"
-#include	"schedule.h"
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "monsters.h"
+#include "schedule.h"
+#include "soundent.h"
 
 // For holograms, make them not solid so the player can walk through them
-#define	SF_GENERICMONSTER_NOTSOLID					4 
+#define SF_GENERICMONSTER_NOTSOLID 4
 
 //=========================================================
 // Monster's Anim Events Go Here
@@ -31,51 +32,50 @@
 class CGenericMonster : public CBaseMonster
 {
 public:
-	void Spawn( void );
-	void Precache( void );
-	void SetYawSpeed( void );
-	int  Classify ( void );
-	void HandleAnimEvent( MonsterEvent_t *pEvent );
-	int ISoundMask ( void );
+	void Spawn() override;
+	void Precache() override;
+	void SetYawSpeed() override;
+	int Classify() override;
+	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
+	int ISoundMask() override;
 
 	// PS2HL
 	string_t m_iszTargetTrigger;
 	string_t m_iszNoTargetTrigger;
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) {
+	bool TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) {
 		if (pevAttacker)
 			if (!strcmp(STRING(pevAttacker->classname), "player"))
 				FireTargets(STRING(m_iszTargetTrigger), this, this, USE_ON, 1);
 		return CBaseMonster::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 	}
-	void KeyValue(KeyValueData *pkvd) {
+	bool KeyValue(KeyValueData *pkvd) {
 		if (FStrEq(pkvd->szKeyName, "no_target_trigger"))
 		{
 			//ALERT(at_console, "mon_gen: no aim - %s\n", pkvd->szValue);
 			m_iszNoTargetTrigger = ALLOC_STRING(pkvd->szValue);
-			pkvd->fHandled = TRUE;
+			return true;
 		}
 		else if (FStrEq(pkvd->szKeyName, "target_trigger"))
 		{
 			//ALERT(at_console, "mon_gen: aim - %s\n", pkvd->szValue);
 			m_iszTargetTrigger = ALLOC_STRING(pkvd->szValue);
-			pkvd->fHandled = TRUE;
+			return true;
 		}
 		//else if (FStrEq(pkvd->szKeyName, "health"))
 		//{
 		//	ALERT(at_console, "mon_gen: hp - %s\n", pkvd->szValue);
 		//	pev->health = atof(pkvd->szValue);
-		//	pkvd->fHandled = TRUE;
+		//	return true;
 		//}
-		else
-		{
-			CBaseMonster::KeyValue(pkvd);
-		}
+			return CBaseMonster::KeyValue(pkvd);
 	}
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
-	static	TYPEDESCRIPTION m_SaveData[];
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
+
+	static TYPEDESCRIPTION m_SaveData[];
+
 };
-LINK_ENTITY_TO_CLASS( monster_generic, CGenericMonster );
+LINK_ENTITY_TO_CLASS(monster_generic, CGenericMonster);
 
 // PS2HL - Save/restore
 TYPEDESCRIPTION CGenericMonster::m_SaveData[] =
@@ -86,10 +86,10 @@ TYPEDESCRIPTION CGenericMonster::m_SaveData[] =
 IMPLEMENT_SAVERESTORE(CGenericMonster, CBaseMonster);
 
 //=========================================================
-// Classify - indicates this monster's place in the 
+// Classify - indicates this monster's place in the
 // relationship table.
 //=========================================================
-int	CGenericMonster :: Classify ( void )
+int CGenericMonster::Classify()
 {
 	// PS2HLU
 	// Fix human grunts shooting at a soda can on ht07signal
@@ -105,11 +105,11 @@ int	CGenericMonster :: Classify ( void )
 // SetYawSpeed - allows each sequence to have a different
 // turn rate associated with it.
 //=========================================================
-void CGenericMonster :: SetYawSpeed ( void )
+void CGenericMonster::SetYawSpeed()
 {
 	int ys;
 
-	switch ( m_Activity )
+	switch (m_Activity)
 	{
 	case ACT_IDLE:
 	default:
@@ -123,13 +123,13 @@ void CGenericMonster :: SetYawSpeed ( void )
 // HandleAnimEvent - catches the monster-specific messages
 // that occur when tagged animation frames are played.
 //=========================================================
-void CGenericMonster :: HandleAnimEvent( MonsterEvent_t *pEvent )
+void CGenericMonster::HandleAnimEvent(MonsterEvent_t* pEvent)
 {
-	switch( pEvent->event )
+	switch (pEvent->event)
 	{
 	case 0:
 	default:
-		CBaseMonster::HandleAnimEvent( pEvent );
+		CBaseMonster::HandleAnimEvent(pEvent);
 		break;
 	}
 }
@@ -137,38 +137,38 @@ void CGenericMonster :: HandleAnimEvent( MonsterEvent_t *pEvent )
 //=========================================================
 // ISoundMask - generic monster can't hear.
 //=========================================================
-int CGenericMonster :: ISoundMask ( void )
+int CGenericMonster::ISoundMask()
 {
-	return	NULL;
+	return bits_SOUND_NONE;
 }
 
 //=========================================================
 // Spawn
 //=========================================================
-void CGenericMonster :: Spawn()
+void CGenericMonster::Spawn()
 {
 	Precache();
 
-	SET_MODEL( ENT(pev), STRING(pev->model) );
+	SET_MODEL(ENT(pev), STRING(pev->model));
 
-/*
+	/*
 	if ( FStrEq( STRING(pev->model), "models/player.mdl" ) )
 		UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 	else
 		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 */
 
-	if ( FStrEq( STRING(pev->model), "models/player.mdl" ) || FStrEq( STRING(pev->model), "models/holo.mdl" ) )
+	if (FStrEq(STRING(pev->model), "models/player.mdl") || FStrEq(STRING(pev->model), "models/holo.mdl"))
 		UTIL_SetSize(pev, VEC_HULL_MIN, VEC_HULL_MAX);
 	else
 		UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
-	pev->solid			= SOLID_SLIDEBOX;
-	pev->movetype		= MOVETYPE_STEP;
-	m_bloodColor		= BLOOD_COLOR_RED;
-	//pev->health			= 8;	// PS2HL
-	m_flFieldOfView		= 0.5;// indicates the width of this monster's forward view cone ( as a dotproduct result )
-	m_MonsterState		= MONSTERSTATE_NONE;
+	pev->solid = SOLID_SLIDEBOX;
+	pev->movetype = MOVETYPE_STEP;
+	m_bloodColor = BLOOD_COLOR_RED;
+	pev->health = 8;
+	m_flFieldOfView = 0.5; // indicates the width of this monster's forward view cone ( as a dotproduct result )
+	m_MonsterState = MONSTERSTATE_NONE;
 
 	// PS2HL
 	if (pev->health == 0)
@@ -178,7 +178,7 @@ void CGenericMonster :: Spawn()
 
 	MonsterInit();
 
-	if ( pev->spawnflags & SF_GENERICMONSTER_NOTSOLID )
+	if ((pev->spawnflags & SF_GENERICMONSTER_NOTSOLID) != 0)
 	{
 		pev->solid = SOLID_NOT;
 		pev->takedamage = DAMAGE_NO;
@@ -188,10 +188,10 @@ void CGenericMonster :: Spawn()
 //=========================================================
 // Precache - precaches all resources this monster needs
 //=========================================================
-void CGenericMonster :: Precache()
+void CGenericMonster::Precache()
 {
-	PRECACHE_MODEL( (char *)STRING(pev->model) );
-}	
+	PRECACHE_MODEL((char*)STRING(pev->model));
+}
 
 //=========================================================
 // AI Schedules Specific to this monster

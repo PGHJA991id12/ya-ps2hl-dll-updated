@@ -22,10 +22,10 @@ public:
 	int  Classify(void) { return CLASS_NONE; };
 	int  BloodColor(void) { return BLOOD_COLOR_GREEN; }
 	void Killed(entvars_t *pevAttacker, int iGib) override;
-	void KeyValue(KeyValueData *pkvd) override;
+	bool KeyValue(KeyValueData *pkvd) override;
 
 	void UpdateGoal(void);
-	BOOL HasDead(void);
+	bool HasDead(void);
 	void EXPORT FlyThink(void);
 	void EXPORT DeployThink(void);
 	void Flight(void);
@@ -134,16 +134,15 @@ void CAlienFlyer::Precache(void)
 	//m_iEngineGibs = PRECACHE_MODEL("models/osprey_enginegibs.mdl");
 }
 
-void CAlienFlyer::KeyValue(KeyValueData *pkvd)
+bool CAlienFlyer::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "death_target"))
 	{
 		death_target = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 
-	else
-		CBaseMonster::KeyValue(pkvd);
+	return CBaseMonster::KeyValue(pkvd);
 }
 
 void CAlienFlyer::CommandUse(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value)
@@ -300,9 +299,9 @@ void CAlienFlyer::FlyThink(void)
 	Flight();
 }
 
-BOOL CAlienFlyer::HasDead()
+bool CAlienFlyer::HasDead()
 {
-	return FALSE;
+	return false;
 }
 
 void CAlienFlyer::UpdateGoal()

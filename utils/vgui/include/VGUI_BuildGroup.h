@@ -1,16 +1,16 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef VGUI_BUILDGROUP_H
-#define VGUI_BUILDGROUP_H
+#pragma once
 
 #include<VGUI.h>
 #include<VGUI_Dar.h>
-
+#include <VGUI_MouseCode.h>
+#include <VGUI_KeyCode.h>
 
 namespace vgui
 {
@@ -63,5 +63,3 @@ protected:
 };
 
 }
-
-#endif

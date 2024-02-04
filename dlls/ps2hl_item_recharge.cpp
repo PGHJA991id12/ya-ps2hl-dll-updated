@@ -124,7 +124,7 @@ void CItemRecharge::Spawn(void)
 	pev->nextthink = gpGlobals->time + RCHG_DELAY_THINK;
 }
 
-void CItemRecharge::KeyValue(KeyValueData *pkvd)
+bool CItemRecharge::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "style") ||
 		FStrEq(pkvd->szKeyName, "height") ||
@@ -132,15 +132,14 @@ void CItemRecharge::KeyValue(KeyValueData *pkvd)
 		FStrEq(pkvd->szKeyName, "value2") ||
 		FStrEq(pkvd->szKeyName, "value3"))
 	{
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "dmdelay"))
 	{
 		m_iReactivate = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
-	else
-		CBaseButton::KeyValue(pkvd);
+	return CBaseButton::KeyValue(pkvd);
 }
 
 void CItemRecharge::Think(void)
@@ -450,6 +449,8 @@ void CItemRecharge::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	if (!FClassnameIs(pActivator->pev, "player"))
 		return;
 
+	auto player = static_cast<CBasePlayer*>(pActivator);
+
 	#ifdef RCHG_NO_BACK_USE
 	// PS2HL - prevent back side usage
 	if (!IsFrontAngle)
@@ -458,7 +459,7 @@ void CItemRecharge::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	
 	#ifdef RCHG_NO_BACK_USE
 	// Check distance
-	Vector Dist = pev->origin - pActivator->pev->origin;
+	Vector Dist = pev->origin - player->pev->origin;
 	if (Dist.Length2D() > RCHG_USE_RADIUS)
 	{
 		PS2HL_DEBUG(ALERT(at_console, "\n\nitem_recharge: player is too far ...\n\n\n"));
@@ -486,7 +487,7 @@ void CItemRecharge::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 	}
 
 	// if the player doesn't have the suit, or there is no juice left, make the deny noise
-	if ((m_iJuice <= 0) || (!(pActivator->pev->weapons & (1 << WEAPON_SUIT))))
+	if ((m_iJuice <= 0) || !player->HasSuit())
 	{
 		if (m_flSoundTime <= gpGlobals->time)
 		{

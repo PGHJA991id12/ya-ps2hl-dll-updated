@@ -9,7 +9,7 @@
 extern int gmsgHealth;
 extern int gmsgCurWeapon;
 extern int gmsgSetFOV;
-extern DLL_GLOBAL ULONG g_ulModelIndexPlayer;
+extern DLL_GLOBAL unsigned int g_ulModelIndexPlayer;
 // Set in combat.cpp.  Used to pass the damage inflictor for death messages.
 extern entvars_t *g_pevLastInflictor;
 
@@ -152,8 +152,8 @@ void EXPORT CDecayBot::SwapBotWithPlayer()
 			//pPlayer2->pev->flags &= ~FL_ONGROUND;
 
 			// Do the actual switch
-			pPlayer->m_bIsInTrigger = FALSE;
-			pPlayer2->m_bIsInTrigger = FALSE;
+			pPlayer->m_bIsInTrigger = false;
+			pPlayer2->m_bIsInTrigger = false;
 			UTIL_SetOrigin(pPlayer->pev, tmp2);
 			UTIL_SetOrigin(pPlayer2->pev, tmp);
 			pPlayer->pev->angles = BotAngles;
@@ -221,14 +221,14 @@ void CDecayBot::Spawn()
 	m_flNextFullBotThink = gpGlobals->time + g_flBotFullThinkInterval;
 	m_flPreviousCommandTime = gpGlobals->time;
 
-	m_fIsCrouching = FALSE;
+	m_fIsCrouching = false;
 	m_forwardSpeed = 0.0f;
 	m_buttonFlags = 0;
 
 	pev->nextthink = gpGlobals->time + 0.1;
 }
 
-int CDecayBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
+bool CDecayBot::TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType)
 {
 	CBaseEntity *attacker = GetClassPtr((CBaseEntity *)pevInflictor);
 	if(IsEnemy(attacker))
@@ -276,7 +276,7 @@ void EXPORT CDecayBot::BotThink(void)
 	*/
 	
 	// this causes an access violation for some reason, ill just disable it for now
-#if 0
+#if 1
 	if (/*GetAttacker() != NULL && GetAttacker() != this->GetEnemy() && */m_attacker != NULL)
 	{
 		//GetAttacker();
@@ -321,7 +321,7 @@ void EXPORT CDecayBot::BotThink(void)
 		if (gpGlobals->time >= m_flNextFullBotThink)
 		{
 			m_flNextFullBotThink = gpGlobals->time + g_flBotFullThinkInterval;
-			m_fIsCrouching = FALSE;
+			m_fIsCrouching = false;
 			m_buttonFlags = 0;
 			m_forwardSpeed = 0.0f;
 		}
@@ -381,7 +381,7 @@ Vector CDecayBot::GetAutoaimVector(float flDelta)
 
 void CDecayBot::Crouch(void)
 {
-	m_fIsCrouching = TRUE;
+	m_fIsCrouching = true;
 }
 
 void CDecayBot::PrimaryAttack(void)
@@ -403,13 +403,13 @@ CBaseMonster *CDecayBot::GetAttacker() const
 	return NULL;
 }
 
-BOOL CDecayBot::IsEnemy(CBaseEntity *enemy)
+bool CDecayBot::IsEnemy(CBaseEntity *enemy)
 {
 	// TODO: better check if it classifies as hostile against the player
-	if(enemy != NULL && enemy->IsAlive() && enemy->Classify() == CLASS_ALIEN_MILITARY)
-	return TRUE;
+	if (enemy != NULL && enemy->IsAlive() && enemy->pev->flags & FL_MONSTER /* && enemy->Classify() == CLASS_ALIEN_MILITARY*/)
+	return true;
 
-	return FALSE;
+	return false;
 }
 
 

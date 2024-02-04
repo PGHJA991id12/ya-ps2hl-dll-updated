@@ -24,23 +24,20 @@ public:
 	void Activate(void);
 	int  Classify(void);
 	void HandleAnimEvent(MonsterEvent_t *pEvent);
-	void KeyValue(KeyValueData *pkvd) {
+	bool KeyValue(KeyValueData *pkvd) {
 		if (FStrEq(pkvd->szKeyName, "speed"))
 		{
 			m_speed = atoi(pkvd->szValue);
-			pkvd->fHandled = TRUE;
+			return true;
 		}
 		else if (FStrEq(pkvd->szKeyName, "yaw_speed"))
 		{
 			//ALERT(at_console, "mon_gen: aim - %s\n", pkvd->szValue);
 			newYawSpeed = atoi(pkvd->szValue);
 			//ALERT(at_console, "monster_modeltrain current yawspeed is:%s\n", pev->yaw_speed);
-			pkvd->fHandled = TRUE;
+			return true;
 		}
-		else
-		{
-			CBaseMonster::KeyValue(pkvd);
-		}
+		return CBaseMonster::KeyValue(pkvd);
 	}
 	void Blocked(CBaseEntity *pOther);
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
@@ -50,8 +47,8 @@ public:
 	int newYawSpeed;
 	int m_speed;
 	entvars_t	*m_pevCurrentTarget;
-	BOOL		m_activated;
-	BOOL		locked=FALSE;
+	bool		m_activated;
+	bool		locked=false;
 	CSprite		*m_Sprite;
 	CBaseEntity *prevActivator = nullptr;
 private:
@@ -101,8 +98,8 @@ void CModelTrain::Spawn()
 	pev->health = 9999;
 	//m_flFieldOfView = 0.2;// indicates the width of this monster's forward view cone ( as a dotproduct result )
 	m_MonsterState = MONSTERSTATE_NONE;
-	m_activated = FALSE;
-	locked = FALSE;
+	m_activated = false;
+	locked = false;
 
 	SetUse(&CModelTrain::Use);
 }
@@ -150,7 +147,7 @@ void CModelTrain::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE us
 		// Create the sprite
 		if (m_Sprite == NULL)
 		{
-			m_Sprite = CSprite::SpriteCreate((char *)STRING(pev->model), pev->origin, TRUE);
+			m_Sprite = CSprite::SpriteCreate((char *)STRING(pev->model), pev->origin, true);
 			if (m_Sprite)
 			{
 				m_Sprite->SetTransparency(pev->rendermode, pev->rendercolor.x, pev->rendercolor.y, pev->rendercolor.z, pev->renderamt, pev->renderfx); // this may be broken
@@ -226,19 +223,25 @@ void CModelTrain::Next(void)
 
 	// This makes it so if an incorrect target is specified
 	// The train goes to the worldspawn, but if theres no target, it just stops
+	// TODO: Find a less complicated way of doing this
 	if (locked) return;
 
-	if (pTarg && !pTarg->pev->target) locked = TRUE;
+	if (pTarg && !pTarg->pev->target) locked = true;
 
 	if (!pTarg)
 	{
-		pTarg = CBaseEntity::Instance(0);
-		locked = TRUE;
+		// TODO: Fix this
+		//pTarg = CBaseEntity::Instance(nullptr);
+		//ALERT(at_console, "Crash here!\n");
+		pTarg = NULL;
+		locked = false;
+		return;
 	}
 
 	// Save last target in case we need to find it again
 	pev->message = pev->target;
 
+	//if(pTarg->pev->target)
 	pev->target = pTarg->pev->target;
 	m_flWait = pTarg->GetDelay();
 
@@ -281,7 +284,7 @@ void CModelTrain::Activate(void)
 	// Not yet active, so teleport to first target
 	if (!m_activated)
 	{
-		m_activated = TRUE;
+		m_activated = true;
 		entvars_t	*pevTarg = VARS(FIND_ENTITY_BY_TARGETNAME(NULL, STRING(pev->target)));
 
 		pev->target = pevTarg->target;

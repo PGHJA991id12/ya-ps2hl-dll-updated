@@ -57,28 +57,28 @@ void CItemGeneric::Spawn(void)
 }
 
 // Parse keys
-void CItemGeneric::KeyValue(KeyValueData *pkvd)
+bool CItemGeneric::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "model"))
 	{
 		// Set model
 		pev->model = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "body"))
 	{
 		// Set body
 		pev->body = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "sequencename"))
 	{
 		// Set sequence
 		m_iSequence = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
-	else
-		CBaseEntity::KeyValue(pkvd);
+
+		return CBaseEntity::KeyValue(pkvd);
 }
 
 // Think handler

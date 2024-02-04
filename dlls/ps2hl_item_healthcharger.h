@@ -21,6 +21,7 @@ Based on "func_healthcharger"
 #include "gamerules.h"	// Required for getting "game rules" values
 #include "effects.h"	// CBeam
 #include "ps2hl_dbg.h"	// BBox render func
+#include "player.h"
 
 
 // Defines
@@ -62,9 +63,9 @@ public:
 	
 
 	// Methods
-	void Precache(void);						// Precache handler
-	void Spawn(void);							// Spawn handler
-	void Think(void);							// Think handler
+	void Precache(void) override;						// Precache handler
+	void Spawn(void) override;							// Spawn handler
+	void Think(void) override;							// Think handler
 	//void ChangeState(HBottleState NewState, int NewSequence);	// Set new state
 	void ChangeSequence(int Sequence);			// Set new animation
 	void SetLevel(float Level);					// Set level of a green goo
@@ -119,30 +120,30 @@ private:
 	// From "func_healthcharger"
 	void EXPORT Off(void);
 	void EXPORT Recharge(void);
-	void KeyValue(KeyValueData *pkvd);
-	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	bool KeyValue(KeyValueData *pkvd) override;
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;
 	virtual int	ObjectCaps(void) { return (CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE) &~FCAP_ACROSS_TRANSITION; }	// Needed for continous use
 
 	// New
-	BOOL IsUsed;								// Needed to track if charger is used
-	BOOL IsFrontAngle;							// Needed to track if player is in front or in back side of the charger
+	bool IsUsed;								// Needed to track if charger is used
+	bool IsFrontAngle;							// Needed to track if player is in front or in back side of the charger
 	RechargeState CurrentState;					// Current state of the charger
 	CHealthBottle * pBottle;					// Ptr. for bottle
 
-	void Spawn(void);							// Spawn handler
-	void Precache(void);						// Precache handler
+	void Spawn(void) override;							// Spawn handler
+	void Precache(void) override;						// Precache handler
 	CBaseEntity * FindPlayer(float Radius);		// Same as UTIL_FindEntityInSphere, but returns NULL if entity is not a player
 	void RotateCamArm(CBaseEntity * pPlayer);	// Rotate camera and arm to player (or to initial position if pointer is NULL)
 	//void RotateCoils();							// Upadate coil position
 	void SetSequenceBox(void);					// Extracts BBox
-	void Think(void);							// Think handler
+	void Think(void) override;							// Think handler
 	void ChangeSequence(int Sequence);			// Set new animation
 	void ChangeState(RechargeState NewState, int NewSequence);	// Set new state
 	//void MakeBeam(void);						// Create beam for one think period
 	
 	// Save/restore
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
+	bool		Save(CSave &save);
+	bool		Restore(CRestore &restore);
 	static	TYPEDESCRIPTION m_SaveData[];
 };
 

@@ -25,8 +25,8 @@ extern cvar_t ps2hl_islave_cheat;
 class CTriggerPlayerISlave : public CBaseDelay
 {
 public:
-	void Spawn(void);	// Spawn handler
-	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);	// Use handler
+	void Spawn(void) override;	// Spawn handler
+	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value) override;	// Use handler
 };
 
 // Include guard: end

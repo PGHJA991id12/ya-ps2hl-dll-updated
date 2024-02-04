@@ -17,7 +17,7 @@ IMPLEMENT_SAVERESTORE(CTriggerRandom, CBaseDelay);
 // Methods //
 
 // Parse keys
-void CTriggerRandom::KeyValue(KeyValueData *pkvd)
+bool CTriggerRandom::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "randomrange"))
 	{
@@ -26,10 +26,9 @@ void CTriggerRandom::KeyValue(KeyValueData *pkvd)
 		if ( Range < 0 || Range > TRR_TRGT_CAP)
 			Range = TRR_TRGT_CAP;
 		PS2HL_DEBUG(ALERT(at_console, "\ntrigger_random: got range - %d\n\n", Range));
-		pkvd->fHandled = TRUE;
+		return true;
 	}
-	else
-		CBaseDelay::KeyValue(pkvd);
+	return CBaseDelay::KeyValue(pkvd);
 }
 
 // Spawn handler

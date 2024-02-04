@@ -57,28 +57,27 @@ void CItemScanner::Spawn(void)
 }
 
 // Parse keys
-void CItemScanner::KeyValue(KeyValueData *pkvd)
+bool CItemScanner::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "reset_delay"))
 	{
 		// Reset delay
 		ResetDelay = atof(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "locked_target"))
 	{
 		// Target to fire when deny
 		LockedTarget = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "unlocked_target"))
 	{
 		// Target to fire when accept
 		UnlockedTarget = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
-	else
-		CBaseEntity::KeyValue(pkvd);
+	return CBaseEntity::KeyValue(pkvd);
 }
 
 // Think handler

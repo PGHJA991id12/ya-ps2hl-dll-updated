@@ -1,12 +1,11 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef VGUI_FONT_H
-#define VGUI_FONT_H
+#pragma once
 
 #include<VGUI.h>
 
@@ -32,6 +31,9 @@ class VGUIAPI Font
   virtual void getCharABCwide(int ch,int& a,int& b,int& c);
   virtual void getTextSize(const char* text,int& wide,int& tall);
   virtual int  getTall();
+#ifndef WIN32
+  virtual int getWide();
+#endif
   virtual int  getId();
  protected:
   char*			_name;
@@ -44,5 +46,3 @@ class VGUIAPI Font
 void Font_Reset();
 
 }
-
-#endif

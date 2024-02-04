@@ -32,7 +32,7 @@ public:
 	void Precache(void);
 	void Spawn(void) { Precache(); }
 	void Think(void);
-	void KeyValue(KeyValueData *pkvd);
+	bool KeyValue(KeyValueData *pkvd);
 	void Telefrag(bool PlayerOnly);
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	virtual int ObjectCaps(void) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
@@ -50,8 +50,8 @@ public:
 	int	 m_Spawnflags; // Spawned monsters spawnflags
 
 	static	TYPEDESCRIPTION m_SaveData[];
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
+	bool Save(CSave& save) override;
+	bool Restore(CRestore& restore) override;
 };
 
 LINK_ENTITY_TO_CLASS(env_warpball, CEnvWarpBall)
@@ -67,32 +67,32 @@ TYPEDESCRIPTION	CEnvWarpBall::m_SaveData[] =
 };
 IMPLEMENT_SAVERESTORE(CEnvWarpBall, CBaseEntity);
 
-void CEnvWarpBall::KeyValue(KeyValueData *pkvd)
+bool CEnvWarpBall::KeyValue(KeyValueData *pkvd)
 {
 	if (FStrEq(pkvd->szKeyName, "radius"))
 	{
 		pev->button = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "warp_target"))
 	{
 		pev->message = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "damage_delay"))
 	{
 		pev->frags = atof(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "monstercount"))
 	{
 		m_cNumMonsters = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "m_imaxlivechildren"))
 	{
 		m_iMaxLiveChildren = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	// PS2HLU
 	// works the same as in monstermaker
@@ -100,15 +100,15 @@ void CEnvWarpBall::KeyValue(KeyValueData *pkvd)
 	else if (FStrEq(pkvd->szKeyName, "monsterspawnflags"))
 	{
 		m_Spawnflags = atoi(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
 	else if (FStrEq(pkvd->szKeyName, "monstertype"))
 	{
 		m_iszMonsterClassname = ALLOC_STRING(pkvd->szValue);
-		pkvd->fHandled = TRUE;
+		return true;
 	}
-	else
-		CBaseEntity::KeyValue(pkvd);
+
+	return CBaseEntity::KeyValue(pkvd);
 }
 
 void CEnvWarpBall::Precache(void)
@@ -146,7 +146,7 @@ void CEnvWarpBall::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	}
 	EMIT_SOUND(pos, CHAN_BODY, "debris/beamstart2.wav", 1, ATTN_NORM);
 	UTIL_ScreenShake(vecOrigin, 6, 160, 1.0, pev->button);
-	CSprite *pSpr = CSprite::SpriteCreate("sprites/Fexplo1.spr", vecOrigin, TRUE);
+	CSprite *pSpr = CSprite::SpriteCreate("sprites/Fexplo1.spr", vecOrigin, true);
 	pSpr->AnimateAndDie(18);
 	pSpr->SetTransparency(kRenderGlow, 77, 210, 130, 255, kRenderFxNoDissipation);
 	EMIT_SOUND(pos, CHAN_ITEM, "debris/beamstart7.wav", 1, ATTN_NORM);

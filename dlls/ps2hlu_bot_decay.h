@@ -26,7 +26,7 @@ public:
 	void EXPORT CreateBot();
 	void EXPORT SwapBotWithPlayer();
 	virtual void Crouch(void);
-	BOOL IsCrouching(void) const { return m_fIsCrouching; }
+	bool IsCrouching(void) const { return m_fIsCrouching; }
 	virtual void ExecuteCommand(void);
 	virtual Vector GetAutoaimVector(float delta);
 
@@ -34,21 +34,21 @@ public:
 	CBasePlayer *GetEnemy();
 	CBaseMonster *GetAttacker() const;
 	CBaseMonster *m_attacker;
-	BOOL IsEnemy(CBaseEntity *enemy);
+	bool IsEnemy(CBaseEntity *enemy);
 	virtual void PrimaryAttack(void);
 	virtual void ClearPrimaryAttack(void);
 
 	// Bots should return FALSE for this, they can't receive NET messages
-	virtual BOOL IsNetClient(void) { return FALSE; }
+	virtual bool IsNetClient(void) { return false; }
 
 	int BloodColor() { return BLOOD_COLOR_RED; }
-	int TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker,
+	bool TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker,
 		float flDamage, int bitsDamageType);
 	int ObjectCaps() { return FCAP_IMPULSE_USE; };
 	mutable EHANDLE m_enemy;
 private:
 	
-	BOOL m_fIsCrouching = FALSE;
+	bool m_fIsCrouching = false;
 	unsigned short m_buttonFlags;
 	float m_forwardSpeed;
 

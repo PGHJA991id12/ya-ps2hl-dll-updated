@@ -4,7 +4,7 @@
 
 // Functions
 
-void DBG_RenderBBox(Vector origin, Vector mins, Vector maxs, int life, BYTE r, BYTE b, BYTE g)
+void DBG_RenderBBox(Vector origin, Vector mins, Vector maxs, int life, byte r, byte b, byte g)
 {
 	//********************Render boundarybox**************************
 

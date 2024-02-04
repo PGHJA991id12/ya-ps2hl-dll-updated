@@ -19,6 +19,7 @@ Based on "func_recharge"
 #include "util.h"		// Required Consts & Macros
 #include "cbase.h"		// Required for CPointEntity
 #include "skill.h"		// Required for getting "skill" values
+#include "player.h"
 #include "gamerules.h"	// Required for getting "game rules" values
 #include "ps2hl_dbg.h"	// BBox render func
 #include "effects.h"	// CBeam
@@ -98,13 +99,13 @@ private:
 	// From "func_recharge"
 	void Off(void);
 	void Recharge(void);
-	void KeyValue(KeyValueData *pkvd);
+	bool KeyValue(KeyValueData *pkvd);
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
 	virtual int	ObjectCaps(void) { return (CBaseToggle::ObjectCaps() | FCAP_CONTINUOUS_USE) &~FCAP_ACROSS_TRANSITION; }	// Needed for continous use
 
 	// New
-	BOOL IsUsed;								// Needed to track if charger is used
-	BOOL IsFrontAngle;							// Needed to track if player is in front or in back side of the charger
+	bool IsUsed;								// Needed to track if charger is used
+	bool IsFrontAngle;							// Needed to track if player is in front or in back side of the charger
 	RechargeState CurrentState;					// Current state of the charger
 	float CoilsAngle;							// Current coils angle
 	CChargerGlass * pGlass;						// Ptr. for glass
@@ -121,8 +122,8 @@ private:
 	void MakeBeam(void);						// Create beam for one think period
 
 	// Save/restore
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
+	bool		Save(CSave &save);
+	bool		Restore(CRestore &restore);
 	static	TYPEDESCRIPTION m_SaveData[];
 };
 

@@ -1,19 +1,14 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef VGUI_HELPERS_H
-#define VGUI_HELPERS_H
-#ifdef _WIN32
 #pragma once
-#endif
 
-
-#include "vgui_panel.h"
-#include "vgui_label.h"
+#include "VGUI_Panel.h"
+#include "VGUI_Label.h"
 
 
 inline int PanelTop(vgui::Panel *pPanel)	{int x,y,w,h; pPanel->getBounds(x,y,w,h); return y;}
@@ -25,7 +20,3 @@ inline int PanelHeight(vgui::Panel *pPanel)	{int x,y,w,h; pPanel->getBounds(x,y,
 
 // Places child at the requested position inside pParent. iAlignment is from Label::Alignment.
 void AlignPanel(vgui::Panel *pChild, vgui::Panel *pParent, int alignment);
-
-
-#endif // VGUI_HELPERS_H
-

@@ -27,7 +27,7 @@ private:
 	// Methods
 	void Spawn(void);						// Spawn handler
 	void Precache(void);					// Precache handler
-	void KeyValue(KeyValueData *pkvd);		// Parse keys
+	bool KeyValue(KeyValueData *pkvd);		// Parse keys
 	void Think(void);						// Think handler
 
 	int m_iSequence;

@@ -37,8 +37,8 @@ public:
 	void Unfreeze(void);		// Unfreeze
 
 	// Save/restore
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
+	bool Save(CSave &save) override;
+	bool Restore(CRestore &restore) override;
 	static	TYPEDESCRIPTION m_SaveData[];
 };
 

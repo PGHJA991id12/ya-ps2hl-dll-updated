@@ -42,13 +42,13 @@ private:
 	int FiredCount;		// Remember how many times targets were fired
 
 	// Methods
-	void KeyValue(KeyValueData *pkvd);	// Parse keys
+	bool KeyValue(KeyValueData *pkvd);	// Parse keys
 	void Spawn(void);					// Spawn handler
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);	// Use handler
 
 	// Save/restore
-	virtual int		Save(CSave &save);
-	virtual int		Restore(CRestore &restore);
+	bool		Save(CSave &save);
+	bool		Restore(CRestore &restore);
 	static	TYPEDESCRIPTION m_SaveData[];
 };
 

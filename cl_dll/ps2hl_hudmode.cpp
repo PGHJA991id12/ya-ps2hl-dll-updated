@@ -22,7 +22,7 @@ Created by supadupaplex
 DECLARE_MESSAGE(m_HudMode, HudMode);
 
 
-int CHudMode::Init(void)
+bool CHudMode::Init(void)
 {
 	m_iMode = 0;
 
@@ -40,7 +40,7 @@ void CHudMode::Reset(void)
 	m_iMode = 0;
 }
 
-int CHudMode::VidInit(void)
+bool CHudMode::VidInit(void)
 {
 	int HUD_crouch_on = gHUD.GetSpriteIndex("crouch_on");
 	int HUD_walk = gHUD.GetSpriteIndex("walk");
@@ -66,7 +66,7 @@ int CHudMode::MsgFunc_HudMode(const char *pszName, int iSize, void *pbuf)
 	return 1;
 }
 
-int CHudMode::Draw(float flTime)
+bool CHudMode::Draw(float flTime)
 {
 	// Do not draw if HUD is disabled
 	if (gHUD.m_iHideHUDDisplay & (HIDEHUD_ALL | HIDEHUD_MISC) )
@@ -77,7 +77,7 @@ int CHudMode::Draw(float flTime)
 		return 1;
 
 	int r, g, b, x, y, a;
-	wrect_t rc;
+	Rect rc;
 
 	a = 225;
 	UnpackRGB(r, g, b, RGB_YELLOWISH);

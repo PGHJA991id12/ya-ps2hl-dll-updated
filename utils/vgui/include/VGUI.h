@@ -1,12 +1,14 @@
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
+//========= Copyright Â© 1996-2002, Valve LLC, All rights reserved. ============
 //
 // Purpose: 
 //
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef VGUI_H
-#define VGUI_H
+#pragma once
+
+//Include this here so warnings are disabled for VGUI1 code as well.
+#include "Platform.h"
 
 //If you are going to add stuff to the vgui core...
 //
@@ -77,10 +79,11 @@
 //		then App can come along later and fire all the signals
 //TODO: Change all method naming to starting with a capital letter.
 
-#ifdef _WIN32
+#ifdef WIN32
 # define VGUIAPI __declspec( dllexport )
 #else
-# define VGUIAPI
+# define VGUIAPI  __attribute__ ((visibility("default")))
+#include <sys/types.h> // size_t define
 #endif
 
 #define null 0L
@@ -93,7 +96,7 @@ typedef unsigned long  ulong;
 namespace vgui
 {
 
-VGUIAPI void  vgui_setMalloc(void* (*malloc)(size_t size));
+VGUIAPI void  vgui_setMalloc(void *(*malloc)(size_t size) );
 VGUIAPI void  vgui_setFree(void (*free)(void* memblock));
 VGUIAPI void  vgui_strcpy(char* dst,int dstLen,const char* src);
 VGUIAPI char* vgui_strdup(const char* src);
@@ -102,6 +105,3 @@ VGUIAPI int   vgui_dprintf(const char* format,...);
 VGUIAPI int   vgui_dprintf2(const char* format,...);
 
 }
-
-#endif
-

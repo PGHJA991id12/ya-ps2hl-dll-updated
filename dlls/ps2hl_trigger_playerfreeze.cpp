@@ -58,12 +58,12 @@ void CTriggerPlayerFreeze::ToggleFreeze()
 	if (pPlayer->pev->flags & FL_FROZEN)
 	{
 		PS2HL_DEBUG(ALERT(at_console, "normal ...\n\n\n"));
-		((CBasePlayer *)((CBaseEntity *)pPlayer))->EnableControl(TRUE);
+		((CBasePlayer *)((CBaseEntity *)pPlayer))->EnableControl(true);
 	}
 	else
 	{
 		PS2HL_DEBUG(ALERT(at_console, "frozen ...\n\n\n"));
-		((CBasePlayer *)((CBaseEntity *)pPlayer))->EnableControl(FALSE);
+		((CBasePlayer *)((CBaseEntity *)pPlayer))->EnableControl(false);
 	}
 
 	SetThink(NULL);
@@ -84,7 +84,7 @@ void CTriggerPlayerFreeze::Unfreeze()
 
 	// Unfreeze
 	PS2HL_DEBUG(ALERT(at_console, "\n\ntrigger_playerfreeze: burst detected - unfreezing player ...\n\n\n"));
-	((CBasePlayer *)((CBaseEntity *)pPlayer))->EnableControl(TRUE);
+	((CBasePlayer *)((CBaseEntity *)pPlayer))->EnableControl(true);
 
 	SetThink(NULL);
 }

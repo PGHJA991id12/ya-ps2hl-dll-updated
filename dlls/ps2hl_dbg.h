@@ -20,6 +20,8 @@
 extern cvar_t ps2hl_debug;
 extern cvar_t ps2hl_precache;
 
+#define PS2HL_ALLOW_DEBUG
+
 // Macros //
 #ifdef PS2HL_ALLOW_DEBUG
 
@@ -41,7 +43,7 @@ extern cvar_t ps2hl_precache;
 // Functions //
 
 // Source: https://www.moddb.com/games/half-life/tutorials/where-is-poppy-your-first-custom-entity-part-1
-extern void DBG_RenderBBox(Vector origin, Vector mins, Vector maxs, int life, BYTE r = 0, BYTE b = 0, BYTE g = 0);
+extern void DBG_RenderBBox(Vector origin, Vector mins, Vector maxs, int life, byte r = 0, byte b = 0, byte g = 0);
 
 // Include guard: end
 #endif

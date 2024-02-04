@@ -21,7 +21,7 @@ Created by supadupaplex
 // cvar reference
 extern cvar_t * cl_ps2hl_oldsights;
 
-int CHudLock::Init(void)
+bool CHudLock::Init(void)
 {
 	m_iOffX = m_iOffY = m_iActive = 0;
 
@@ -31,7 +31,7 @@ int CHudLock::Init(void)
 
 	gHUD.AddHudElem(this);
 
-	return 1;
+	return true;
 };
 
 void CHudLock::Reset(void)
@@ -39,7 +39,7 @@ void CHudLock::Reset(void)
 	m_iOffX = m_iOffY = m_iActive = 0;
 }
 
-void CHudLock::SetSprite(SpriteHandle_t hspr, wrect_t rc)
+void CHudLock::SetSprite(HSPRITE hspr, Rect rc)
 {
 	m_hLock = hspr;
 	m_rcLock = rc;
@@ -66,7 +66,7 @@ void CHudLock::SetState(bool Active)
 //	return 1;
 //}
 
-int CHudLock::VidInit(void)
+bool CHudLock::VidInit(void)
 {
 	m_hLock = 0;
 	m_rcLock.top = 0;
@@ -77,9 +77,9 @@ int CHudLock::VidInit(void)
 	return 1;
 };
 
-int CHudLock::Draw(float flTime)
+bool CHudLock::Draw(float flTime)
 {
-	static wrect_t nullrc;
+	static Rect nullrc;
 
 	// Do not draw if HUD is disabled
 	if (gHUD.m_iHideHUDDisplay & (HIDEHUD_ALL | HIDEHUD_WEAPONS))
