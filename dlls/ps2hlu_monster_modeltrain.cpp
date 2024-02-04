@@ -223,19 +223,17 @@ void CModelTrain::Next(void)
 
 	// This makes it so if an incorrect target is specified
 	// The train goes to the worldspawn, but if theres no target, it just stops
-	// TODO: Find a less complicated way of doing this
 	if (locked) return;
 
-	if (pTarg && !pTarg->pev->target) locked = true;
+	if (pTarg && FStringNull(pTarg->pev->target))
+	{
+		locked = true;
+	}
 
 	if (!pTarg)
 	{
-		// TODO: Fix this
-		//pTarg = CBaseEntity::Instance(nullptr);
-		//ALERT(at_console, "Crash here!\n");
-		pTarg = NULL;
-		locked = false;
-		return;
+		pTarg = CBaseEntity::Instance(FIND_ENTITY_BY_CLASSNAME(NULL, "worldspawn"));
+		locked = true;
 	}
 
 	// Save last target in case we need to find it again
@@ -252,11 +250,12 @@ void CModelTrain::Next(void)
 	}
 	m_pevCurrentTarget = pTarg->pev;// keep track of this since path corners change our target for us.
 
-	pev->enemy = pTarg->edict();//hack
+	pev->enemy = pTarg->edict(); // hack
 
 	// PS2HLU
 	// Always use the angles of the next target (path)
 	pev->angles = pTarg->pev->angles;
+	
 
 
 	if (FBitSet(m_pevCurrentTarget->spawnflags, SF_CORNER_TELEPORT))
