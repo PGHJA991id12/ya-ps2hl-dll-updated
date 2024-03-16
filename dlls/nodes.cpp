@@ -271,6 +271,13 @@ bool CGraph::HandleLinkEnt(int iNode, entvars_t* pevLinkEnt, int afCapMask, NODE
 	{
 		return true;
 	}
+	// PS2HLU
+	// Dont consider this as a solid wall, mark as passable (non-solid) for monster navigation
+	// Needs to be turned off to actually allow monsters to walk through it
+	else if (FClassnameIs(pevLinkEnt, "func_wall_toggle") && (pevLinkEnt->spawnflags & 2) && queryType == NODEGRAPH_STATIC)
+	{
+		return true;
+	}
 	else
 	{
 		ALERT(at_aiconsole, "Unhandled Ent in Path %s\n", STRING(pevLinkEnt->classname));

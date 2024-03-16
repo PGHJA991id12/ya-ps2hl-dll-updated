@@ -69,6 +69,12 @@ void CFuncWall::Spawn()
 
 	// If it can't move/go away, it's really part of the world
 	pev->flags |= FL_WORLDBRUSH;
+
+	// PS2HLU
+	// Send info to client to make
+	// gunshot decals & particles visibly travel through this
+	if (pev->spawnflags & 4)
+		pev->iuser4 = 1;
 }
 
 
@@ -96,9 +102,9 @@ LINK_ENTITY_TO_CLASS(func_wall_toggle, CFuncWallToggle);
 void CFuncWallToggle::Spawn()
 {
 	// PS2HLU
-	// TODO: Figure out how to add spawnflag 2
-	// spawnflag 4 allows monsters and players to shoot through the wall
-	// spawnflag 2 allows monsters to see throught the wall
+	// This feature is actually inherited from func_wall
+	// spawnflag 4 allows monsters (to see) and players to shoot through the wall
+	// spawnflag 2 allows nodes to link together through this entity
 
 	CFuncWall::Spawn();
 	if ((pev->spawnflags & SF_WALL_START_OFF) != 0)
@@ -106,6 +112,7 @@ void CFuncWallToggle::Spawn()
 
 	// PS2HLU
 	// Notify client that shots pass throught wall
+	// This is done differently with an entity name check on PS2
 	if (pev->spawnflags & 4)
 		pev->iuser4 = 1; // !! Change this to something better if other things 
 						 //    need to be sent over the network in the future
