@@ -2106,7 +2106,6 @@ void CEnvFunnel::Precache()
 }
 
 LINK_ENTITY_TO_CLASS( env_funnel, CEnvFunnel );
-LINK_ENTITY_TO_CLASS(env_extremefunnel, CEnvFunnel); // PS2HLU temponary solution
 
 void CEnvFunnel::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE useType, float value)
 {

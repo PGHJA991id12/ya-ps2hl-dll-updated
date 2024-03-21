@@ -30,6 +30,14 @@
 #include "demo_api.h"
 #include "vgui_ScorePanel.h"
 
+// PS2HLU
+#include "event_api.h"
+#include "particleman.h"
+#include "r_studioint.h"
+
+extern engine_studio_api_t IEngineStudio;
+
+
 hud_player_info_t g_PlayerInfoList[MAX_PLAYERS_HUD + 1];	// player info from the engine
 extra_player_info_t g_PlayerExtraInfo[MAX_PLAYERS_HUD + 1]; // additional player info sent directly to the client dll
 
@@ -279,6 +287,186 @@ int __MsgFunc_AllowSpec(const char* pszName, int iSize, void* pbuf)
 	return 0;
 }
 
+// PS2HLU
+// Rough reimplementation of
+// the extremefunnel effect
+// Call to it in PS2 HL looks like this:
+// 
+// Write a tempentity with byte 128
+// coord coord coord (origin coords)
+// coord coord coord (???)
+// short (sprite index)
+// short (???)
+// short (maybe another sprite index, not too sure)
+
+// Implementation of client-side particles I used as reference:
+// https://github.com/FreeSlave/halflife-featureful/blob/216e030866809350c5e3b2de19dbc48f39283e46/cl_dll/cl_msg_fx.cpp#L497-L567
+
+#define PARTICLE_MINPOS -50
+#define PARTICLE_MAXPOS 50
+
+int __MsgFunc_BigFunnel(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+
+	const float x = READ_COORD();
+	const float y = READ_COORD();
+	const float z = READ_COORD();
+
+	// Not sure what these do
+	const float velX = READ_COORD();
+	const float velY = READ_COORD();
+	const float velZ = READ_COORD();
+
+	const int modelIndex = READ_SHORT();
+
+	// Not sure about what this one does either
+	// Looks like the part of the code, that wouldve
+	// changed whether the funnel was reverse or not
+	// Currently going to use it for the last stage of
+	// the extremefunnel aka a particle burst
+	const int mysteryflag = READ_SHORT();
+
+	// always 1
+	const int floatymodelIndex = READ_SHORT(); // ???
+	//gEngfuncs.Con_Printf("Particle code thingy ran!\n");
+
+	if (g_pParticleMan)
+	{
+		// gEngfuncs.Con_Printf("Particle code thingy ran!\n");
+		const float clTime = gEngfuncs.GetClientTime();
+
+		model_s* sprite = IEngineStudio.GetModelByIndex(modelIndex);
+		model_s* floatything = IEngineStudio.GetModelByIndex(floatymodelIndex);
+
+		if (sprite)
+		{
+			if (mysteryflag == 1)
+			{
+				for (int i = 0; i < 250; i++)
+				{
+
+					CBaseParticle* particle = g_pParticleMan->CreateParticle(Vector(x, y, z), Vector(0.0f, 0.0f, 0.0f), sprite, 1.0f, 220, "particle");
+					if (particle)
+					{
+						particle->SetLightFlag(LIGHT_NONE);
+						particle->SetCullFlag(CULL_PVS);
+						particle->SetRenderFlag(RENDER_FACEPLAYER);
+
+						Vector randomparticledir = {0, 0, 0};
+
+						randomparticledir.x = gEngfuncs.pfnRandomLong(0, 100);
+						randomparticledir.y = gEngfuncs.pfnRandomLong(-100, 100);
+						randomparticledir.z = gEngfuncs.pfnRandomLong(-100, 100);
+
+
+						particle->m_vVelocity = randomparticledir;
+						particle->m_iRendermode = kRenderTransAdd;
+						particle->m_vColor = Vector(225, 225, 225);
+						particle->m_flGravity = 0;
+						particle->m_flSize = 32.0;
+						particle->m_flFadeSpeed = 2.0f;
+						// the fading in the PS2 version starts 1 seconds
+						// before the sprite dies, how do I make it match?
+						// maybe fade out manually?
+						particle->m_flScaleSpeed = 0;
+						// if (flags & 16)
+						//{
+						/*
+						int frameRate = 10;
+							particle->m_iFramerate = frameRate > 0 ? frameRate : 10;
+							particle->m_iNumFrames = 20;
+						*/
+						//}
+
+						particle->m_flDieTime = clTime + 4;
+					}
+				}
+			}
+			else
+			{
+				CBaseParticle* particle = g_pParticleMan->CreateParticle(Vector(x, y, z), Vector(0.0f, 0.0f, 0.0f), sprite, 1.0f, 220, "particle");
+				if (particle)
+				{
+					particle->SetLightFlag(LIGHT_NONE);
+					particle->SetCullFlag(CULL_PVS);
+					particle->SetRenderFlag(RENDER_FACEPLAYER);
+
+					Vector randomparticledir = {0, 0, 0};
+
+					randomparticledir.x = gEngfuncs.pfnRandomLong(0, 100);
+					randomparticledir.y = gEngfuncs.pfnRandomLong(-100, 100);
+					randomparticledir.z = gEngfuncs.pfnRandomLong(-100, 100);
+
+
+					particle->m_vVelocity = randomparticledir;
+					particle->m_iRendermode = kRenderTransAdd;
+					particle->m_vColor = Vector(225, 225, 225);
+					particle->m_flGravity = 0;
+					particle->m_flSize = 32.0;
+					particle->m_flFadeSpeed = 2.0f;
+					// the fading in the PS2 version starts 1 seconds
+					// before the sprite dies, how do I make it match?
+					// maybe fade out manually?
+					particle->m_flScaleSpeed = 0;
+					// if (flags & 16)
+					//{
+					/*
+					int frameRate = 10;
+						particle->m_iFramerate = frameRate > 0 ? frameRate : 10;
+						particle->m_iNumFrames = 20;
+					*/
+					//}
+
+					particle->m_flDieTime = clTime + 4;
+				}
+			}
+		}
+		
+		if (floatything)
+		{
+			for (int j = 0; j < 8; j++)
+			{
+
+				Vector particlepos = {x + gEngfuncs.pfnRandomLong(PARTICLE_MINPOS, PARTICLE_MAXPOS),
+					y + gEngfuncs.pfnRandomLong(PARTICLE_MINPOS, PARTICLE_MAXPOS),
+					z + gEngfuncs.pfnRandomLong(PARTICLE_MINPOS, 0)};
+
+				CBaseParticle* floatyparticle = g_pParticleMan->CreateParticle(particlepos, Vector(0.0f, 0.0f, 0.0f), floatything, 1.0f, 220, "particle");
+				if (floatyparticle)
+				{
+					floatyparticle->SetLightFlag(LIGHT_NONE);
+					floatyparticle->SetCullFlag(CULL_PVS);
+					floatyparticle->SetRenderFlag(RENDER_FACEPLAYER);
+
+					Vector randomparticledir = {0, 0, 0};
+
+					// There seems to be a minimum speed limit on these
+					// in PS2 HL
+					randomparticledir.x = gEngfuncs.pfnRandomLong(0, 100);
+					randomparticledir.y = gEngfuncs.pfnRandomLong(-100, 100);
+					randomparticledir.z = gEngfuncs.pfnRandomLong(-100, 100);
+
+
+					floatyparticle->m_vVelocity = randomparticledir;
+					floatyparticle->m_iRendermode = kRenderTransAdd;
+					floatyparticle->m_vColor = Vector(0, 0xff, 0); // these are pure green
+					floatyparticle->m_flGravity = 0;
+					floatyparticle->m_flSize = 1.0;
+					floatyparticle->m_flScaleSpeed = 0;
+
+					randomparticledir = {0, 0, 0};
+					floatyparticle->m_flDieTime = clTime + 2;
+				}
+			}
+		}
+	}
+	
+	// Do we return 1 or 0?
+	// TODO: Figure this out
+	return 1;
+}
+
 // This is called every time the DLL is loaded
 void CHud::Init()
 {
@@ -320,6 +508,7 @@ void CHud::Init()
 	HOOK_MESSAGE( TeamInfo );
 	*/
 	//HOOK_MESSAGE( Accuracy );
+	HOOK_MESSAGE(BigFunnel);
 
 	HOOK_MESSAGE(Spectator);
 	HOOK_MESSAGE(AllowSpec);
