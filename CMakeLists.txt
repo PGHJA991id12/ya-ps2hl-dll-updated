@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(HalfLifeMod
 	VERSION 1.0
-	DESCRIPTION "Half-Life CMake Mod Template"
+	DESCRIPTION "PS2 Half-Life - Updated"
 	LANGUAGES CXX)
 
 if (UNIX)

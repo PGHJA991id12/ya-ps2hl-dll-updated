@@ -1,60 +1,68 @@
 name: CI/CD
 
-on: [push, pull_request]
+on: [push]
+
+env:
+  BUILD_TYPE: Release
 
 jobs:
   linux:
     name: Linux-x86
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        compiler: [g++, clang++]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
-      - name: Install G++ Multilib, Clang++ & OpenGL library
-        run: |
-          sudo apt update
-          sudo apt install -y g++-multilib clang libgl1-mesa-dev
-      
-      - name: Build
-        run: |
-          cd linux
-          make COMPILER=${{ matrix.compiler }} CFG=release -j2
-      
-      - name: Deploy
-        uses: actions/upload-artifact@v3.1.0
         with:
-          name: Linux-x86-${{ matrix.compiler }}
-          path: |
-            linux/release/client.so
-            linux/release/client.so.dbg
-            linux/release/hl.so
-            linux/release/hl.so.dbg
+          submodules: recursive
+      - name: Install G++ Multilib & 32 bit OpenGL library
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt update
+          sudo apt install -y g++-11-multilib libgcc-s1:i386 libstdc++6:i386 libgl1-mesa-dev:i386
       
+      - name: Configure
+        run: CC=gcc-11 CXX=g++-11 cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF
+        
+      - name: Build
+        run: CC=gcc-11 CXX=g++-11 cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j2
+        
+      - name: Prepare artifacts
+        run: |
+          mkdir cl_dlls
+          mkdir dlls
+          mv build/src/game/client/client.so cl_dlls
+          mv build/src/game/server/hl.so dlls
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Linux-x86
+          path: |
+            cl_dlls
+            dlls
   win32:
     name: Win32
     runs-on: windows-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      
-      - name: Add msbuild to PATH
-        uses: microsoft/setup-msbuild@v1.1
         with:
-          msbuild-architecture: x86
-      
+          submodules: recursive
+          
+      - name: Configure
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -A Win32 -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF
       - name: Build
-        run: msbuild projects/vs2019/projects.sln -t:rebuild -property:Configuration=Release -maxcpucount:2
-      
-      - name: Deploy
-        uses: actions/upload-artifact@v3.1.0
+        run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j2
+      - name: Prepare artifacts
+        run: |
+          mkdir cl_dlls
+          mkdir dlls
+          mv build/src/game/client/Release/client.dll cl_dlls
+          mv build/src/game/server/Release/hl.dll dlls
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
           name: Win32
           path: |
-            projects/vs2019/Release/hl_cdll/client.dll
-            projects/vs2019/Release/hl_cdll/client.pdb
-            projects/vs2019/Release/hldll/hl.dll
-            projects/vs2019/Release/hldll/hl.pdb
-      
+            cl_dlls
+            dlls
