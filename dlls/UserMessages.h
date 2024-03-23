@@ -62,5 +62,6 @@ inline int gmsgExtremeFunnel = 0; // Big sprite funnel & burst effect
 
 // PS2HLU
 inline int gmsgChangePlayer = 0;
+inline int gmsgHudColor = 0;
 
 void LinkUserMessages();

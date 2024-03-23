@@ -18,6 +18,7 @@ extern int gmsgScoreInfo;
 extern int gmsgMOTD;
 extern int gmsgServerName;
 extern bool g_teamplay;
+extern int gmsgHudColor;
 //static CMultiplayGameMgrHelper g_GameMgrHelper;
 
 // TODO:
@@ -420,6 +421,24 @@ void CHalfLifeCoop::InitHUD(CBasePlayer *pl)
 	if (g_fGameOver)
 	{
 		MESSAGE_BEGIN(MSG_ONE, SVC_INTERMISSION, NULL, pl->edict());
+		MESSAGE_END();
+	}
+
+	// Set player hud color
+	if (pl->m_decayIndex == 1)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgHudColor, NULL, pl->edict());
+		WRITE_BYTE(160);
+		WRITE_BYTE(160);
+		WRITE_BYTE(192);
+		MESSAGE_END();
+	}
+	else
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgHudColor, NULL, pl->edict());
+		WRITE_BYTE(255);
+		WRITE_BYTE(128);
+		WRITE_BYTE(64);
 		MESSAGE_END();
 	}
 }

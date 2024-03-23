@@ -468,6 +468,12 @@ int __MsgFunc_BigFunnel(const char* pszName, int iSize, void* pbuf)
 	return 1;
 }
 
+// PS2HLU
+int __MsgFunc_HudColor(const char* pszName, int iSize, void* pbuf)
+{
+	return static_cast<int>(gHUD.MsgFunc_HudColor(pszName, iSize, pbuf));
+}
+
 // This is called every time the DLL is loaded
 void CHud::Init()
 {
@@ -510,6 +516,7 @@ void CHud::Init()
 	*/
 	//HOOK_MESSAGE( Accuracy );
 	HOOK_MESSAGE(BigFunnel);
+	HOOK_MESSAGE(HudColor);
 
 	HOOK_MESSAGE(Spectator);
 	HOOK_MESSAGE(AllowSpec);

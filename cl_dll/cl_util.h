@@ -174,9 +174,15 @@ void VectorInverse(float* v);
 
 inline void UnpackRGB(int& r, int& g, int& b, unsigned long ulRGB)
 {
-	r = (ulRGB & 0xFF0000) >> 16;
-	g = (ulRGB & 0xFF00) >> 8;
-	b = ulRGB & 0xFF;
+	// PS2HLU
+	// Very ugly hack
+	r = gHUD.HudColor.x;
+	g = gHUD.HudColor.y;
+	b = gHUD.HudColor.z;
+
+	// r = (ulRGB & 0xFF0000) >> 16;
+	// g = (ulRGB & 0xFF00) >> 8;
+	// b = ulRGB & 0xFF;
 }
 
 HSPRITE LoadSprite(const char* pszName);

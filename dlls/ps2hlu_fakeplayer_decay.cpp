@@ -9,6 +9,7 @@
 extern int gmsgHealth;
 extern int gmsgCurWeapon;
 extern int gmsgSetFOV;
+extern int gmsgHudColor;
 extern DLL_GLOBAL unsigned int g_ulModelIndexPlayer;
 // Set in combat.cpp.  Used to pass the damage inflictor for death messages.
 extern entvars_t *g_pevLastInflictor;
@@ -152,6 +153,7 @@ void EXPORT CDecayBot::SwapBotWithPlayer()
 			//pPlayer2->pev->flags &= ~FL_ONGROUND;
 
 			// Do the actual switch
+			EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, SOUND_FLASHLIGHT_ON, 1.0, ATTN_NORM, 0, PITCH_NORM);
 			pPlayer->m_bIsInTrigger = false;
 			pPlayer2->m_bIsInTrigger = false;
 			UTIL_SetOrigin(pPlayer->pev, tmp2);
@@ -170,6 +172,25 @@ void EXPORT CDecayBot::SwapBotWithPlayer()
 			pPlayer2->pev->body = PlayerBody;
 			pPlayer->pev->velocity = BotVelocity;
 			pPlayer2->pev->velocity = PlayerVelocity;
+
+			
+
+			if (pPlayer->m_decayIndex == 1)
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgHudColor, NULL, pPlayer->edict());
+				WRITE_BYTE(160);
+				WRITE_BYTE(160);
+				WRITE_BYTE(192);
+				MESSAGE_END();
+			}
+			else
+			{
+				MESSAGE_BEGIN(MSG_ONE, gmsgHudColor, NULL, pPlayer->edict());
+				WRITE_BYTE(255);
+				WRITE_BYTE(128);
+				WRITE_BYTE(64);
+				MESSAGE_END();
+			}
 			/*
 			pPlayer2->pev->avelocity = pPlayer->pev->avelocity;
 			pPlayer2->pev->basevelocity = pPlayer->pev->basevelocity;
@@ -276,7 +297,7 @@ void EXPORT CDecayBot::BotThink(void)
 	*/
 	
 	// this causes an access violation for some reason, ill just disable it for now
-#if 1
+#if 0
 	if (/*GetAttacker() != NULL && GetAttacker() != this->GetEnemy() && */m_attacker != NULL)
 	{
 		//GetAttacker();
