@@ -2739,16 +2739,41 @@ edict_t* EntSelectSpawnPoint(CBaseEntity* pPlayer)
 	player = pPlayer->edict();
 
 	// choose a info_player_deathmatch point
+	// PS2HLU
+	// Starting spawn point
 	if (g_pGameRules->IsCoOp())
 	{
 		pSpot = UTIL_FindEntityByClassname(g_pLastSpawn, "info_player_coop");
-		if (!FNullEnt(pSpot))
+		// Player always starts as Gina (white HUD)
+		if (!FNullEnt(pSpot) && pSpot->m_decayIndex == 1)
 		{
 			ALERT(at_console, "info_player_coop decayindex: %d\n", pSpot->m_decayIndex);
 			pPlayer->m_decayIndex = pSpot->m_decayIndex;
 			goto ReturnSpot;
 		}
-		pSpot = UTIL_FindEntityByClassname(g_pLastSpawn, "info_player_start");
+		else
+		{
+			pSpot = UTIL_FindEntityByClassname(g_pLastSpawn, "info_player_start");
+			if (!FNullEnt(pSpot))
+			{
+				//ALERT(at_console, "info_player_coop decayindex: %d\n", pSpot->m_decayIndex);
+				// pPlayer->m_decayIndex = pSpot->m_decayIndex;
+				pPlayer->m_decayIndex = 1;
+				goto ReturnSpot;
+			}
+			
+			if (FNullEnt(pSpot))
+			{
+				pSpot = UTIL_FindEntityByClassname(g_pLastSpawn, "info_player_coop");
+				if (!FNullEnt(pSpot))
+				{
+					ALERT(at_console, "info_player_coop2 decayindex: %d\n", pSpot->m_decayIndex);
+					pPlayer->m_decayIndex = pSpot->m_decayIndex;
+					goto ReturnSpot;
+				}
+			}
+		}
+
 		if (!FNullEnt(pSpot))
 			goto ReturnSpot;
 	}

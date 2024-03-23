@@ -77,11 +77,22 @@ bool CHalfLifeCoop::ClientCommand(CBasePlayer *pPlayer, const char *pcmd)
 //=========================================================
 void CHalfLifeCoop::RefreshSkillData(void)
 {
+	// Set the skill level to normal like in
+	// the ps2 version
+	CVAR_SET_STRING("skill", "2");
 	// load all default values
 	CGameRules::RefreshSkillData();
 
 	// override some values for multiplay.
+	gSkillData.healthchargerCapacity = 40;
+	gSkillData.suitchargerCapacity = 50;
 
+	// Shotgun buckshot
+	gSkillData.plrDmgBuckshot = 20; // fewer pellets in deathmatch
+
+	gSkillData.plrDmgHornet = 10;
+
+	/*
 		// suitcharger
 	gSkillData.suitchargerCapacity = 30;
 
@@ -124,6 +135,7 @@ void CHalfLifeCoop::RefreshSkillData(void)
 
 	// hornet
 	gSkillData.plrDmgHornet = 10;
+	*/
 }
 
 extern cvar_t timeleft, fragsleft;
@@ -1077,7 +1089,7 @@ bool CHalfLifeCoop::PlayFootstepSounds(CBasePlayer *pl, float fvol)
 
 bool CHalfLifeCoop::FAllowFlashlight(void)
 {
-	return flashlight.value != 0;
+	return 0;
 }
 
 //=========================================================
