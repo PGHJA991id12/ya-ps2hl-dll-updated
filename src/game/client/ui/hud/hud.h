@@ -588,6 +588,13 @@ public:
 	cvar_t* m_pCvarStealMouse;
 	cvar_t* m_pCvarDraw;
 
+	// PS2HLU
+	// Hud color
+	// NOTE: This solution is far from ideal,
+	// the better solution would be merging the hud
+	// color support from Half-Life: Unified SDK
+	Vector HudColor = { 255, 160, 0 };
+
 	int m_iFontHeight;
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);
 	int DrawHudString(int x, int y, int iMaxX, const char* szString, int r, int g, int b);
@@ -678,6 +685,9 @@ public:
 	bool MsgFunc_SetFOV(const char* pszName, int iSize, void* pbuf);
 	bool MsgFunc_Concuss(const char* pszName, int iSize, void* pbuf);
 	bool MsgFunc_Weapons(const char* pszName, int iSize, void* pbuf);
+
+	// PS2HLU
+	bool MsgFunc_HudColor(const char* pszName, int iSize, void* pbuf);
 
 	// Screen information
 	SCREENINFO m_scrinfo;

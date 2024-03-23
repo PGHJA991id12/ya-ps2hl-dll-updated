@@ -18,7 +18,8 @@ extern int gmsgScoreInfo;
 extern int gmsgMOTD;
 extern int gmsgServerName;
 extern bool g_teamplay;
-// static CMultiplayGameMgrHelper g_GameMgrHelper;
+extern int gmsgHudColor;
+//static CMultiplayGameMgrHelper g_GameMgrHelper;
 
 // TODO:
 // Refactor code
@@ -77,12 +78,23 @@ bool CHalfLifeCoop::ClientCommand(CBasePlayer* pPlayer, const char* pcmd)
 //=========================================================
 void CHalfLifeCoop::RefreshSkillData(void)
 {
+	// Set the skill level to normal like in
+	// the ps2 version
+	CVAR_SET_STRING("skill", "2");
 	// load all default values
 	CGameRules::RefreshSkillData();
 
 	// override some values for multiplay.
+	gSkillData.healthchargerCapacity = 40;
+	gSkillData.suitchargerCapacity = 50;
 
-	// suitcharger
+	// Shotgun buckshot
+	gSkillData.plrDmgBuckshot = 20; // fewer pellets in deathmatch
+
+	gSkillData.plrDmgHornet = 10;
+
+	/*
+		// suitcharger
 	gSkillData.suitchargerCapacity = 30;
 
 	// Crowbar whack
@@ -124,6 +136,7 @@ void CHalfLifeCoop::RefreshSkillData(void)
 
 	// hornet
 	gSkillData.plrDmgHornet = 10;
+	*/
 }
 
 extern cvar_t timeleft, fragsleft;
@@ -407,6 +420,24 @@ void CHalfLifeCoop::InitHUD(CBasePlayer* pl)
 	if (g_fGameOver)
 	{
 		MESSAGE_BEGIN(MSG_ONE, SVC_INTERMISSION, NULL, pl->edict());
+		MESSAGE_END();
+	}
+
+	// Set player hud color
+	if (pl->m_decayIndex == 1)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgHudColor, NULL, pl->edict());
+		WRITE_BYTE(160);
+		WRITE_BYTE(160);
+		WRITE_BYTE(192);
+		MESSAGE_END();
+	}
+	else
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgHudColor, NULL, pl->edict());
+		WRITE_BYTE(255);
+		WRITE_BYTE(128);
+		WRITE_BYTE(64);
 		MESSAGE_END();
 	}
 }
@@ -1075,7 +1106,7 @@ bool CHalfLifeCoop::PlayFootstepSounds(CBasePlayer* pl, float fvol)
 
 bool CHalfLifeCoop::FAllowFlashlight(void)
 {
-	return flashlight.value != 0;
+	return 0;
 }
 
 //=========================================================

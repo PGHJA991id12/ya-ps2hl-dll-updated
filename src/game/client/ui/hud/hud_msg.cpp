@@ -54,6 +54,9 @@ bool CHud::MsgFunc_ResetHUD(const char* pszName, int iSize, void* pbuf)
 	// reset concussion effect
 	m_iConcussionEffect = 0;
 
+	// PS2HLU
+	gHUD.HudColor = {255, 160, 0};
+
 	return true;
 }
 
@@ -148,4 +151,15 @@ bool CHud::MsgFunc_Weapons(const char* pszName, int iSize, void* pbuf)
 	m_iWeaponBits = (lowerBits & 0XFFFFFFFF) | ((upperBits & 0XFFFFFFFF) << 32ULL);
 
 	return true;
+}
+
+// PS2HLU
+bool CHud::MsgFunc_HudColor(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+	gHUD.HudColor.x = READ_BYTE();
+	gHUD.HudColor.y = READ_BYTE();
+	gHUD.HudColor.z = READ_BYTE();
+
+	return 1;
 }

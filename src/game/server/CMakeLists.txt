@@ -105,6 +105,7 @@ target_sources(hl PRIVATE
 	entities/ps2hl_trigger_playerfreeze.h
 	entities/ps2hl_trigger_random.cpp
 	entities/ps2hl_trigger_random.h
+	entities/ps2hlu_env_extremefunnel.cpp
 	entities/sound.cpp
 	entities/soundent.cpp
 	entities/soundent.h

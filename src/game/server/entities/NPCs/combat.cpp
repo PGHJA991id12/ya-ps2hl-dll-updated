@@ -1231,7 +1231,7 @@ bool CBaseMonster::FInViewCone(Vector* pOrigin)
 //=========================================================
 bool CBaseEntity::FVisible(CBaseEntity* pEntity)
 {
-	TraceResult tr;
+	TraceResult tr2;
 	Vector vecLookerOrigin;
 	Vector vecTargetOrigin;
 
@@ -1245,7 +1245,40 @@ bool CBaseEntity::FVisible(CBaseEntity* pEntity)
 	vecLookerOrigin = pev->origin + pev->view_ofs; //look through the caller's 'eyes'
 	vecTargetOrigin = pEntity->EyePosition();
 
-	UTIL_TraceLine(vecLookerOrigin, vecTargetOrigin, ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr);
+	UTIL_TraceLine(vecLookerOrigin, vecTargetOrigin, ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr2);
+
+	// PS2HLU
+	// Func wall spawnflag 4
+	// This is the code that allows monsters to actually see through the wall
+	TraceResult tr;
+	CBaseEntity* pEntityHit = CBaseEntity::Instance(tr2.pHit);
+	if (pEntityHit && pEntityHit->pev->spawnflags & 4 && strncmp(STRING(pEntityHit->pev->classname), "func_wall", 9 ) == 0)
+	{
+		//ALERT(at_console, "See through wall traceline preformed!\n");
+
+		// TODO: Figure out if this is a safe solution, or the traceline can hit the attacking monster
+		UTIL_TraceLine((tr2.vecEndPos), vecTargetOrigin, ignore_monsters, ignore_glass, tr2.pHit /*pentIgnore*/, &tr);
+
+		/*
+		MESSAGE_BEGIN(0, SVC_TEMPENTITY);
+		WRITE_BYTE(TE_LINE);
+		WRITE_COORD(tr2.vecEndPos.x);
+		WRITE_COORD(tr2.vecEndPos.y);
+		WRITE_COORD(tr2.vecEndPos.z);
+		WRITE_COORD(tr.vecEndPos.x);
+		WRITE_COORD(tr.vecEndPos.y);
+		WRITE_COORD(tr.vecEndPos.z);
+		WRITE_SHORT(1);
+		WRITE_BYTE(0xff);
+		WRITE_BYTE(0xff);
+		WRITE_BYTE(0xff);
+		MESSAGE_END();
+		*/
+	}
+	else
+	{
+		tr = tr2;
+	}
 
 	if (tr.flFraction != 1.0)
 	{
@@ -1263,12 +1296,25 @@ bool CBaseEntity::FVisible(CBaseEntity* pEntity)
 //=========================================================
 bool CBaseEntity::FVisible(const Vector& vecOrigin)
 {
-	TraceResult tr;
+	TraceResult tr2;
 	Vector vecLookerOrigin;
 
 	vecLookerOrigin = EyePosition(); //look through the caller's 'eyes'
 
-	UTIL_TraceLine(vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr);
+	UTIL_TraceLine(vecLookerOrigin, vecOrigin, ignore_monsters, ignore_glass, ENT(pev) /*pentIgnore*/, &tr2);
+
+	// PS2HLU
+	// See through func_walls with spawnflag 4
+	TraceResult tr;
+	CBaseEntity* pEntityHit = CBaseEntity::Instance(tr2.pHit);
+	if (pEntityHit && pEntityHit->pev->spawnflags & 4 && strncmp(STRING(pEntityHit->pev->classname), "func_wall", 9) == 0)
+	{
+		UTIL_TraceLine((tr2.vecEndPos), vecOrigin, ignore_monsters, ignore_glass, tr2.pHit /*pentIgnore*/, &tr);
+	}
+	else
+	{
+		tr = tr2;
+	}
 
 	if (tr.flFraction != 1.0)
 	{
@@ -1410,12 +1456,12 @@ void CBaseEntity::FireBullets(unsigned int cShots, Vector vecSrc, Vector vecDirS
 		vecEnd = vecSrc + vecDir * flDistance;
 
 		// PS2HLU
-		// Allow bullets to pass throught func_wall_toggle with spawnflag 4 set
+		// Allow bullets to pass throught func_wall & func_wall_toggle with spawnflag 4 set
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr2);
 
 		CBaseEntity *pEntity = CBaseEntity::Instance(tr2.pHit);
 		TraceResult tr;
-		if (pEntity && pEntity->pev->spawnflags & 4 && FStrEq(STRING(pEntity->pev->classname), "func_wall_toggle"))
+		if (pEntity && pEntity->pev->spawnflags & 4 && strncmp(STRING(pEntity->pev->classname), "func_wall", 9) == 0 )
 			UTIL_TraceLine((tr2.vecEndPos + vecDir), vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
 		else
 			tr = tr2;
@@ -1555,12 +1601,12 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 
 		vecEnd = vecSrc + vecDir * flDistance;
 		// PS2HLU
-		// Allow bullets to pass throught func_wall_toggle with spawnflag 4 set
+		// Allow bullets to pass throught func_wall with spawnflag 4 set
 		UTIL_TraceLine(vecSrc, vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr2);
 
 		CBaseEntity *pEntity = CBaseEntity::Instance(tr2.pHit);
 		TraceResult tr;
-		if (pEntity && pEntity->pev->spawnflags & 4 && FStrEq(STRING(pEntity->pev->classname), "func_wall_toggle"))
+		if (pEntity && pEntity->pev->spawnflags & 4 && strncmp(STRING(pEntity->pev->classname), "func_wall", 9) == 0 )
 			UTIL_TraceLine((tr2.vecEndPos + vecDir), vecEnd, dont_ignore_monsters, ENT(pev)/*pentIgnore*/, &tr);
 		else
 			tr = tr2;

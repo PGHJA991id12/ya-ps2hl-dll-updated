@@ -58,8 +58,10 @@ inline int gmsgWeapons = 0;
 // PS2HL
 inline int gmsgHudMode = 0;	// HUD mode
 inline int gmsgHudLockOff = 0; // HUD lock offset
+inline int gmsgExtremeFunnel = 0; // Big sprite funnel & burst effect
 
 // PS2HLU
 inline int gmsgChangePlayer = 0;
+inline int gmsgHudColor = 0;
 
 void LinkUserMessages();
