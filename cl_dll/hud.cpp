@@ -296,7 +296,7 @@ int __MsgFunc_AllowSpec(const char* pszName, int iSize, void* pbuf)
 // coord coord coord (origin coords)
 // coord coord coord (???)
 // short (sprite index)
-// short (???)
+// short (reverse flag)
 // short (maybe another sprite index, not too sure)
 
 // Implementation of client-side particles I used as reference:
@@ -401,7 +401,8 @@ int __MsgFunc_BigFunnel(const char* pszName, int iSize, void* pbuf)
 
 					particle->m_vVelocity = randomparticledir;
 					particle->m_iRendermode = kRenderTransAdd;
-					particle->m_vColor = Vector(225, 225, 225);
+					particle->m_flBrightness = 200;
+					//particle->m_vColor = Vector(225, 225, 225);
 					particle->m_flGravity = 0;
 					particle->m_flSize = 32.0;
 					particle->m_flFadeSpeed = 2.0f;
@@ -450,7 +451,7 @@ int __MsgFunc_BigFunnel(const char* pszName, int iSize, void* pbuf)
 
 					floatyparticle->m_vVelocity = randomparticledir;
 					floatyparticle->m_iRendermode = kRenderTransAdd;
-					floatyparticle->m_vColor = Vector(0, 0xff, 0); // these are pure green
+					floatyparticle->m_vColor = Vector(0, 244, 0); // these are pure green
 					floatyparticle->m_flGravity = 0;
 					floatyparticle->m_flSize = 1.0;
 					floatyparticle->m_flScaleSpeed = 0;
