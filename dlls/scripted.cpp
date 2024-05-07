@@ -725,11 +725,6 @@ void CCineMonster::SequenceDone(CBaseMonster* pMonster)
 		//UTIL_SetSize(pMonster->pev, { 0, 0, 0 }, { 0, 0, 0 });
 	}
 
-	// PS2HL - fix epilepsy for clip_scientist on t0a0
-	// PS2HLU - fixes rosenberg repeating animations when using the radio in ht03uplink
-	if (pev->spawnflags & 0x400)
-		pMonster->m_pCine->m_iszPlay = 0;
-
 	if (( pev->spawnflags & SF_SCRIPT_REPEATABLE) == 0 )
 	{
 		SetThink(&CCineMonster::SUB_Remove);
@@ -1060,7 +1055,14 @@ bool CBaseMonster::CineCleanup()
 
 		// We should have some animation to put these guys in, but for now it's idle.
 		// Due to NOINTERP above, there won't be any blending between this anim & the sequence
-		m_Activity = ACT_RESET;
+
+		// PS2HL - fix epilepsy for clip_scientist on t0a0
+		// PS2HLU - moved here to match PS2HL code
+		// No reset entity flag
+		// This fixes rosenberg repeating animations when using the radio in ht03uplink
+		// For some reason this uses a different value, than the one in Opposing Force (256) did
+		if ( ( pOldCine->pev->spawnflags & 0x400 ) == 0 )
+			m_Activity = ACT_RESET;
 	}
 	// set them back into a normal state
 	pev->enemy = NULL;
