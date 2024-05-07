@@ -197,10 +197,18 @@ void CMultiSource::Use(CBaseEntity* pActivator, CBaseEntity* pCaller, USE_TYPE u
 		ALERT(at_console, "MultiSrc:Used by non member %s.\n", STRING(pCaller->pev->classname));
 		return;
 	}
-
+	else
+	{
+		// PS2HLU
+		// When spawnflag 2 is checked activate even if only 1 targeted (multiple entities, same targetname) entity is active
+		// Only used on ht11lasers
+		if ( ( pev->spawnflags & 2 ) == 0)
+			m_rgTriggered[i - 1] ^= 1;
+		else
+			m_rgTriggered[i - 1] = 1;
+	}
 	// CONSIDER: a Use input to the multisource always toggles.  Could check useType for ON/OFF/TOGGLE
 
-	m_rgTriggered[i - 1] ^= 1;
 
 	//
 	if (IsTriggered(pActivator))
@@ -230,11 +238,7 @@ bool CMultiSource::IsTriggered(CBaseEntity*)
 		i++;
 	}
 
-	// PS2HLU
-	// Activate even if only 1 targeted (multiple entities, same targetname) entity is active
-	// When spawnflag 2 is checked
-	// Only used on ht11lasers
-	if (pev->spawnflags & 2 || i == m_iTotal)
+	if (i == m_iTotal)
 	{
 		if (FStringNull(m_globalstate) || gGlobalState.EntityGetState(m_globalstate) == GLOBAL_ON)
 			return true;
