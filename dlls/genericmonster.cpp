@@ -39,9 +39,15 @@ public:
 	void HandleAnimEvent(MonsterEvent_t* pEvent) override;
 	int ISoundMask() override;
 
+	// PS2HLU
+	void PlayScriptedSentence(const char* pszSentence, float duration, float volume, float attenuation, bool bConcurrent, CBaseEntity* pListener);
+	void IdleHeadTurn(Vector& vecFriend);
+	void EXPORT MonsterThink();
+
 	// PS2HL
 	string_t m_iszTargetTrigger;
 	string_t m_iszNoTargetTrigger;
+
 	bool TakeDamage(entvars_t *pevInflictor, entvars_t *pevAttacker, float flDamage, int bitsDamageType) {
 		if (pevAttacker)
 			if (!strcmp(STRING(pevAttacker->classname), "player"))
@@ -61,6 +67,7 @@ public:
 			m_iszTargetTrigger = ALLOC_STRING(pkvd->szValue);
 			return true;
 		}
+
 		//else if (FStrEq(pkvd->szKeyName, "health"))
 		//{
 		//	ALERT(at_console, "mon_gen: hp - %s\n", pkvd->szValue);
@@ -74,6 +81,12 @@ public:
 
 	static TYPEDESCRIPTION m_SaveData[];
 
+// PS2HLU
+private:
+	float m_talkTime;
+	EHANDLE m_hTalkTarget;
+	float m_flIdealYaw;
+	float m_flCurrentYaw;
 };
 LINK_ENTITY_TO_CLASS(monster_generic, CGenericMonster);
 
@@ -82,6 +95,10 @@ TYPEDESCRIPTION CGenericMonster::m_SaveData[] =
 {
 	DEFINE_FIELD(CGenericMonster, m_iszTargetTrigger, FIELD_STRING),
 	DEFINE_FIELD(CGenericMonster, m_iszNoTargetTrigger, FIELD_STRING),
+	DEFINE_FIELD(CGenericMonster, m_talkTime, FIELD_FLOAT),
+	DEFINE_FIELD(CGenericMonster, m_hTalkTarget, FIELD_EHANDLE),
+	DEFINE_FIELD(CGenericMonster, m_flIdealYaw, FIELD_FLOAT),
+	DEFINE_FIELD(CGenericMonster, m_flCurrentYaw, FIELD_FLOAT),
 };
 IMPLEMENT_SAVERESTORE(CGenericMonster, CBaseMonster);
 
@@ -94,7 +111,11 @@ int CGenericMonster::Classify()
 	// PS2HLU
 	// Fix human grunts shooting at a soda can on ht07signal
 	// TODO: Need to figure out what the other flag does
-	// and also "trigger_hit" "4"
+	// Update: "trigger_hit" is the value used in the
+	// Hazard Course for the autoaim section, for some reason this value
+	// is defined for multiple entities in ht07signal
+
+	// if (pev->spawnflags & 0x8000)
 	if (pev->spawnflags & 131072)
 		return CLASS_NONE;
 
@@ -183,6 +204,12 @@ void CGenericMonster::Spawn()
 		pev->solid = SOLID_NOT;
 		pev->takedamage = DAMAGE_NO;
 	}
+
+	// PS2HLU
+	if (pev->spawnflags & 8)
+		m_afCapability = bits_CAP_TURN_HEAD;
+
+	m_flIdealYaw = m_flCurrentYaw = 0;
 }
 
 //=========================================================
@@ -196,3 +223,66 @@ void CGenericMonster::Precache()
 //=========================================================
 // AI Schedules Specific to this monster
 //=========================================================
+
+/**
+This code is from FWGS's Blue-Shift recreation, specifically from this commit:
+https://github.com/FWGS/hlsdk-portable/commit/1e529268980f59c337f0f149fd57b0ecbba4db3e
+**/
+
+void CGenericMonster::PlayScriptedSentence(const char* pszSentence, float duration, float volume, float attenuation, bool bConcurrent, CBaseEntity* pListener)
+{
+	m_talkTime = gpGlobals->time + duration;
+	PlaySentence(pszSentence, duration, volume, attenuation);
+
+	m_hTalkTarget = pListener;
+}
+
+void CGenericMonster::IdleHeadTurn(Vector& vecFriend)
+{
+	// turn head in desired direction only if ent has a turnable head
+	if (m_afCapability & bits_CAP_TURN_HEAD)
+	{
+		float yaw = VecToYaw(vecFriend - pev->origin) - pev->angles.y;
+
+		if (yaw > 180)
+			yaw -= 360;
+		if (yaw < -180)
+			yaw += 360;
+
+		m_flIdealYaw = yaw;
+	}
+}
+
+void CGenericMonster::MonsterThink()
+{
+	if (m_afCapability & bits_CAP_TURN_HEAD)
+	{
+		if (m_hTalkTarget != 0)
+		{
+			if (gpGlobals->time > m_talkTime)
+			{
+				m_flIdealYaw = 0;
+				m_hTalkTarget = 0;
+			}
+			else
+			{
+				IdleHeadTurn(m_hTalkTarget->pev->origin);
+			}
+		}
+
+		if (m_flCurrentYaw != m_flIdealYaw)
+		{
+			if (m_flCurrentYaw <= m_flIdealYaw)
+			{
+				m_flCurrentYaw += V_min(m_flIdealYaw - m_flCurrentYaw, 20.0f);
+			}
+			else
+			{
+				m_flCurrentYaw -= V_min(m_flCurrentYaw - m_flIdealYaw, 20.0f);
+			}
+			SetBoneController(0, m_flCurrentYaw);
+		}
+	}
+
+	CBaseMonster::MonsterThink();
+}
