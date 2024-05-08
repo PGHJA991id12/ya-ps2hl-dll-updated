@@ -1172,8 +1172,9 @@ void CSentry::Precache()
 
 	// PS2HLU
 	// Precache explosion sprite only if we are in co-op mode
-	if (g_pGameRules->IsCoOp())
-	PRECACHE_MODEL("sprites/explode1.spr"); // Explosion sprite
+	// This is already precached in W_Precache
+	//if (g_pGameRules->IsCoOp())
+	//PRECACHE_MODEL("sprites/explode1.spr"); // Explosion sprite
 }
 
 void CSentry::Spawn()
@@ -1191,6 +1192,15 @@ void CSentry::Spawn()
 	m_iDeployHeight = 64;
 	m_iMinPitch = -60;
 	UTIL_SetSize(pev, Vector(-16, -16, -m_iRetractHeight), Vector(16, 16, m_iRetractHeight));
+
+	// PS2HLU
+	Vector vecSrc, vecAng;
+	GetAttachment(1, vecSrc, vecAng);
+	m_pEyeGlow = CSprite::SpriteCreate(TURRET_GLOW_SPRITE, vecSrc, false);
+	m_pEyeGlow->SetTransparency(kRenderGlow, 255, 0, 0, 0, kRenderFxNoDissipation);
+	m_pEyeGlow->SetScale(0.5f);
+	m_pEyeGlow->SetAttachment(edict(), 2);
+	m_eyeBrightness = 0;
 
 	SetTouch(&CSentry::SentryTouch);
 	SetThink(&CSentry::Initialize);
@@ -1214,6 +1224,7 @@ void CSentry::Shoot(Vector& vecSrc, Vector& vecDirToEnemy)
 		break;
 	}
 	pev->effects = pev->effects | EF_MUZZLEFLASH;
+
 }
 
 bool CSentry::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
@@ -1336,18 +1347,22 @@ void CSentry::SentryExplode()
 	//GetAttachment(1, vecSrc, vecAng);
 
 	// play explosion effect
-	MESSAGE_BEGIN(MSG_PAS, SVC_TEMPENTITY, pev->origin);
+	MESSAGE_BEGIN(MSG_PVS, SVC_TEMPENTITY, pev->origin);
 	WRITE_BYTE(TE_EXPLOSION);		// This makes a dynamic light and the explosion sprites/sound
 	WRITE_COORD(pev->origin.x);	// Send to PAS because of the sound
 	WRITE_COORD(pev->origin.y);
 	WRITE_COORD(pev->origin.z);
 	WRITE_SHORT(g_sModelIndexFireball);
-	WRITE_BYTE(13); // scale * 10
-	WRITE_BYTE(15); // framerate
+	WRITE_BYTE(RANDOM_LONG(10, 15)); // scale * 10
+	WRITE_BYTE(12); // framerate
 	WRITE_BYTE(TE_EXPLFLAG_NONE);
 	MESSAGE_END();
 
 	pev->effects |= EF_NODRAW; // Make sentry invisible
 	SetThink(NULL);
+
+	// Note:
+	// Firing upon death is checked here in the ps2 version only after the explosion
+	//if(m_iTriggerCondition == AITRIGGER_DEATH)
 }
 
