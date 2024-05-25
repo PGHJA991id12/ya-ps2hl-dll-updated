@@ -768,8 +768,26 @@ void CBreakable::Die()
 	pev->targetname = 0;
 
 	pev->solid = SOLID_NOT;
-	// Fire targets on break
-	SUB_UseTargets(NULL, USE_TOGGLE, 0);
+
+	// PS2HLU
+	// Firing targets (disabling 3 triggers) on the map ht91alien causes
+	// a mysterious crash, but since the firing wouldve
+	// just turned off those triggers, just remove them
+	auto szMapName = (char*)STRING(gpGlobals->mapname);
+	if (strcmp(szMapName, "ht91alien") == 0 && cFlag == BREAK_METAL && pev->impulse == 100 && FClassnameIs(pev, "func_pushable"))
+		{
+			auto m_pKillEnt = UTIL_FindEntityByTargetname(NULL, STRING(pev->target));
+			while (m_pKillEnt)
+			{
+				UTIL_Remove(m_pKillEnt);
+				m_pKillEnt = UTIL_FindEntityByTargetname(m_pKillEnt, STRING(pev->target));
+			}
+		}
+	else
+		{
+		// Fire targets on break
+		SUB_UseTargets(NULL, USE_TOGGLE, 0);
+		}
 
 	SetThink(&CBreakable::SUB_Remove);
 	pev->nextthink = pev->ltime + 0.1;
@@ -839,6 +857,7 @@ TYPEDESCRIPTION CPushable::m_SaveData[] =
 };
 
 IMPLEMENT_SAVERESTORE(CPushable, CBreakable);
+
 
 LINK_ENTITY_TO_CLASS(func_pushable, CPushable);
 
