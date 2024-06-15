@@ -35,6 +35,7 @@ public:
 	bool KeyValue(KeyValueData *pkvd);
 	void Telefrag(bool PlayerOnly);
 	void Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE useType, float value);
+	void DeathNotice(entvars_t* pevChild) override; // monster maker children use this to tell the monster maker that they have died.
 	virtual int ObjectCaps(void) { return CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
 	Vector vecOrigin;
 
@@ -89,7 +90,7 @@ bool CEnvWarpBall::KeyValue(KeyValueData *pkvd)
 		m_cNumMonsters = atoi(pkvd->szValue);
 		return true;
 	}
-	else if (FStrEq(pkvd->szKeyName, "m_imaxlivechildren"))
+	else if (FStrEq(pkvd->szKeyName, "maxlivechildren"))
 	{
 		m_iMaxLiveChildren = atoi(pkvd->szValue);
 		return true;
@@ -132,6 +133,11 @@ void CEnvWarpBall::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 	CBeam *pBeam;
 	CBaseEntity *pEntity = UTIL_FindEntityByTargetname(NULL, STRING(pev->message));
 	edict_t *pos;
+	
+	// PS2HLU
+	// Dont play the effect if we dont have a monster specified & we matched MaxLiveChildren
+	if (m_iszMonsterClassname && m_iMaxLiveChildren > 0 && m_cLiveChildren >= m_iMaxLiveChildren)
+		return;
 
 	if (pEntity)//target found ?
 	{
@@ -144,6 +150,13 @@ void CEnvWarpBall::Use(CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE u
 		vecOrigin = pev->origin;
 		pos = edict();
 	}
+
+	// PS2HLU
+	// Make monsters spawn at warp target
+	// not just play the effect, and spawn the monsters at origin
+	if (pEntity)
+		UTIL_SetOrigin(pev, pEntity->pev->origin);
+
 	EMIT_SOUND(pos, CHAN_BODY, "debris/beamstart2.wav", 1, ATTN_NORM);
 	UTIL_ScreenShake(vecOrigin, 6, 160, 1.0, pev->button);
 	CSprite *pSpr = CSprite::SpriteCreate("sprites/Fexplo1.spr", vecOrigin, true);
@@ -227,7 +240,7 @@ void CEnvWarpBall::MakeMonster(void)
 		return;
 	}
 
-	if (!m_flGround)
+	if (m_flGround == 0.0f)
 	{
 		// set altitude. Now that I'm activated, any breakables, etc should be out from under me. 
 		TraceResult tr;
@@ -242,13 +255,15 @@ void CEnvWarpBall::MakeMonster(void)
 	mins.z = m_flGround;
 
 	// PS2HL: no need for this
-	//CBaseEntity *pList[2];
-	//int count = UTIL_EntitiesInBox(pList, 2, mins, maxs, FL_CLIENT | FL_MONSTER);
-	//if (count)
-	//{
-	//	// don't build a stack of monsters!
-	//	return;
-	//}
+	// PS2HLU: There is indeed a need for this
+
+	CBaseEntity *pList[2];
+	int count = UTIL_EntitiesInBox(pList, 2, mins, maxs, FL_CLIENT | FL_MONSTER);
+	if (count)
+	{
+		// don't build a stack of monsters!
+		return;
+	}
 
 	pent = CREATE_NAMED_ENTITY(m_iszMonsterClassname);
 
@@ -266,19 +281,9 @@ void CEnvWarpBall::MakeMonster(void)
 	}
 
 	pevCreate = VARS(pent);
+	pevCreate->origin = pev->origin;
+	pevCreate->angles = pev->angles;
 
-	// PS2HLU
-	// Make monsters spawn at warp target
-	// not just play the effect, and spawn the monsters at origin
-	if (pev->message) {
-		pevCreate->origin = vecOrigin;
-		pevCreate->angles = pev->angles;
-	}
-	else
-	{
-		pevCreate->origin = pev->origin;
-		pevCreate->angles = pev->angles;
-	}
 	SetBits(pevCreate->spawnflags, SF_MONSTER_FALL_TO_GROUND);
 
 	// Children hit monsterclip brushes
@@ -307,4 +312,11 @@ void CEnvWarpBall::MakeMonster(void)
 		SetThink(NULL);
 		SetUse(NULL);
 	}
+}
+
+// From "Monstermaker"
+void CEnvWarpBall::DeathNotice(entvars_t* pevChild)
+{
+	// ok, we've gotten the deathnotice from our child, now clear out its owner if we don't want it to fade.
+	m_cLiveChildren--;
 }

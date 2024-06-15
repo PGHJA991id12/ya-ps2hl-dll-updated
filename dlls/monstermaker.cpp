@@ -198,6 +198,19 @@ void CMonsterMaker::MakeMonster()
 		m_flGround = tr.vecEndPos.z;
 	}
 
+	// PS2HLU
+	// Target entity to spawn monster at
+	// Only used in ht04dampen
+	if (m_SpawnTarget)
+	{
+		TargetEntity = UTIL_FindEntityByTargetname(0, (char*)STRING(m_SpawnTarget));
+		if (TargetEntity)
+		{
+			UTIL_SetOrigin(pev, TargetEntity->pev->origin);
+			// ALERT(at_console, "DEBUG MonsterMaker SpawnTarget Found!\n");
+		}
+	}
+
 	Vector mins = pev->origin - Vector(34, 34, 0);
 	Vector maxs = pev->origin + Vector(34, 34, 0);
 	maxs.z = pev->origin.z;
@@ -227,24 +240,6 @@ void CMonsterMaker::MakeMonster()
 	}
 
 	pevCreate = VARS(pent);
-
-	// PS2HLU
-	// Target entity to spawn monster at
-	// Only used in ht04dampen
-	/*if (m_SpawnTarget)
-	{
-		TargetEntity = UTIL_FindEntityByTargetname(TargetEntity, (char *)STRING(m_SpawnTarget));
-		if (TargetEntity)
-		{
-			pevCreate->origin = TargetEntity->pev->origin;
-			ALERT(at_console, "MonsterMaker SpawnTarget Found!\n");
-		}
-	}
-	else
-	{
-		pevCreate->origin = pev->origin;
-	}*/
-
 	pevCreate->origin = pev->origin;
 	pevCreate->angles = pev->angles;
 	SetBits(pevCreate->spawnflags, SF_MONSTER_FALL_TO_GROUND);
