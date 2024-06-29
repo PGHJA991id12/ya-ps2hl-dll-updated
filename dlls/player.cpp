@@ -2974,16 +2974,6 @@ void CBasePlayer::Spawn()
 	else
 		SetBodygroup(0, 0);
 
-	if (gmsgChangePlayer)
-	{
-		MESSAGE_BEGIN(MSG_ONE, gmsgChangePlayer, NULL, pev);
-		WRITE_BYTE(this->m_decayIndex);
-		MESSAGE_END();
-	}
-	else
-	{
-		ALERT(at_console, "Message gmsgChangePlayer not found in client!\n");
-	}
 }
 
 

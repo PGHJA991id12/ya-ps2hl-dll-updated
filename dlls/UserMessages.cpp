@@ -71,7 +71,6 @@ void LinkUserMessages()
 	gmsgHudLockOff = REG_USER_MSG("HudLockOff", -1); // HUD lock offset
 
 	// PS2HLU
-	gmsgChangePlayer = REG_USER_MSG("ChangePlr", 1);
 	gmsgExtremeFunnel = REG_USER_MSG("BigFunnel", -1); // 54
 	gmsgHudColor = REG_USER_MSG("HudColor", 3);
 }
