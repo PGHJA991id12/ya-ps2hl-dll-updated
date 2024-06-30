@@ -593,7 +593,8 @@ public:
 	// NOTE: This solution is far from ideal,
 	// the better solution would be merging the hud
 	// color support from Half-Life: Unified SDK
-	Vector HudColor = { 255, 160, 0 };
+	//Vector HudColor = { 255, 160, 0 };
+	unsigned long HudColor = 0x00FFA000;
 
 	int m_iFontHeight;
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);

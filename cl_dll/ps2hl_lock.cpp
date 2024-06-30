@@ -123,7 +123,7 @@ bool CHudLock::Draw(float flTime)
 	if (m_iActive)
 		UnpackRGB(r, g, b, RGB_REDISH);
 	else
-		UnpackRGB(r, g, b, RGB_YELLOWISH);
+		UnpackRGB(r, g, b, gHUD.HudColor);
 	ScaleColors(r, g, b, a);
 
 	// Draw

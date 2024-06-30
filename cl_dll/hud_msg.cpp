@@ -55,7 +55,7 @@ bool CHud::MsgFunc_ResetHUD(const char* pszName, int iSize, void* pbuf)
 	m_iConcussionEffect = 0;
 
 	// PS2HLU
-	gHUD.HudColor = {255, 160, 0};
+	gHUD.HudColor = 0x00FFA000;
 
 	return true;
 }
@@ -133,7 +133,7 @@ bool CHud::MsgFunc_Concuss(const char* pszName, int iSize, void* pbuf)
 	if (0 != m_iConcussionEffect)
 	{
 		int r, g, b;
-		UnpackRGB(r, g, b, RGB_YELLOWISH);
+		UnpackRGB(r, g, b, gHUD.HudColor);
 		this->m_StatusIcons.EnableIcon("dmg_concuss", r, g, b);
 	}
 	else
@@ -157,9 +157,11 @@ bool CHud::MsgFunc_Weapons(const char* pszName, int iSize, void* pbuf)
 bool CHud::MsgFunc_HudColor(const char* pszName, int iSize, void* pbuf)
 {
 	BEGIN_READ(pbuf, iSize);
-	gHUD.HudColor.x = READ_BYTE();
-	gHUD.HudColor.y = READ_BYTE();
-	gHUD.HudColor.z = READ_BYTE();
+
+	// This is possibly the stupidest solution I could come
+	// up with to avoid rewriting all of the FillRGBA code in every HUD element
+
+	gHUD.HudColor = ((READ_BYTE() & 0xFF) << 16) + ((READ_BYTE() & 0xFF) << 8) + (READ_BYTE() & 0xFF);
 
 	return 1;
 }

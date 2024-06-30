@@ -80,7 +80,7 @@ bool CHudMode::Draw(float flTime)
 	Rect rc;
 
 	a = 225;
-	UnpackRGB(r, g, b, RGB_YELLOWISH);
+	UnpackRGB(r, g, b, gHUD.HudColor);
 	ScaleColors(r, g, b, a);
 
 	y = (m_prcWalk->bottom - m_prcWalk->top) * 2;
