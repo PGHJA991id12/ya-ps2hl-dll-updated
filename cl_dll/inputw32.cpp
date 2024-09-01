@@ -28,6 +28,7 @@
 
 #include "PlatformHeaders.h"
 
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_mouse.h>
 #include <SDL2/SDL_gamecontroller.h>
 
@@ -158,6 +159,7 @@ cvar_t* joy_advaxisz;
 cvar_t* joy_advaxisr;
 cvar_t* joy_advaxisu;
 cvar_t* joy_advaxisv;
+cvar_t* joy_supported;
 cvar_t* joy_forwardthreshold;
 cvar_t* joy_sidethreshold;
 cvar_t* joy_pitchthreshold;
@@ -169,7 +171,7 @@ cvar_t* joy_yawsensitivity;
 cvar_t* joy_wwhack1;
 cvar_t* joy_wwhack2;
 
-bool joy_avail, joy_advancedinit, joy_haspov;
+bool joy_avail = false, joy_advancedinit, joy_haspov;
 
 /*
 ===========
@@ -380,6 +382,28 @@ void IN_GetMousePos(int* mx, int* my)
 
 /*
 ===========
+IN_GetMouseSensitivity
+
+Get mouse sensitivity with sanitization
+===========
+*/
+float IN_GetMouseSensitivity()
+{
+	// Absurdly high sensitivity values can cause the game to hang, so clamp
+	if (sensitivity->value > 10000.0)
+	{
+		gEngfuncs.Cvar_SetValue("sensitivity", 10000.0);
+	}
+	else if (sensitivity->value < 0.01)
+	{
+		gEngfuncs.Cvar_SetValue("sensitivity", 0.01);
+	}
+
+	return sensitivity->value;
+}
+
+/*
+===========
 IN_ResetMouse
 
 FIXME: Call through to engine?
@@ -389,11 +413,6 @@ void IN_ResetMouse()
 {
 	// no work to do in SDL
 #ifdef WIN32
-	if (IN_UseRawInput() && !g_iVisibleMouse)
-	{
-		IN_SetMouseRelative(true);
-	}
-
 	if (!IN_UseRawInput() && mouseactive && gEngfuncs.GetWindowCenterX && gEngfuncs.GetWindowCenterY)
 	{
 		SetCursorPos(gEngfuncs.GetWindowCenterX(), gEngfuncs.GetWindowCenterY());
@@ -402,6 +421,21 @@ void IN_ResetMouse()
 		old_mouse_pos = center;
 	}
 #endif
+}
+
+/*
+===========
+IN_ResetRelativeMouseState
+===========
+*/
+void IN_ResetRelativeMouseState(void)
+{
+	if (IN_UseRawInput())
+	{
+		SDL_PumpEvents();
+		int deltaX, deltaY;
+		SDL_GetRelativeMouseState(&deltaX, &deltaY);
+	}
 }
 
 /*
@@ -447,7 +481,7 @@ void IN_ScaleMouse(float* x, float* y)
 	float my = *y;
 
 	// This is the default sensitivity
-	float mouse_senstivity = (gHUD.GetSensitivity() != 0) ? gHUD.GetSensitivity() : sensitivity->value;
+	float mouse_senstivity = (gHUD.GetSensitivity() != 0) ? gHUD.GetSensitivity() : IN_GetMouseSensitivity();
 
 	// Using special accleration values
 	if (m_customaccel->value != 0)
@@ -689,11 +723,18 @@ void IN_StartupJoystick()
 	if (0 != gEngfuncs.CheckParm("-nojoy", NULL))
 		return;
 
-	// assume no joystick
-	joy_avail = false;
+	static float flLastCheck = 0.0f;
+	if (flLastCheck > 0.0f && (gEngfuncs.GetAbsoluteTime() - flLastCheck) < 1.0f)
+		return;
+
+	//gEngfuncs.Con_Printf("IN_StartupJoystick, %f\n", flLastCheck);
+
+	flLastCheck = gEngfuncs.GetAbsoluteTime();
 
 	int nJoysticks = SDL_NumJoysticks();
 	if (nJoysticks > 0)
+	{
+		if (s_pJoystick == NULL)
 	{
 		for (int i = 0; i < nJoysticks; i++)
 		{
@@ -711,17 +752,26 @@ void IN_StartupJoystick()
 
 					// mark the joystick as available and advanced initialization not completed
 					// this is needed as cvars are not available during initialization
-					gEngfuncs.Con_Printf("joystick found\n\n", SDL_GameControllerName(s_pJoystick));
+						gEngfuncs.Con_Printf("joystick found %s\n\n", SDL_GameControllerName(s_pJoystick));
 					joy_avail = true;
 					joy_advancedinit = false;
 					break;
+					}
 				}
 			}
 		}
 	}
 	else
 	{
+		if (s_pJoystick)
+			SDL_GameControllerClose(s_pJoystick);
+
+		s_pJoystick = NULL;
+		if (joy_avail)
+		{
+			joy_avail = 0;
 		gEngfuncs.Con_DPrintf("joystick not found -- driver not present\n\n");
+		}
 	}
 }
 
@@ -911,6 +961,9 @@ void IN_JoyMove(float frametime, usercmd_t* cmd)
 		joy_advancedinit = true;
 	}
 
+	// re-scan for joystick presence
+	IN_StartupJoystick();
+
 	// verify joystick is available and that the user wants to use it
 	if (!joy_avail || 0 == in_joystick->value)
 	{
@@ -1097,7 +1150,7 @@ IN_Init
 void IN_Init()
 {
 	m_filter = gEngfuncs.pfnRegisterVariable("m_filter", "0", FCVAR_ARCHIVE);
-	sensitivity = gEngfuncs.pfnRegisterVariable("sensitivity", "3", FCVAR_ARCHIVE); // user mouse sensitivity setting.
+	sensitivity = gEngfuncs.pfnRegisterVariable("sensitivity", "3", FCVAR_ARCHIVE | FCVAR_FILTERSTUFFTEXT); // user mouse sensitivity setting.
 
 	in_joystick = gEngfuncs.pfnRegisterVariable("joystick", "0", FCVAR_ARCHIVE);
 	joy_name = gEngfuncs.pfnRegisterVariable("joyname", "joystick", 0);
@@ -1108,6 +1161,7 @@ void IN_Init()
 	joy_advaxisr = gEngfuncs.pfnRegisterVariable("joyadvaxisr", "0", 0);
 	joy_advaxisu = gEngfuncs.pfnRegisterVariable("joyadvaxisu", "0", 0);
 	joy_advaxisv = gEngfuncs.pfnRegisterVariable("joyadvaxisv", "0", 0);
+	joy_supported = gEngfuncs.pfnRegisterVariable("joysupported", "1", 0);
 	joy_forwardthreshold = gEngfuncs.pfnRegisterVariable("joyforwardthreshold", "0.15", 0);
 	joy_sidethreshold = gEngfuncs.pfnRegisterVariable("joysidethreshold", "0.15", 0);
 	joy_pitchthreshold = gEngfuncs.pfnRegisterVariable("joypitchthreshold", "0.15", 0);

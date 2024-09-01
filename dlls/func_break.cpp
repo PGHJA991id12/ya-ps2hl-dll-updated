@@ -842,6 +842,8 @@ public:
 	// breakables use an overridden takedamage
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
+	int DamageDecal(int bitsDamageType) override;
+
 	static TYPEDESCRIPTION m_SaveData[];
 
 	static const char* m_soundNames[3];
@@ -857,7 +859,6 @@ TYPEDESCRIPTION CPushable::m_SaveData[] =
 };
 
 IMPLEMENT_SAVERESTORE(CPushable, CBreakable);
-
 
 LINK_ENTITY_TO_CLASS(func_pushable, CPushable);
 
@@ -1047,4 +1048,12 @@ bool CPushable::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, floa
 		return CBreakable::TakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
 
 	return true;
+}
+
+int CPushable::DamageDecal(int bitsDamageType)
+{
+	if (FBitSet(pev->spawnflags, SF_PUSH_BREAKABLE))
+		return CBreakable::DamageDecal(bitsDamageType);
+
+	return CBaseEntity::DamageDecal(bitsDamageType);
 }

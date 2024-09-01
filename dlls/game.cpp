@@ -666,6 +666,8 @@ cvar_t sk_flyer_damage1 = {"sk_flyer_damage1", "0"};
 cvar_t sk_flyer_damage2 = {"sk_flyer_damage2", "0"};
 cvar_t sk_flyer_damage3 = {"sk_flyer_damage3", "0"};
 
+cvar_t sv_busters = {"sv_busters", "0", FCVAR_SERVER};
+
 // END Cvars for Skill Level settings
 
 static bool SV_InitServer()
@@ -698,6 +700,7 @@ void GameDLLInit()
 
 	g_psv_gravity = CVAR_GET_POINTER("sv_gravity");
 	g_psv_aim = CVAR_GET_POINTER("sv_aim");
+	g_psv_allow_autoaim = CVAR_GET_POINTER("sv_allow_autoaim");
 	g_footsteps = CVAR_GET_POINTER("mp_footsteps");
 
 	// PS2HL - stronger gravity (helps to test mods for PS2)
@@ -740,6 +743,8 @@ void GameDLLInit()
 	CVAR_REGISTER(&allowmonsters);
 
 	CVAR_REGISTER(&mp_chattime);
+
+	CVAR_REGISTER(&sv_busters);
 
 	CVAR_REGISTER(&sv_allowbunnyhopping);
 
