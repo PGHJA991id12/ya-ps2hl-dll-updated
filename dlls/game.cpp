@@ -287,22 +287,6 @@ cvar_t sk_sentry_health1 = {"sk_sentry_health1", "0"};
 cvar_t sk_sentry_health2 = {"sk_sentry_health2", "0"};
 cvar_t sk_sentry_health3 = {"sk_sentry_health3", "0"};
 
-// PS2HLU
-
-// Focus emitter
-cvar_t	sk_focus_health1 = { "sk_focus_health1","0" };
-cvar_t	sk_focus_health2 = { "sk_focus_health2","0" };
-cvar_t	sk_focus_health3 = { "sk_focus_health3","0" };
-
-// Flyer
-cvar_t	sk_flyer_health1 = { "sk_flyer_health1","0" };
-cvar_t	sk_flyer_health2 = { "sk_flyer_health2","0" };
-cvar_t	sk_flyer_health3 = { "sk_flyer_health3","0" };
-
-cvar_t	sk_flyer_damage1 = { "sk_flyer_damage1","0" };
-cvar_t	sk_flyer_damage2 = { "sk_flyer_damage2","0" };
-cvar_t	sk_flyer_damage3 = { "sk_flyer_damage3","0" };
-
 // PLAYER WEAPONS
 
 // Crowbar whack
@@ -475,6 +459,212 @@ cvar_t sk_player_arm3 = {"sk_player_arm3", "1"};
 cvar_t sk_player_leg1 = {"sk_player_leg1", "1"};
 cvar_t sk_player_leg2 = {"sk_player_leg2", "1"};
 cvar_t sk_player_leg3 = {"sk_player_leg3", "1"};
+
+// PS2HLU
+// Cvars used in PS2 HL to store the mission results/high scores
+
+cvar_t decay_ht01_p1_kills = {"decay_ht01_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p2_kills = {"decay_ht01_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p1_damage = {"decay_ht01_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p2_damage = {"decay_ht01_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p1_accuracy = {"decay_ht01_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p2_accuracy = {"decay_ht01_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p1_grade = {"decay_ht01_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_p2_grade = {"decay_ht01_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht01_completed = {"decay_ht01_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p1_kills = {"decay_ht02_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p2_kills = {"decay_ht02_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p1_damage = {"decay_ht02_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p2_damage = {"decay_ht02_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p1_accuracy = {"decay_ht02_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p2_accuracy = {"decay_ht02_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p1_grade = {"decay_ht02_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_p2_grade = {"decay_ht02_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht02_completed = {"decay_ht02_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p1_kills = {"decay_ht03_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p2_kills = {"decay_ht03_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p1_damage = {"decay_ht03_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p2_damage = {"decay_ht03_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p1_accuracy = {"decay_ht03_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p2_accuracy = {"decay_ht03_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p1_grade = {"decay_ht03_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_p2_grade = {"decay_ht03_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht03_completed = {"decay_ht03_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p1_kills = {"decay_ht04_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p2_kills = {"decay_ht04_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p1_damage = {"decay_ht04_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p2_damage = {"decay_ht04_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p1_accuracy = {"decay_ht04_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p2_accuracy = {"decay_ht04_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p1_grade = {"decay_ht04_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_p2_grade = {"decay_ht04_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht04_completed = {"decay_ht04_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p1_kills = {"decay_ht05_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p2_kills = {"decay_ht05_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p1_damage = {"decay_ht05_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p2_damage = {"decay_ht05_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p1_accuracy = {"decay_ht05_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p2_accuracy = {"decay_ht05_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p1_grade = {"decay_ht05_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_p2_grade = {"decay_ht05_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht05_completed = {"decay_ht05_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p1_kills = {"decay_ht06_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p2_kills = {"decay_ht06_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p1_damage = {"decay_ht06_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p2_damage = {"decay_ht06_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p1_accuracy = {"decay_ht06_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p2_accuracy = {"decay_ht06_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p1_grade = {"decay_ht06_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_p2_grade = {"decay_ht06_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht06_completed = {"decay_ht06_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p1_kills = {"decay_ht07_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p2_kills = {"decay_ht07_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p1_damage = {"decay_ht07_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p2_damage = {"decay_ht07_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p1_accuracy = {"decay_ht07_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p2_accuracy = {"decay_ht07_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p1_grade = {"decay_ht07_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_p2_grade = {"decay_ht07_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht07_completed = {"decay_ht07_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p1_kills = {"decay_ht08_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p2_kills = {"decay_ht08_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p1_damage = {"decay_ht08_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p2_damage = {"decay_ht08_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p1_accuracy = {"decay_ht08_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p2_accuracy = {"decay_ht08_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p1_grade = {"decay_ht08_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_p2_grade = {"decay_ht08_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht08_completed = {"decay_ht08_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p1_kills = {"decay_ht09_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p2_kills = {"decay_ht09_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p1_damage = {"decay_ht09_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p2_damage = {"decay_ht09_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p1_accuracy = {"decay_ht09_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p2_accuracy = {"decay_ht09_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p1_grade = {"decay_ht09_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_p2_grade = {"decay_ht09_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht09_completed = {"decay_ht09_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p1_kills = {"decay_ht10_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p2_kills = {"decay_ht10_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p1_damage = {"decay_ht10_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p2_damage = {"decay_ht10_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p1_accuracy = {"decay_ht10_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p2_accuracy = {"decay_ht10_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p1_grade = {"decay_ht10_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_p2_grade = {"decay_ht10_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht10_completed = {"decay_ht10_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p1_kills = {"decay_ht11_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p2_kills = {"decay_ht11_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p1_damage = {"decay_ht11_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p2_damage = {"decay_ht11_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p1_accuracy = {"decay_ht11_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p2_accuracy = {"decay_ht11_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p1_grade = {"decay_ht11_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_p2_grade = {"decay_ht11_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht11_completed = {"decay_ht11_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p1_kills = {"decay_ht12_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p2_kills = {"decay_ht12_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p1_damage = {"decay_ht12_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p2_damage = {"decay_ht12_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p1_accuracy = {"decay_ht12_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p2_accuracy = {"decay_ht12_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p1_grade = {"decay_ht12_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht12_p2_grade = {"decay_ht12_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht13_completed = {"decay_ht13_completed", "0", FCVAR_ARCHIVE };
+
+/*
+* These are completely unused for some reason, but are registered anyway
+* SPECULATION: These values couldve been intended for some kind of extra mission pack
+* with the Extras CD addon functionality
+*/
+
+cvar_t decay_ht21_p1_kills = {"decay_ht21_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p2_kills = {"decay_ht21_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p1_damage = {"decay_ht21_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p2_damage = {"decay_ht21_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p1_accuracy = {"decay_ht21_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p2_accuracy = {"decay_ht21_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p1_grade = {"decay_ht21_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_p2_grade = {"decay_ht21_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht21_completed = {"decay_ht21_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p1_kills = {"decay_ht22_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p2_kills = {"decay_ht22_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p1_damage = {"decay_ht22_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p2_damage = {"decay_ht22_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p1_accuracy = {"decay_ht22_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p2_accuracy = {"decay_ht22_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p1_grade = {"decay_ht22_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_p2_grade = {"decay_ht22_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht22_completed = {"decay_ht22_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p1_kills = {"decay_ht23_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p2_kills = {"decay_ht23_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p1_damage = {"decay_ht23_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p2_damage = {"decay_ht23_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p1_accuracy = {"decay_ht23_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p2_accuracy = {"decay_ht23_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p1_grade = {"decay_ht23_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_p2_grade = {"decay_ht23_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht23_completed = {"decay_ht23_completed", "0", FCVAR_ARCHIVE };
+
+// This is used in the Alien Mission
+
+cvar_t decay_ht91_p1_kills = {"decay_ht91_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p2_kills = {"decay_ht91_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p1_damage = {"decay_ht91_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p2_damage = {"decay_ht91_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p1_accuracy = {"decay_ht91_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p2_accuracy = {"decay_ht91_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p1_grade = {"decay_ht91_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_p2_grade = {"decay_ht91_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht91_completed = {"decay_ht91_completed", "0", FCVAR_ARCHIVE };
+
+// Unused
+
+cvar_t decay_ht92_p1_kills = {"decay_ht92_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p2_kills = {"decay_ht92_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p1_damage = {"decay_ht92_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p2_damage = {"decay_ht92_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p1_accuracy = {"decay_ht92_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p2_accuracy = {"decay_ht92_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p1_grade = {"decay_ht92_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_p2_grade = {"decay_ht92_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht92_completed = {"decay_ht92_completed", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p1_kills = {"decay_ht93_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p2_kills = {"decay_ht93_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p1_damage = {"decay_ht93_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p2_damage = {"decay_ht93_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p1_accuracy = {"decay_ht93_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p2_accuracy = {"decay_ht93_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p1_grade = {"decay_ht93_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_p2_grade = {"decay_ht93_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_ht93_completed = {"decay_ht93_completed", "0", FCVAR_ARCHIVE };
+
+// used for the screen at the end of missions
+
+cvar_t decay_last_mission_p1_kills = {"decay_last_mission_p1_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p2_kills = {"decay_last_mission_p2_kills", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p1_damage = {"decay_last_mission_p1_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p2_damage = {"decay_last_mission_p2_damage", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p1_accuracy = {"decay_last_mission_p1_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p2_accuracy = {"decay_last_mission_p2_accuracy", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p1_grade = {"decay_last_mission_p1_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_p2_grade = {"decay_last_mission_p2_grade", "0", FCVAR_ARCHIVE };
+cvar_t decay_last_mission_completed = {"decay_last_mission_completed", "0", FCVAR_ARCHIVE };
+cvar_t last_decay_mission_attempted = {"last_decay_mission_attempted", "0", FCVAR_ARCHIVE };
+
+// Focus emitter
+cvar_t sk_focus_health1 = {"sk_focus_health1", "0"};
+cvar_t sk_focus_health2 = {"sk_focus_health2", "0"};
+cvar_t sk_focus_health3 = {"sk_focus_health3", "0"};
+
+// Flyer
+cvar_t sk_flyer_health1 = {"sk_flyer_health1", "0"};
+cvar_t sk_flyer_health2 = {"sk_flyer_health2", "0"};
+cvar_t sk_flyer_health3 = {"sk_flyer_health3", "0"};
+
+cvar_t sk_flyer_damage1 = {"sk_flyer_damage1", "0"};
+cvar_t sk_flyer_damage2 = {"sk_flyer_damage2", "0"};
+cvar_t sk_flyer_damage3 = {"sk_flyer_damage3", "0"};
 
 // END Cvars for Skill Level settings
 
@@ -785,18 +975,6 @@ void GameDLLInit()
 	CVAR_REGISTER(&sk_sentry_health2); // {"sk_sentry_health2","0"};
 	CVAR_REGISTER(&sk_sentry_health3); // {"sk_sentry_health3","0"};
 	
-	// PS2HLU
-	// Decay stuff
-	CVAR_REGISTER(&sk_flyer_health1);
-	CVAR_REGISTER(&sk_flyer_health2);
-	CVAR_REGISTER(&sk_flyer_health3);
-	CVAR_REGISTER(&sk_flyer_damage1);
-	CVAR_REGISTER(&sk_flyer_damage2);
-	CVAR_REGISTER(&sk_flyer_damage3);
-	CVAR_REGISTER(&sk_focus_health1);
-	CVAR_REGISTER(&sk_focus_health2);
-	CVAR_REGISTER(&sk_focus_health3);
-
 	// PLAYER WEAPONS
 
 	// Crowbar whack
@@ -969,6 +1147,199 @@ void GameDLLInit()
 	CVAR_REGISTER(&sk_player_leg2);
 	CVAR_REGISTER(&sk_player_leg3);
 	// END REGISTER CVARS FOR SKILL LEVEL STUFF
+
+	// PS2HLU
+	// Register PS2 HL cvars
+	// Comments about these cvars can be found at their
+	// decleration above
+	CVAR_REGISTER(&decay_ht01_p1_kills);
+	CVAR_REGISTER(&decay_ht01_p2_kills);
+	CVAR_REGISTER(&decay_ht01_p1_damage);
+	CVAR_REGISTER(&decay_ht01_p2_damage);
+	CVAR_REGISTER(&decay_ht01_p1_accuracy);
+	CVAR_REGISTER(&decay_ht01_p2_accuracy);
+	CVAR_REGISTER(&decay_ht01_p1_grade);
+	CVAR_REGISTER(&decay_ht01_p2_grade);
+	CVAR_REGISTER(&decay_ht01_completed);
+	CVAR_REGISTER(&decay_ht02_p1_kills);
+	CVAR_REGISTER(&decay_ht02_p2_kills);
+	CVAR_REGISTER(&decay_ht02_p1_damage);
+	CVAR_REGISTER(&decay_ht02_p2_damage);
+	CVAR_REGISTER(&decay_ht02_p1_accuracy);
+	CVAR_REGISTER(&decay_ht02_p2_accuracy);
+	CVAR_REGISTER(&decay_ht02_p1_grade);
+	CVAR_REGISTER(&decay_ht02_p2_grade);
+	CVAR_REGISTER(&decay_ht02_completed);
+	CVAR_REGISTER(&decay_ht03_p1_kills);
+	CVAR_REGISTER(&decay_ht03_p2_kills);
+	CVAR_REGISTER(&decay_ht03_p1_damage);
+	CVAR_REGISTER(&decay_ht03_p2_damage);
+	CVAR_REGISTER(&decay_ht03_p1_accuracy);
+	CVAR_REGISTER(&decay_ht03_p2_accuracy);
+	CVAR_REGISTER(&decay_ht03_p1_grade);
+	CVAR_REGISTER(&decay_ht03_p2_grade);
+	CVAR_REGISTER(&decay_ht03_completed);
+	CVAR_REGISTER(&decay_ht04_p1_kills);
+	CVAR_REGISTER(&decay_ht04_p2_kills);
+	CVAR_REGISTER(&decay_ht04_p1_damage);
+	CVAR_REGISTER(&decay_ht04_p2_damage);
+	CVAR_REGISTER(&decay_ht04_p1_accuracy);
+	CVAR_REGISTER(&decay_ht04_p2_accuracy);
+	CVAR_REGISTER(&decay_ht04_p1_grade);
+	CVAR_REGISTER(&decay_ht04_p2_grade);
+	CVAR_REGISTER(&decay_ht04_completed);
+	CVAR_REGISTER(&decay_ht05_p1_kills);
+	CVAR_REGISTER(&decay_ht05_p2_kills);
+	CVAR_REGISTER(&decay_ht05_p1_damage);
+	CVAR_REGISTER(&decay_ht05_p2_damage);
+	CVAR_REGISTER(&decay_ht05_p1_accuracy);
+	CVAR_REGISTER(&decay_ht05_p2_accuracy);
+	CVAR_REGISTER(&decay_ht05_p1_grade);
+	CVAR_REGISTER(&decay_ht05_p2_grade);
+	CVAR_REGISTER(&decay_ht05_completed);
+	CVAR_REGISTER(&decay_ht06_p1_kills);
+	CVAR_REGISTER(&decay_ht06_p2_kills);
+	CVAR_REGISTER(&decay_ht06_p1_damage);
+	CVAR_REGISTER(&decay_ht06_p2_damage);
+	CVAR_REGISTER(&decay_ht06_p1_accuracy);
+	CVAR_REGISTER(&decay_ht06_p2_accuracy);
+	CVAR_REGISTER(&decay_ht06_p1_grade);
+	CVAR_REGISTER(&decay_ht06_p2_grade);
+	CVAR_REGISTER(&decay_ht06_completed);
+	CVAR_REGISTER(&decay_ht07_p1_kills);
+	CVAR_REGISTER(&decay_ht07_p2_kills);
+	CVAR_REGISTER(&decay_ht07_p1_damage);
+	CVAR_REGISTER(&decay_ht07_p2_damage);
+	CVAR_REGISTER(&decay_ht07_p1_accuracy);
+	CVAR_REGISTER(&decay_ht07_p2_accuracy);
+	CVAR_REGISTER(&decay_ht07_p1_grade);
+	CVAR_REGISTER(&decay_ht07_p2_grade);
+	CVAR_REGISTER(&decay_ht07_completed);
+	CVAR_REGISTER(&decay_ht08_p1_kills);
+	CVAR_REGISTER(&decay_ht08_p2_kills);
+	CVAR_REGISTER(&decay_ht08_p1_damage);
+	CVAR_REGISTER(&decay_ht08_p2_damage);
+	CVAR_REGISTER(&decay_ht08_p1_accuracy);
+	CVAR_REGISTER(&decay_ht08_p2_accuracy);
+	CVAR_REGISTER(&decay_ht08_p1_grade);
+	CVAR_REGISTER(&decay_ht08_p2_grade);
+	CVAR_REGISTER(&decay_ht08_completed);
+	CVAR_REGISTER(&decay_ht09_p1_kills);
+	CVAR_REGISTER(&decay_ht09_p2_kills);
+	CVAR_REGISTER(&decay_ht09_p1_damage);
+	CVAR_REGISTER(&decay_ht09_p2_damage);
+	CVAR_REGISTER(&decay_ht09_p1_accuracy);
+	CVAR_REGISTER(&decay_ht09_p2_accuracy);
+	CVAR_REGISTER(&decay_ht09_p1_grade);
+	CVAR_REGISTER(&decay_ht09_p2_grade);
+	CVAR_REGISTER(&decay_ht09_completed);
+	CVAR_REGISTER(&decay_ht10_p1_kills);
+	CVAR_REGISTER(&decay_ht10_p2_kills);
+	CVAR_REGISTER(&decay_ht10_p1_damage);
+	CVAR_REGISTER(&decay_ht10_p2_damage);
+	CVAR_REGISTER(&decay_ht10_p1_accuracy);
+	CVAR_REGISTER(&decay_ht10_p2_accuracy);
+	CVAR_REGISTER(&decay_ht10_p1_grade);
+	CVAR_REGISTER(&decay_ht10_p2_grade);
+	CVAR_REGISTER(&decay_ht10_completed);
+	CVAR_REGISTER(&decay_ht11_p1_kills);
+	CVAR_REGISTER(&decay_ht11_p2_kills);
+	CVAR_REGISTER(&decay_ht11_p1_damage);
+	CVAR_REGISTER(&decay_ht11_p2_damage);
+	CVAR_REGISTER(&decay_ht11_p1_accuracy);
+	CVAR_REGISTER(&decay_ht11_p2_accuracy);
+	CVAR_REGISTER(&decay_ht11_p1_grade);
+	CVAR_REGISTER(&decay_ht11_p2_grade);
+	CVAR_REGISTER(&decay_ht11_completed);
+	CVAR_REGISTER(&decay_ht12_p1_kills);
+	CVAR_REGISTER(&decay_ht12_p2_kills);
+	CVAR_REGISTER(&decay_ht12_p1_damage);
+	CVAR_REGISTER(&decay_ht12_p2_damage);
+	CVAR_REGISTER(&decay_ht12_p1_accuracy);
+	CVAR_REGISTER(&decay_ht12_p2_accuracy);
+	CVAR_REGISTER(&decay_ht12_p1_grade);
+	CVAR_REGISTER(&decay_ht12_p2_grade);
+	CVAR_REGISTER(&decay_ht13_completed);
+
+	CVAR_REGISTER(&decay_ht21_p1_kills);
+	CVAR_REGISTER(&decay_ht21_p2_kills);
+	CVAR_REGISTER(&decay_ht21_p1_damage);
+	CVAR_REGISTER(&decay_ht21_p2_damage);
+	CVAR_REGISTER(&decay_ht21_p1_accuracy);
+	CVAR_REGISTER(&decay_ht21_p2_accuracy);
+	CVAR_REGISTER(&decay_ht21_p1_grade);
+	CVAR_REGISTER(&decay_ht21_p2_grade);
+	CVAR_REGISTER(&decay_ht21_completed);
+	CVAR_REGISTER(&decay_ht22_p1_kills);
+	CVAR_REGISTER(&decay_ht22_p2_kills);
+	CVAR_REGISTER(&decay_ht22_p1_damage);
+	CVAR_REGISTER(&decay_ht22_p2_damage);
+	CVAR_REGISTER(&decay_ht22_p1_accuracy);
+	CVAR_REGISTER(&decay_ht22_p2_accuracy);
+	CVAR_REGISTER(&decay_ht22_p1_grade);
+	CVAR_REGISTER(&decay_ht22_p2_grade);
+	CVAR_REGISTER(&decay_ht22_completed);
+	CVAR_REGISTER(&decay_ht23_p1_kills);
+	CVAR_REGISTER(&decay_ht23_p2_kills);
+	CVAR_REGISTER(&decay_ht23_p1_damage);
+	CVAR_REGISTER(&decay_ht23_p2_damage);
+	CVAR_REGISTER(&decay_ht23_p1_accuracy);
+	CVAR_REGISTER(&decay_ht23_p2_accuracy);
+	CVAR_REGISTER(&decay_ht23_p1_grade);
+	CVAR_REGISTER(&decay_ht23_p2_grade);
+	CVAR_REGISTER(&decay_ht23_completed);
+
+	CVAR_REGISTER(&decay_ht91_p1_kills);
+	CVAR_REGISTER(&decay_ht91_p2_kills);
+	CVAR_REGISTER(&decay_ht91_p1_damage);
+	CVAR_REGISTER(&decay_ht91_p2_damage);
+	CVAR_REGISTER(&decay_ht91_p1_accuracy);
+	CVAR_REGISTER(&decay_ht91_p2_accuracy);
+	CVAR_REGISTER(&decay_ht91_p1_grade);
+	CVAR_REGISTER(&decay_ht91_p2_grade);
+	CVAR_REGISTER(&decay_ht91_completed);
+	CVAR_REGISTER(&decay_ht92_p1_kills);
+	CVAR_REGISTER(&decay_ht92_p2_kills);
+	CVAR_REGISTER(&decay_ht92_p1_damage);
+	CVAR_REGISTER(&decay_ht92_p2_damage);
+	CVAR_REGISTER(&decay_ht92_p1_accuracy);
+	CVAR_REGISTER(&decay_ht92_p2_accuracy);
+	CVAR_REGISTER(&decay_ht92_p1_grade);
+	CVAR_REGISTER(&decay_ht92_p2_grade);
+	CVAR_REGISTER(&decay_ht92_completed);
+	CVAR_REGISTER(&decay_ht93_p1_kills);
+	CVAR_REGISTER(&decay_ht93_p2_kills);
+	CVAR_REGISTER(&decay_ht93_p1_damage);
+	CVAR_REGISTER(&decay_ht93_p2_damage);
+	CVAR_REGISTER(&decay_ht93_p1_accuracy);
+	CVAR_REGISTER(&decay_ht93_p2_accuracy);
+	CVAR_REGISTER(&decay_ht93_p1_grade);
+	CVAR_REGISTER(&decay_ht93_p2_grade);
+	CVAR_REGISTER(&decay_ht93_completed);
+
+	CVAR_REGISTER(&decay_last_mission_p1_kills);
+	CVAR_REGISTER(&decay_last_mission_p2_kills);
+	CVAR_REGISTER(&decay_last_mission_p1_damage);
+	CVAR_REGISTER(&decay_last_mission_p2_damage);
+	CVAR_REGISTER(&decay_last_mission_p1_accuracy);
+	CVAR_REGISTER(&decay_last_mission_p2_accuracy);
+	CVAR_REGISTER(&decay_last_mission_p1_grade);
+	CVAR_REGISTER(&decay_last_mission_p2_grade);
+	CVAR_REGISTER(&decay_last_mission_completed);
+	CVAR_REGISTER(&last_decay_mission_attempted);
+
+	// Decay entity stuff
+	CVAR_REGISTER(&sk_flyer_health1);
+	CVAR_REGISTER(&sk_flyer_health2);
+	CVAR_REGISTER(&sk_flyer_health3);
+	CVAR_REGISTER(&sk_flyer_damage1);
+	CVAR_REGISTER(&sk_flyer_damage2);
+	CVAR_REGISTER(&sk_flyer_damage3);
+	CVAR_REGISTER(&sk_focus_health1);
+	CVAR_REGISTER(&sk_focus_health2);
+	CVAR_REGISTER(&sk_focus_health3);
+
+	// PS2HLU END
 
 	InitMapLoadingUtils();
 
