@@ -430,7 +430,7 @@ void CFocusEmitter::Spawn()
 	SetThink(&CFocusEmitter::EmitterThink);
 
 	ChangeSequence( FOCUSEMITTER_IDLE_CLOSED );
-	pev->renderfx = kRenderFxFullbright;
+	//pev->renderfx = kRenderFxFullbright;
 	pev->takedamage = DAMAGE_NO;
 
 	pev->nextthink = -1;
