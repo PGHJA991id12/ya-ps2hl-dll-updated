@@ -4515,6 +4515,7 @@ Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelt
 	bestent = NULL;
 
 	m_fOnTarget = false;
+	m_bIsTargetFriendly = true;
 
 	UTIL_TraceLine(vecSrc, vecSrc + bestdir * flDist, dont_ignore_monsters, edict(), &tr);
 
@@ -4591,6 +4592,9 @@ Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelt
 				continue;
 		}
 
+		if (IRelationship(pEntity) > 0)
+			m_bIsTargetFriendly = false;
+
 		// can shoot at this one
 		bestdot = dot;
 		bestent = pEdict;
@@ -4621,6 +4625,7 @@ void CBasePlayer::ResetAutoaim()
 		SET_CROSSHAIRANGLE(edict(), 0, 0);
 	}
 	m_fOnTarget = false;
+	m_bIsTargetFriendly = true;
 }
 
 /*

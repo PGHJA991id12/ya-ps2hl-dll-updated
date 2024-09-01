@@ -666,7 +666,10 @@ bool CBasePlayerWeapon::UpdateClientData(CBasePlayer* pPlayer)
 	if (pPlayer->m_pActiveItem == this)
 	{
 		if (pPlayer->m_fOnTarget)
-			state = WEAPON_IS_ONTARGET;
+			if (pPlayer->m_bIsTargetFriendly)
+				state = 0x41;
+			else
+				state = WEAPON_IS_ONTARGET;
 		else
 			state = 1;
 	}

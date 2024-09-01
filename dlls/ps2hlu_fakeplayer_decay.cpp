@@ -236,6 +236,9 @@ void CDecayBot::Spawn()
 
 	pev->flags = FL_CLIENT | FL_FAKECLIENT;
 
+	// DEBUG DEBUG
+	pev->flags |= FL_GODMODE;
+
 	SetThink(&CDecayBot::BotThink);
 
 	m_flNextBotThink = gpGlobals->time + g_flBotCommandInterval;
@@ -319,6 +322,34 @@ void EXPORT CDecayBot::BotThink(void)
 	else
 		ClearPrimaryAttack();
 #endif
+
+	Vector autoaim = GetAutoaimVector(3.1256671980042f);
+	if (m_fOnTarget && m_bIsTargetFriendly == false)
+	{
+		auto desiredangle = UTIL_VecToAngles(autoaim);
+
+		//auto botPitch = UTIL_AngleDiff(desiredangle.x, pev->angles.x);
+		//pev->angles.x = UTIL_AngleMod(pev->angles.x + botPitch);
+		pev->angles.x = UTIL_AngleMod(360.0f - desiredangle.x);
+		pev->v_angle.y = pev->angles.y = desiredangle.y;
+
+		/*
+		if (pev->v_angle.x < -89.0f)
+			pev->v_angle.x = -89.0f;
+		else if (pev->v_angle.x > 89.0f)
+			pev->v_angle.x = 89.0f;
+		*/
+
+		pev->angles.z = pev->v_angle.z = 0;
+
+		pev->fixangle = 1;
+		if (m_fOnTarget)
+			PrimaryAttack();
+		else
+			ClearPrimaryAttack();
+	}
+	//pev->angles.x = 0;
+
 	/*
 	// DEBUG
 	// This code visualizes the bounding box
@@ -392,13 +423,14 @@ byte CDecayBot::ThrottledMsec(void) const
 	return (byte)iNewMsec;
 }
 
-
+/*
 Vector CDecayBot::GetAutoaimVector(float flDelta)
 {
 	UTIL_MakeVectors(pev->v_angle + pev->punchangle);
 
 	return gpGlobals->v_forward;
 }
+*/
 
 void CDecayBot::Crouch(void)
 {
@@ -427,7 +459,7 @@ CBaseMonster *CDecayBot::GetAttacker() const
 bool CDecayBot::IsEnemy(CBaseEntity *enemy)
 {
 	// TODO: better check if it classifies as hostile against the player
-	if (enemy != NULL && enemy->IsAlive() && enemy->pev->flags & FL_MONSTER /* && enemy->Classify() == CLASS_ALIEN_MILITARY*/)
+	if (enemy != NULL && enemy->IsAlive() /* && enemy->pev->flags & FL_MONSTER *//* && enemy->Classify() == CLASS_ALIEN_MILITARY*/)
 	return true;
 
 	return false;

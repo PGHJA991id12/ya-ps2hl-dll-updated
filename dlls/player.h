@@ -195,6 +195,10 @@ public:
 
 	Vector m_vecAutoAim;
 	bool m_fOnTarget;
+
+	// PS2HLU
+	bool m_bIsTargetFriendly;
+
 	int m_iDeaths;
 	float m_iRespawnFrames; // used in PlayerDeathThink() to make sure players can always respawn
 

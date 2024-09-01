@@ -28,7 +28,7 @@ public:
 	virtual void Crouch(void);
 	bool IsCrouching(void) const { return m_fIsCrouching; }
 	virtual void ExecuteCommand(void);
-	virtual Vector GetAutoaimVector(float delta);
+	//virtual Vector GetAutoaimVector(float delta);
 
 	// actual AI part of the bot
 	CBasePlayer *GetEnemy();
