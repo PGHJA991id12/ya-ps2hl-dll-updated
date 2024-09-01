@@ -2940,15 +2940,6 @@ void PM_CheckParamters()
 		pmove->maxspeed = V_min(maxspeed, pmove->maxspeed);
 	}
 
-	// Slow down, I'm pulling it! (a box maybe) but only when I'm standing on ground
-	//
-	// JoshA: Moved this to CheckParamters rather than working on the velocity,
-	// as otherwise it affects every integration step incorrectly.
-	if ((pmove->onground != -1) && (pmove->cmd.buttons & IN_USE))
-	{
-		pmove->maxspeed *= 1.0f / 3.0f;
-	}
-
 	if ((spd != 0.0) &&
 		(spd > pmove->maxspeed))
 	{
@@ -3124,6 +3115,14 @@ void PM_PlayerMove(qboolean server)
 			//  it will be set immediately again next frame if necessary
 			pmove->movetype = MOVETYPE_WALK;
 		}
+	}
+
+	// PS2HLU reverted due to the func_pushable fixes not being implemented
+	// Implementing the fixes would break the crystal cart section in ht01accident
+	// Slow down, I'm pulling it! (a box maybe) but only when I'm standing on ground
+	if ((pmove->onground != -1) && (pmove->cmd.buttons & IN_USE) != 0)
+	{
+		VectorScale(pmove->velocity, 0.3, pmove->velocity);
 	}
 
 	// Handle movement
