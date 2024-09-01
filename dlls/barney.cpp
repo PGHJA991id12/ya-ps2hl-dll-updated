@@ -400,13 +400,7 @@ void CBarney::Spawn()
 	UTIL_SetSize(pev, VEC_HUMAN_HULL_MIN, VEC_HUMAN_HULL_MAX);
 
 	pev->solid = SOLID_SLIDEBOX;
-
-	// PS2HLU
-	// Dont fall, used in htoutro
-	if (pev->spawnflags & 8192)
-		pev->movetype = MOVETYPE_FLY;
-	else
-		pev->movetype		= MOVETYPE_STEP;
+	pev->movetype = MOVETYPE_STEP;
 
 	m_bloodColor = BLOOD_COLOR_RED;
 	pev->health = gSkillData.barneyHealth;
@@ -420,6 +414,13 @@ void CBarney::Spawn()
 	m_afCapability = bits_CAP_HEAR | bits_CAP_TURN_HEAD | bits_CAP_DOORS_GROUP;
 
 	MonsterInit();
+
+	// PS2HLU
+	// Dont allow autoaim to aim at me
+	// TODO: Figure out if this spawnflag is barney specific, or applies to all monsters
+	if (pev->spawnflags & 8192 && pev->takedamage == DAMAGE_AIM)
+		pev->takedamage = DAMAGE_YES;
+
 	SetUse(&CBarney::FollowerUse);
 }
 
