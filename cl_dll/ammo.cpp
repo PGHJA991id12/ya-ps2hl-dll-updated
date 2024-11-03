@@ -263,6 +263,10 @@ DECLARE_COMMAND(m_Ammo, Close);
 DECLARE_COMMAND(m_Ammo, NextWeapon);
 DECLARE_COMMAND(m_Ammo, PrevWeapon);
 
+// PS2HLU
+DECLARE_MESSAGE(m_Ammo, TankAmmo);
+DECLARE_MESSAGE(m_Ammo, TankUse);
+
 // width of ammo fonts
 #define AMMO_SMALL_WIDTH 10
 #define AMMO_LARGE_WIDTH 20
@@ -281,6 +285,10 @@ bool CHudAmmo::Init()
 	HOOK_MESSAGE(HideWeapon);
 	HOOK_MESSAGE(AmmoX);
 
+	// PS2HLU
+	HOOK_MESSAGE(TankAmmo);
+	HOOK_MESSAGE(TankUse);
+
 	HOOK_COMMAND("slot1", Slot1);
 	HOOK_COMMAND("slot2", Slot2);
 	HOOK_COMMAND("slot3", Slot3);
@@ -294,6 +302,10 @@ bool CHudAmmo::Init()
 	HOOK_COMMAND("cancelselect", Close);
 	HOOK_COMMAND("invnext", NextWeapon);
 	HOOK_COMMAND("invprev", PrevWeapon);
+
+	// PS2HLU todo
+	//HOOK_COMMAND("nextslot", NextSlot);
+	//HOOK_COMMAND("prevslot", PrevSlot);
 
 	Reset();
 
@@ -717,6 +729,58 @@ bool CHudAmmo::MsgFunc_WeaponList(const char* pszName, int iSize, void* pbuf)
 	return true;
 }
 
+// PS2HLU
+// func_tank ammo
+
+bool CHudAmmo::MsgFunc_TankAmmo(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+
+	int iTankAmmo = READ_SHORT();
+
+	if(m_pWeapon)
+		m_pWeapon->iClip = iTankAmmo;
+
+	return true;
+}
+bool CHudAmmo::MsgFunc_TankUse(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+
+	int bEnabled = READ_BYTE();
+	int iCurAmmo = READ_SHORT();
+	int iMaxAmmo = READ_SHORT();
+
+	if (m_pWeapon)
+	{
+		if (bEnabled)
+		{
+			OldRealWpnData = *m_pWeapon;
+
+			prevReserve[0] = m_pWeapon->iClip;
+			prevReserve[1] = gWR.CountAmmo(m_pWeapon->iAmmoType);
+			m_pWeapon->iClip = iCurAmmo;
+			gWR.SetAmmo(m_pWeapon->iAmmoType, iMaxAmmo);
+
+			bOverwriteAmmoIndicator = true;
+		}
+		else
+		{
+			// Dont break previously selected weapons ammo on quickswitch
+			if (m_pWeapon->iId == OldRealWpnData.iId)
+			{
+				m_pWeapon = &OldRealWpnData;
+				m_pWeapon->iClip = prevReserve[0];
+			}
+			gWR.SetAmmo(OldRealWpnData.iAmmoType, abs(prevReserve[1]));
+
+			bOverwriteAmmoIndicator = false;
+		}
+	}
+
+	return true;
+}
+
 //------------------------------------------------------------------------
 // Command Handlers
 //------------------------------------------------------------------------
@@ -888,7 +952,8 @@ bool CHudAmmo::Draw(float flTime)
 	if (!gHUD.HasSuit())
 		return true;
 
-	if ((gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
+	// PS2HLU
+	if (((gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0 ) && !bOverwriteAmmoIndicator)
 		return true;
 
 	// Draw Weapon Menu
@@ -932,6 +997,10 @@ bool CHudAmmo::Draw(float flTime)
 	{
 		int iIconWidth = m_pWeapon->rcAmmo.right - m_pWeapon->rcAmmo.left;
 
+		// PS2HLU
+		if (bOverwriteAmmoIndicator)
+			iIconWidth = 0;
+
 		if (pw->iClip >= 0)
 		{
 			// room for the number and the '|' and the current ammo
@@ -967,12 +1036,16 @@ bool CHudAmmo::Draw(float flTime)
 			x = gHUD.DrawHudNumber(x, y, iFlags | DHN_3DIGITS, gWR.CountAmmo(pw->iAmmoType), r, g, b);
 		}
 
-		// Draw the ammo Icon
-		int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
-		SPR_Set(m_pWeapon->hAmmo, r, g, b);
-		SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
+		// PS2HLU
+		if (!bOverwriteAmmoIndicator)
+		{
+			// Draw the ammo Icon
+			int iOffset = (m_pWeapon->rcAmmo.bottom - m_pWeapon->rcAmmo.top) / 8;
+			SPR_Set(m_pWeapon->hAmmo, r, g, b);
+			SPR_DrawAdditive(0, x, y - iOffset, &m_pWeapon->rcAmmo);
+		}
 	}
-
+	
 	// Does weapon have seconday ammo?
 	if (pw->iAmmo2Type > 0)
 	{

@@ -73,4 +73,6 @@ void LinkUserMessages()
 	// PS2HLU
 	gmsgExtremeFunnel = REG_USER_MSG("BigFunnel", -1); // 54
 	gmsgHudColor = REG_USER_MSG("HudColor", 3);
+	gmsgTankUse = REG_USER_MSG("TankUse", 5);
+	gmsgTankAmmo = REG_USER_MSG("TankAmmo", 2);
 }

@@ -159,6 +159,9 @@ public:
 	bool MsgFunc_WeapPickup(const char* pszName, int iSize, void* pbuf);
 	bool MsgFunc_ItemPickup(const char* pszName, int iSize, void* pbuf);
 	bool MsgFunc_HideWeapon(const char* pszName, int iSize, void* pbuf);
+	// PS2HLU
+	bool MsgFunc_TankUse(const char* pszName, int iSize, void* pbuf);
+	bool MsgFunc_TankAmmo(const char* pszName, int iSize, void* pbuf);
 
 	void SlotInput(int iSlot);
 	void UserCmd_Slot1();
@@ -181,6 +184,11 @@ private:
 	WEAPON* m_pWeapon;
 	int m_HUD_bucket0;
 	int m_HUD_selection;
+
+	// PS2HLU
+	WEAPON OldRealWpnData;
+	int prevReserve[2] = {0, 0};
+	bool bOverwriteAmmoIndicator = false;
 };
 
 //

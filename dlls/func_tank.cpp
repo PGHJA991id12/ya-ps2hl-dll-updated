@@ -20,7 +20,7 @@
 #include "explode.h"
 
 #include "player.h"
-
+#include "UserMessages.h"
 
 #define SF_TANK_ACTIVE 0x0001
 #define SF_TANK_PLAYER 0x0002
@@ -104,6 +104,9 @@ public:
 	void StopControl();
 	void ControllerPostFrame();
 
+	// PS2HLU
+	int m_iMaxAmmo = -1;
+	int m_iFiredShots = 0;
 
 protected:
 	CBasePlayer* m_pController;
@@ -328,6 +331,11 @@ bool CFuncTank::KeyValue(KeyValueData* pkvd)
 		m_iszMaster = ALLOC_STRING(pkvd->szValue);
 		return true;
 	}
+	else if (FStrEq(pkvd->szKeyName, "maxammo"))
+	{
+		m_iMaxAmmo = atoi(pkvd->szValue);
+		return true;
+	}
 
 	return CBaseEntity::KeyValue(pkvd);
 }
@@ -373,6 +381,16 @@ bool CFuncTank::StartControl(CBasePlayer* pController)
 
 	m_pController->m_iHideHUD |= HIDEHUD_WEAPONS;
 	m_vecControllerUsePos = m_pController->pev->origin;
+	
+	// PS2HLU
+	if (m_iMaxAmmo != -1)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgTankUse, NULL, m_pController->pev);
+		WRITE_BYTE(1);
+		WRITE_SHORT(m_iMaxAmmo - m_iFiredShots);
+		WRITE_SHORT(m_iMaxAmmo);
+		MESSAGE_END();
+	}
 
 	pev->nextthink = pev->ltime + 0.1;
 
@@ -390,6 +408,17 @@ void CFuncTank::StopControl()
 	ALERT(at_console, "stopped using TANK\n");
 
 	m_pController->m_iHideHUD &= ~HIDEHUD_WEAPONS;
+
+	// PS2HLU
+	if (m_iMaxAmmo != -1)
+	{
+		MESSAGE_BEGIN(MSG_ONE, gmsgTankUse, NULL, m_pController->pev);
+		WRITE_BYTE(0);
+		WRITE_SHORT(m_iMaxAmmo - m_iFiredShots);
+		WRITE_SHORT(m_iMaxAmmo);
+		MESSAGE_END();
+		
+	}
 
 	pev->nextthink = 0;
 	m_pController = NULL;
@@ -685,6 +714,17 @@ void CFuncTank::Fire(const Vector& barrelEnd, const Vector& forward, entvars_t* 
 			pSprite->pev->nextthink += 0.1;
 		}
 		SUB_UseTargets(this, USE_TOGGLE, 0);
+
+		// PS2HLU
+		m_iFiredShots++;
+
+		if (m_iMaxAmmo != -1 && m_pController != NULL)
+		{
+			// Update hud!
+			MESSAGE_BEGIN(MSG_ONE, gmsgTankAmmo, NULL, m_pController->pev);
+			WRITE_SHORT(m_iMaxAmmo - m_iFiredShots);
+			MESSAGE_END();
+		}
 	}
 	m_fireLast = gpGlobals->time;
 }
@@ -736,6 +776,10 @@ LINK_ENTITY_TO_CLASS(func_tank, CFuncTankGun);
 void CFuncTankGun::Fire(const Vector& barrelEnd, const Vector& forward, entvars_t* pevAttacker)
 {
 	int i;
+
+	if ((m_iMaxAmmo - m_iFiredShots) == 0)
+	return;
+	//ALERT(at_console, "Max ammo: %i\n", m_iMaxAmmo);
 
 	if (m_fireLast != 0)
 	{
