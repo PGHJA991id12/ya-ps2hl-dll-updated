@@ -266,6 +266,8 @@ DECLARE_COMMAND(m_Ammo, PrevWeapon);
 // PS2HLU
 DECLARE_MESSAGE(m_Ammo, TankAmmo);
 DECLARE_MESSAGE(m_Ammo, TankUse);
+DECLARE_COMMAND(m_Ammo, NextSlot);
+DECLARE_COMMAND(m_Ammo, PrevSlot);
 
 // width of ammo fonts
 #define AMMO_SMALL_WIDTH 10
@@ -303,9 +305,9 @@ bool CHudAmmo::Init()
 	HOOK_COMMAND("invnext", NextWeapon);
 	HOOK_COMMAND("invprev", PrevWeapon);
 
-	// PS2HLU todo
-	//HOOK_COMMAND("nextslot", NextSlot);
-	//HOOK_COMMAND("prevslot", PrevSlot);
+	// PS2HLU
+	HOOK_COMMAND("nextslot", NextSlot);
+	HOOK_COMMAND("prevslot", PrevSlot);
 
 	Reset();
 
@@ -938,6 +940,89 @@ void CHudAmmo::UserCmd_PrevWeapon()
 	gpActiveSel = NULL;
 }
 
+// PS2HLU
+// These are used for the DPAD navigation on the PS2 version
+// Selects the previous slot
+void CHudAmmo::UserCmd_PrevSlot()
+{
+	if (gHUD.m_fPlayerDead || (gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
+		return;
+
+	if (!gpActiveSel || gpActiveSel == (WEAPON*)1)
+		gpActiveSel = m_pWeapon;
+
+	int pos = 0;
+	int slot = MAX_WEAPON_SLOTS - 1;
+	if (gpActiveSel)
+	{
+		//pos = gpActiveSel->iSlotPos;
+		slot = gpActiveSel->iSlot - 1;
+	}
+
+	for (int loop = 0; loop <= 1; loop++)
+	{
+		for (; slot >= 0; slot--)
+		{
+			for (; pos < MAX_WEAPON_POSITIONS; pos++)
+			{
+				WEAPON* wsp = gWR.GetWeaponSlot(slot, pos);
+
+				if (wsp && gWR.HasAmmo(wsp))
+				{
+					gpActiveSel = wsp;
+					return;
+				}
+			}
+
+			pos = 0;
+		}
+
+		slot = MAX_WEAPON_SLOTS - 1;
+	}
+
+	gpActiveSel = NULL;
+}
+
+// Selects the next slot
+void CHudAmmo::UserCmd_NextSlot()
+{
+	if (gHUD.m_fPlayerDead || (gHUD.m_iHideHUDDisplay & (HIDEHUD_WEAPONS | HIDEHUD_ALL)) != 0)
+		return;
+
+	if (!gpActiveSel || gpActiveSel == (WEAPON*)1)
+		gpActiveSel = m_pWeapon;
+
+	int pos = 0;
+	int slot = 0;
+	if (gpActiveSel)
+	{
+		//pos = gpActiveSel->iSlotPos;
+		slot = gpActiveSel->iSlot + 1;
+	}
+
+	for (int loop = 0; loop <= 1; loop++)
+	{
+		for (; slot < MAX_WEAPON_SLOTS; slot++)
+		{
+			for (; pos < MAX_WEAPON_POSITIONS; pos++)
+			{
+				WEAPON* wsp = gWR.GetWeaponSlot(slot, pos);
+
+				if (wsp && gWR.HasAmmo(wsp))
+				{
+					gpActiveSel = wsp;
+					return;
+				}
+			}
+
+			pos = 0;
+		}
+
+		slot = 0; // start looking from the first slot again
+	}
+
+	gpActiveSel = NULL;
+}
 
 
 //-------------------------------------------------------------------------
