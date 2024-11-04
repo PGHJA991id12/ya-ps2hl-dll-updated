@@ -178,6 +178,10 @@ public:
 	void UserCmd_NextWeapon();
 	void UserCmd_PrevWeapon();
 
+	// PS2HLU
+	void UserCmd_NextSlot();
+	void UserCmd_PrevSlot();
+
 private:
 	float m_fFade;
 	RGBA m_rgba;
