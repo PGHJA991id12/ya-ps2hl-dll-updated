@@ -154,8 +154,6 @@ void EXPORT CDecayBot::SwapBotWithPlayer()
 
 			// Do the actual switch
 			EMIT_SOUND_DYN(ENT(pPlayer->pev), CHAN_WEAPON, SOUND_FLASHLIGHT_ON, 1.0, ATTN_NORM, 0, PITCH_NORM);
-			pPlayer->m_bIsInTrigger = false;
-			pPlayer2->m_bIsInTrigger = false;
 			UTIL_SetOrigin(pPlayer->pev, tmp2);
 			UTIL_SetOrigin(pPlayer2->pev, tmp);
 			pPlayer->pev->angles = BotAngles;

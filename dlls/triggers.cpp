@@ -592,11 +592,6 @@ public:
 	void InitTrigger();
 
 	int ObjectCaps() override { return CBaseToggle::ObjectCaps() & ~FCAP_ACROSS_TRANSITION; }
-private:
-	// PS2HLU
-	// Trigger stuff for decay
-	CBaseEntity *prevActivator = NULL;
-	bool canTriggerProceed = false;
 };
 
 LINK_ENTITY_TO_CLASS(trigger, CBaseTrigger);
@@ -1222,22 +1217,23 @@ void CTriggerOnce::Spawn()
 void CBaseTrigger::MultiTouch(CBaseEntity* pOther)
 {
 	entvars_t* pevToucher;
+	CBaseEntity* pList[2];
 
 	pevToucher = pOther->pev;
 
 	// PS2HLU
-	// Set to true if the player is in the trigger
-	// Used to make sure both activators are standing
-	// in the trigger
-
-	if (pOther->Classify() == CLASS_PLAYER)
-		pOther->m_bIsInTrigger = true;
-
-	// Only touch clients, monsters, or pushables (depending on flags)
-	if (((pevToucher->flags & FL_CLIENT) != 0 && (pev->spawnflags & SF_TRIGGER_NOCLIENTS) == 0) ||
-		((pevToucher->flags & FL_MONSTER) != 0 && (pev->spawnflags & SF_TRIGGER_ALLOWMONSTERS) != 0) ||
-		(pev->spawnflags & SF_TRIGGER_PUSHABLES) != 0 && FClassnameIs(pevToucher, "func_pushable"))
+	// Finally got the trigggers to work!
+	// Spawnflag 512 is still a mystery to me, it isnt even used in the decay campaign anywhere
+	// but it changes the variable thats checked in spawnflag 256 to be zero, ill still have to figure that out
+	if ((pev->spawnflags & 0x200) == 0)
 	{
+		if ((pev->spawnflags & 0x100) == 0)
+		{
+			// Only touch clients, monsters, or pushables (depending on flags)
+			if (((pevToucher->flags & FL_CLIENT) != 0 && (pev->spawnflags & SF_TRIGGER_NOCLIENTS) == 0) ||
+				((pevToucher->flags & FL_MONSTER) != 0 && (pev->spawnflags & SF_TRIGGER_ALLOWMONSTERS) != 0) ||
+				(pev->spawnflags & SF_TRIGGER_PUSHABLES) != 0 && FClassnameIs(pevToucher, "func_pushable"))
+			{
 
 #if 0
 		// if the trigger has an angles field, check player's facing direction
@@ -1249,7 +1245,17 @@ void CBaseTrigger::MultiTouch(CBaseEntity* pOther)
 		}
 #endif
 
-		ActivateMultiTrigger(pOther);
+				ActivateMultiTrigger(pOther);
+			}
+		}
+
+		// if (pev->absmax.x == 0) // theres a check here, but im pretty sure ive got entvars messed up in ghidra
+		{
+			int numPlayersInTrigger = UTIL_EntitiesInBox(pList, 2, pev->absmin, pev->absmax, FL_CLIENT);
+
+			if (numPlayersInTrigger == 2)
+				ActivateMultiTrigger(pOther);
+		}
 	}
 }
 
@@ -1261,40 +1267,11 @@ void CBaseTrigger::MultiTouch(CBaseEntity* pOther)
 //
 void CBaseTrigger::ActivateMultiTrigger(CBaseEntity* pActivator)
 {
-	// Dont allow trigger to proceed
-	canTriggerProceed = false;
-
 	if (pev->nextthink > gpGlobals->time)
 		return; // still waiting for reset time
 
 	if (!UTIL_IsMasterTriggered(m_sMaster, pActivator))
 		return;
-
-	// PS2HLU
-	// Allow trigger to activate only when both players are
-	// standing in it, or the player's decay Index matches the trigger's
-	if (pev->spawnflags & 256 && prevActivator && pActivator->Classify() == CLASS_PLAYER)
-	{
-		if (!m_decayIndex)
-		{
-			if ((prevActivator->m_decayIndex != pActivator->m_decayIndex) && prevActivator->m_bIsInTrigger && pActivator->m_bIsInTrigger)
-					canTriggerProceed = true;
-		}
-		else
-		{
-			if (pActivator->m_decayIndex == this->m_decayIndex)
-				canTriggerProceed = true;
-		}
-	}
-	// set previous activator only after the value was needed
-	prevActivator = pActivator;
-
-	if (0 == (pev->spawnflags & 256 && pActivator->Classify() == CLASS_PLAYER))
-		canTriggerProceed = true;
-
-	if (!canTriggerProceed)
-		return;
-
 
 	if (FClassnameIs(pev, "trigger_secret"))
 	{

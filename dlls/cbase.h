@@ -391,10 +391,6 @@ public:
 	float wpn_accuracy = 0.0f;
 
 	int p_dmgTaken = 0;
-
-	// used to determine if player is still
-	// standing in the trigger
-	bool m_bIsInTrigger = false;
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == NULL) || FNullEnt(ent->edict()); }
