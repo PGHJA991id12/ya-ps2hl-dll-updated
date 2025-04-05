@@ -561,6 +561,10 @@ public:
 #endif
 	}
 
+	// PS2HLU
+	// Used for autoaim
+	void WeaponIdle() override;
+
 private:
 	unsigned short m_usCrowbar;
 };

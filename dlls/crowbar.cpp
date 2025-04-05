@@ -309,3 +309,8 @@ bool CCrowbar::Swing(bool fFirst)
 	}
 	return fDidHit;
 }
+
+void CCrowbar::WeaponIdle()
+{
+	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+}

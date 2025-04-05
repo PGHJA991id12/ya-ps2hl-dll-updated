@@ -118,6 +118,8 @@ void CHandGrenade::WeaponIdle()
 	if (m_flReleaseThrow == 0 && 0 != m_flStartThrow)
 		m_flReleaseThrow = gpGlobals->time;
 
+	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 

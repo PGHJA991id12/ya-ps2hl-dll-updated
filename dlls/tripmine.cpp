@@ -493,6 +493,8 @@ void CTripmine::WeaponIdle()
 	//If we're here then we're in a player's inventory, and need to use this body
 	pev->body = 0;
 
+	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 

@@ -446,6 +446,8 @@ void CSatchel::Detonate()
 
 void CSatchel::WeaponIdle()
 {
+	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 

@@ -564,6 +564,8 @@ void CSqueak::SecondaryAttack()
 
 void CSqueak::WeaponIdle()
 {
+	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 

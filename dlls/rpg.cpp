@@ -524,6 +524,8 @@ void CRpg::WeaponIdle()
 {
 	UpdateSpot();
 
+	m_pPlayer->GetAutoaimVector(AUTOAIM_10DEGREES);
+
 	if (m_flTimeWeaponIdle > UTIL_WeaponTimeBase())
 		return;
 
