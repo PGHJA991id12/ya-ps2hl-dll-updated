@@ -119,4 +119,18 @@ public:
 
 	MONSTERSTATE GetIdealState() override;
 	Schedule_t* GetScheduleOfType(int iType) override;
+
+	// PS2HLU
+	Vector BodyTarget(const Vector& posSrc) override
+	{
+		int numAttachments = GetNumAttachments();
+		if (numAttachments > 0)
+		{
+			Vector attachmentVec;
+			Vector vecEmpty;
+			GetAttachment(numAttachments, attachmentVec, vecEmpty);
+			return attachmentVec;
+		}
+		return Center() * 0.75 + EyePosition() * 0.25;
+	}
 };

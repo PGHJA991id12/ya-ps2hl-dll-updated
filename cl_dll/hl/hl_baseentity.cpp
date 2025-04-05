@@ -181,6 +181,7 @@ void CBaseAnimating::InitBoneControllers() {}
 float CBaseAnimating::SetBlending(int iBlender, float flValue) { return 0; }
 void CBaseAnimating::GetBonePosition(int iBone, Vector& origin, Vector& angles) {}
 void CBaseAnimating::GetAttachment(int iAttachment, Vector& origin, Vector& angles) {}
+int CBaseAnimating::GetNumAttachments() { return 0; } // PS2HLU
 int CBaseAnimating::FindTransition(int iEndingSequence, int iGoalSequence, int* piDir) { return -1; }
 void CBaseAnimating::GetAutomovement(Vector& origin, Vector& angles, float flInterval) {}
 void CBaseAnimating::SetBodygroup(int iGroup, int iValue) {}

@@ -72,7 +72,7 @@ void COsprey::Spawn()
 
 	//Set FL_FLY so the Osprey model is interpolated.
 	pev->flags |= FL_MONSTER | FL_FLY;
-	pev->takedamage = DAMAGE_YES;
+	pev->takedamage = DAMAGE_AIM; // PS2HLU allow autoaiming
 	m_flRightHealth = 200;
 	m_flLeftHealth = 200;
 	pev->health = 400;

@@ -210,6 +210,19 @@ void CBaseAnimating::GetAttachment(int iAttachment, Vector& origin, Vector& angl
 	GET_ATTACHMENT(ENT(pev), iAttachment, origin, angles);
 }
 
+// PS2HLU
+#include "studio.h"
+int CBaseAnimating::GetNumAttachments()
+{
+	void* pmodel = GET_MODEL_PTR(ENT(pev));
+	studiohdr_t* pstudiohdr = (studiohdr_t*)pmodel;
+
+	if (!pstudiohdr || pev->sequence < 0 || pev->sequence >= pstudiohdr->numseq)
+		return 0;
+
+	return pstudiohdr->numattachments;
+}
+
 //=========================================================
 //=========================================================
 int CBaseAnimating::FindTransition(int iEndingSequence, int iGoalSequence, int* piDir)

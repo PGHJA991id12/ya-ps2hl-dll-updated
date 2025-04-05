@@ -152,6 +152,20 @@ public:
 	virtual void SetAnswerQuestion(CTalkMonster* pSpeaker);
 	virtual int FriendNumber(int arrayNumber) { return arrayNumber; }
 
+	// PS2HLU
+	Vector BodyTarget(const Vector& posSrc) override
+	{
+		int numAttachments = GetNumAttachments();
+		if (numAttachments > 0)
+		{
+			Vector attachmentVec;
+			Vector vecEmpty;
+			GetAttachment(numAttachments, attachmentVec, vecEmpty);
+			return attachmentVec;
+		}
+		return Center() * 0.75 + EyePosition() * 0.25;
+	}
+
 	bool Save(CSave& save) override;
 	bool Restore(CRestore& restore) override;
 	static TYPEDESCRIPTION m_SaveData[];

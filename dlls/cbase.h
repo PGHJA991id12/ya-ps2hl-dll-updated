@@ -358,6 +358,9 @@ public:
 	virtual Vector Center() { return (pev->absmax + pev->absmin) * 0.5; } // center point of entity
 	virtual Vector EyePosition() { return pev->origin + pev->view_ofs; }  // position of eyes
 	virtual Vector EarPosition() { return pev->origin + pev->view_ofs; }  // position of ears
+
+	// PS2HLU
+	// Theres a brand new attachment point on most models, that the crosshair will try to stick to
 	virtual Vector BodyTarget(const Vector& posSrc) { return Center(); }  // position to shoot at
 
 	virtual int Illumination() { return GETENTITYILLUM(ENT(pev)); }
@@ -518,6 +521,7 @@ public:
 	void GetAutomovement(Vector& origin, Vector& angles, float flInterval = 0.1);
 	int FindTransition(int iEndingSequence, int iGoalSequence, int* piDir);
 	void GetAttachment(int iAttachment, Vector& origin, Vector& angles);
+	int GetNumAttachments(); // PS2HLU
 	void SetBodygroup(int iGroup, int iValue);
 	int GetBodygroup(int iGroup);
 	bool ExtractBbox(int sequence, float* mins, float* maxs);
