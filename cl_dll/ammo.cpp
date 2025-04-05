@@ -117,12 +117,18 @@ void WeaponsResource::LoadWeaponSprites(WEAPON* pWeapon)
 	else
 		pWeapon->hCrosshair = 0;
 
-	// PS2HL - give a choice to enable old crosshairs
-	if (cl_ps2hl_oldsights->value != 0)
-		p = GetSpriteList(pList, "autoaimold", iRes, i);
+	// PS2HLU
+	p = GetSpriteList(pList, "autoaimold", iRes, i);
+	if (p)
+	{
+		sprintf(sz, "sprites/%s.spr", p->szSprite);
+		pWeapon->hAutoaimOld = SPR_Load(sz);
+		pWeapon->rcAutoaimOld = p->rc;
+	}
 	else
-		p = GetSpriteList(pList, "autoaim", iRes, i);
-
+		pWeapon->hAutoaimOld = 0;
+		
+	p = GetSpriteList(pList, "autoaim", iRes, i);
 	if (p)
 	{
 		sprintf(sz, "sprites/%s.spr", p->szSprite);
@@ -567,12 +573,12 @@ bool CHudAmmo::MsgFunc_HideWeapon(const char* pszName, int iSize, void* pbuf)
 	{
 		static Rect nullrc;
 		gpActiveSel = NULL;
-		SetCrosshair(0, nullrc, 0, 0, 0);
+		gHUD.m_HudLock.SetCrosshair(0, nullrc, {0, 0, 0});
 	}
 	else
 	{
 		if (m_pWeapon)
-			SetCrosshair(m_pWeapon->hCrosshair, m_pWeapon->rcCrosshair, 255, 255, 255);
+			gHUD.m_HudLock.SetCrosshair(m_pWeapon->hCrosshair, m_pWeapon->rcCrosshair, {255, 255, 255});
 	}
 
 	return true;
@@ -601,11 +607,11 @@ bool CHudAmmo::MsgFunc_CurWeapon(const char* pszName, int iSize, void* pbuf)
 	}
 
 	// PS2HL - update lock state
-	gHUD.m_HudLock.SetState(fOnTarget);
+	gHUD.m_HudLock.SetState(iState);
 
 	if (iId < 1)
 	{
-		SetCrosshair(0, nullrc, 0, 0, 0);
+		gHUD.m_HudLock.SetCrosshair(0, nullrc, {0, 0, 0});
 		m_pWeapon = nullptr;
 		return false;
 	}
@@ -645,17 +651,17 @@ bool CHudAmmo::MsgFunc_CurWeapon(const char* pszName, int iSize, void* pbuf)
 
 		if (gHUD.m_iFOV >= 90)
 		{ // normal crosshairs
-			if (fOnTarget && m_pWeapon->hAutoaim)
-				SetCrosshair(m_pWeapon->hAutoaim, m_pWeapon->rcAutoaim, 255, 255, 255);
+			if (fOnTarget && m_pWeapon->hAutoaimOld)
+				gHUD.m_HudLock.SetCrosshair(m_pWeapon->hAutoaimOld, m_pWeapon->rcAutoaimOld, {255, 255, 255});
 			else
-				SetCrosshair(m_pWeapon->hCrosshair, m_pWeapon->rcCrosshair, 255, 255, 255);
+				gHUD.m_HudLock.SetCrosshair(m_pWeapon->hCrosshair, m_pWeapon->rcCrosshair, {255, 255, 255});
 		}
 		else
 		{ // zoomed crosshairs
 			if (fOnTarget && m_pWeapon->hZoomedAutoaim)
-				SetCrosshair(m_pWeapon->hZoomedAutoaim, m_pWeapon->rcZoomedAutoaim, 255, 255, 255);
+				gHUD.m_HudLock.SetCrosshair(m_pWeapon->hZoomedAutoaim, m_pWeapon->rcZoomedAutoaim, {255, 255, 255});
 			else
-				SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, 255, 255, 255);
+				gHUD.m_HudLock.SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, {255, 255, 255});
 		}
 	}
 	else
@@ -663,9 +669,9 @@ bool CHudAmmo::MsgFunc_CurWeapon(const char* pszName, int iSize, void* pbuf)
 		// New crosshairs //
 
 		if (gHUD.m_iFOV >= 90)
-			SetCrosshair(m_pWeapon->hCrosshair, m_pWeapon->rcCrosshair, 255, 255, 255);
+			gHUD.m_HudLock.SetCrosshair(m_pWeapon->hCrosshair, m_pWeapon->rcCrosshair, {255, 255, 255});
 		else
-			SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, 255, 255, 255);
+			gHUD.m_HudLock.SetCrosshair(m_pWeapon->hZoomedCrosshair, m_pWeapon->rcZoomedCrosshair, {255, 255, 255});
 
 		gHUD.m_HudLock.SetSprite(m_pWeapon->hAutoaim, m_pWeapon->rcAutoaim);
 	}

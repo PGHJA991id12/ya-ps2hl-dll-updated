@@ -47,6 +47,8 @@ struct WEAPON
 	Rect rcAmmo2;
 	HSPRITE hCrosshair;
 	Rect rcCrosshair;
+	HSPRITE hAutoaimOld;
+	Rect rcAutoaimOld;
 	HSPRITE hAutoaim;
 	Rect rcAutoaim;
 	HSPRITE hZoomedCrosshair;

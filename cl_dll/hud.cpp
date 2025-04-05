@@ -546,6 +546,9 @@ void CHud::Init()
 	cl_bobtilt = CVAR_CREATE("cl_bobtilt", "0", FCVAR_ARCHIVE);
 	r_decals = gEngfuncs.pfnGetCvarPointer("r_decals");
 
+	// PS2HLU
+	m_pCvarCrosshair = gEngfuncs.pfnGetCvarPointer("crosshair");
+
 	m_pSpriteList = NULL;
 
 	// Clear any old HUD list

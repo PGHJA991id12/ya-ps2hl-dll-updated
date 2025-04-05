@@ -130,7 +130,10 @@ void CHalfLifeRules::PlayerSpawn(CBasePlayer* pPlayer)
 //=========================================================
 bool CHalfLifeRules::AllowAutoTargetCrosshair()
 {
-	return (g_iSkillLevel == SKILL_EASY);
+	// PS2HLU
+	// having this disabled causes an odd state of
+	// the crosshair targeting enemies, but not having fOnTarget set
+	return true;
 }
 
 //=========================================================

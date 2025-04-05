@@ -2815,6 +2815,8 @@ pt_end:
 
 	// Track button info so we can detect 'pressed' and 'released' buttons next frame
 	m_afButtonLast = pev->button;
+
+	//ALERT(at_console, "player x angle: %f \n", pev->angles.y);
 }
 
 
@@ -4578,19 +4580,18 @@ Vector CBasePlayer::GetAutoaimVector(float flDelta)
 	// m_vecAutoAim = m_vecAutoAim * 0.99;
 
 	// Don't send across network if sv_aim is 0
-	if (g_psv_aim->value != 0 && g_psv_allow_autoaim != 0)
+	if (g_psv_aim->value != 0)
 	{
 		if (m_vecAutoAim.x != m_lastx ||
 			m_vecAutoAim.y != m_lasty)
 		{
 			// PS2HL - this is bugged: sometimes it makes crosshair to stay off center after aim assist is finished
-			// SET_CROSSHAIRANGLE( edict(), -m_vecAutoAim.x, m_vecAutoAim.y );
+			//SET_CROSSHAIRANGLE( edict(), -m_vecAutoAim.x, m_vecAutoAim.y );
 
-			//// PS2HL - update HUD lock offset (doesn't work, don't have time to investigate)
-			// MESSAGE_BEGIN(MSG_ONE, gmsgHudLockOff, NULL, pev);
-			// WRITE_COORD(m_vecAutoAim.x);
-			// WRITE_COORD(m_vecAutoAim.y);
-			// MESSAGE_END();
+			MESSAGE_BEGIN(MSG_ONE, gmsgLockOffs, NULL, pev);
+			WRITE_COORD(m_vecAutoAim.x);
+			WRITE_COORD(m_vecAutoAim.y);
+			MESSAGE_END();
 
 			m_lastx = m_vecAutoAim.x;
 			m_lasty = m_vecAutoAim.y;
@@ -4603,7 +4604,12 @@ Vector CBasePlayer::GetAutoaimVector(float flDelta)
 
 	// ALERT( at_console, "%f %f\n", angles.x, angles.y );
 
-	UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
+	// PS2HLU
+	// Weapons dont change their firing angle, this functionality was replaced
+	// in favor of the lock-on mechanic
+
+	//UTIL_MakeVectors(pev->v_angle + pev->punchangle + m_vecAutoAim);
+	UTIL_MakeVectors(pev->v_angle + pev->punchangle);
 	return gpGlobals->v_forward;
 }
 
@@ -4617,7 +4623,7 @@ Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelt
 	edict_t* bestent;
 	TraceResult tr;
 
-	if (g_psv_aim->value == 0 || g_psv_allow_autoaim->value == 0)
+	if (g_psv_aim->value == 0)
 	{
 		m_fOnTarget = false;
 		return g_vecZero;
@@ -4633,8 +4639,11 @@ Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelt
 	m_fOnTarget = false;
 	m_bIsTargetFriendly = true;
 
+	// PS2HLU
+	// This code returns a zero vector if the players cursor is on the targeted entity,
+	// this behaviour is gone in the PS2 version, to aid with aiming/lockon
+	/*
 	UTIL_TraceLine(vecSrc, vecSrc + bestdir * flDist, dont_ignore_monsters, edict(), &tr);
-
 
 	if (tr.pHit && tr.pHit->v.takedamage != DAMAGE_NO)
 	{
@@ -4647,6 +4656,7 @@ Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelt
 			return m_vecAutoAim;
 		}
 	}
+	*/
 
 	for (int i = 1; i < gpGlobals->maxEntities; i++, pEdict++)
 	{
@@ -4708,6 +4718,7 @@ Vector CBasePlayer::AutoaimDeflection(Vector& vecSrc, float flDist, float flDelt
 				continue;
 		}
 
+		// PS2HLU
 		if (IRelationship(pEntity) > 0)
 			m_bIsTargetFriendly = false;
 
@@ -4738,7 +4749,13 @@ void CBasePlayer::ResetAutoaim()
 	if (m_vecAutoAim.x != 0 || m_vecAutoAim.y != 0)
 	{
 		m_vecAutoAim = Vector(0, 0, 0);
-		SET_CROSSHAIRANGLE(edict(), 0, 0);
+
+		//SET_CROSSHAIRANGLE(edict(), 0, 0);
+
+		MESSAGE_BEGIN(MSG_ONE, gmsgLockOffs, NULL, pev);
+		WRITE_COORD(m_vecAutoAim.x);
+		WRITE_COORD(m_vecAutoAim.y);
+		MESSAGE_END();
 	}
 	m_fOnTarget = false;
 	m_bIsTargetFriendly = true;

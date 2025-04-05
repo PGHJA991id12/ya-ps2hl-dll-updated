@@ -127,17 +127,27 @@ public:
 	void Reset(void) override;
 	
 	void SetSprite	(HSPRITE hspr, Rect rc);
-	void SetState		(bool Active);
-	//void CHudLock::SetOffsets	(int OffsetX, int OffsetY);
-	//int MsgFunc_HudLockOff(const char *pszName, int iSize, void *pbuf);
+	void SetState		(int iState);
+	bool MsgFunc_LockOffs(const char* pszName, int iSize, void* pbuf);
+	void SetCrosshair(HSPRITE sprite, Rect rect, Vector color);
 
 private:
 	HSPRITE m_hLock;
 	Rect m_rcLock;
 
 	int m_iActive;
-	int m_iOffX;
-	int m_iOffY;
+	
+	// PS2HLU
+	HSPRITE m_hCrosshair = 0;
+	Rect m_rcCrosshair{};
+	Vector vecCrosshairColor{};
+	Vector autoaimAngle{};
+
+	float m_fX;
+	float m_fY;
+	float m_fTargetX;
+	float m_fTargetY;
+	int framesRemaining = 0;
 };
 
 //
@@ -608,6 +618,7 @@ public:
 	// color support from Half-Life: Unified SDK
 	//Vector HudColor = { 255, 160, 0 };
 	unsigned long HudColor = 0x00FFA000;
+	cvar_t* m_pCvarCrosshair;
 
 	int m_iFontHeight;
 	int DrawHudNumber(int x, int y, int iFlags, int iNumber, int r, int g, int b);

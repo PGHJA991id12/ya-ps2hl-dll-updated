@@ -68,7 +68,7 @@ void LinkUserMessages()
 
 	// PS2HL
 	gmsgHudMode = REG_USER_MSG("HudMode", 1);		 // HUD mode
-	gmsgHudLockOff = REG_USER_MSG("HudLockOff", -1); // HUD lock offset
+	gmsgLockOffs = REG_USER_MSG("LockOffs", 4); // HUD lock offset
 
 	// PS2HLU
 	gmsgExtremeFunnel = REG_USER_MSG("BigFunnel", -1); // 54

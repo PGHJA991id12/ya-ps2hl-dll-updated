@@ -197,12 +197,14 @@ public:
 	bool m_fOnTarget;
 
 	// PS2HLU
-	bool m_bIsTargetFriendly;
+	bool m_bIsTargetFriendly = true;
 
 	int m_iDeaths;
 	float m_flRespawnTimer; // used in PlayerDeathThink() to make sure players can always respawn
 
-	int m_lastx, m_lasty; // These are the previous update's crosshair angles, DON"T SAVE/RESTORE
+	// PS2HLU
+	// GetAutoAimVector was comparing vec_t (float)s with ints and it was obviously always failing
+	float m_lastx, m_lasty; // These are the previous update's crosshair angles, DON"T SAVE/RESTORE
 
 	int m_nCustomSprayFrames = -1; // Custom clan logo frames for this player
 	float m_flNextDecalTime;  // next time this player can spray a decal

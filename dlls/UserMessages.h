@@ -57,10 +57,10 @@ inline int gmsgWeapons = 0;
 
 // PS2HL
 inline int gmsgHudMode = 0;	// HUD mode
-inline int gmsgHudLockOff = 0; // HUD lock offset
 
 // PS2HLU
 inline int gmsgHudColor = 0;
+inline int gmsgLockOffs = 0;	  // HUD lock offset
 inline int gmsgExtremeFunnel = 0; // Big sprite funnel & burst effect
 inline int gmsgTankUse = 0;
 inline int gmsgTankAmmo = 0;
